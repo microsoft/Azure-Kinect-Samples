@@ -1,0 +1,32 @@
+FROM ubuntu:bionic AS base
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository -y ppa:aziotsdklinux/ppa-azureiot && \
+    apt-get update && \
+    apt-get install -y azure-iot-sdk-c-dev libusb-1.0-0 libgl1-mesa-glx libgl1-mesa-dri && \
+    rm -rf /var/lib/apt/lists/*
+
+# TODO These lines should be replaced with an apt-get install once it is hosted
+COPY ./k4asdk_1.0.0_amd64.deb /
+RUN dpkg -i /k4asdk_1.0.0_amd64.deb
+    
+FROM base AS build-env
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends pkg-config ninja-build cmake git libgl-dev git-lfs clang gcc-multilib g++-multilib make libusb-1.0-0-dev libgl1-mesa-dev libsoundio-dev libvulkan-dev libx11-dev libxcursor-dev libxinerama-dev libxrandr-dev libssl-dev mesa-common-dev && \
+    rm -rf /var/lib/apt/lists/* 
+
+FROM build-env AS build-iotedgemodule
+COPY . /app
+WORKDIR /app
+RUN cmake .
+RUN make
+
+FROM base
+RUN echo "/usr/bin/" >> /etc/ld.so.conf.d/k4a.conf
+RUN ldconfig
+ENV DISPLAY :0
+WORKDIR /app
+COPY --from=build-iotedgemodule /app/main ./
+RUN useradd -ms /bin/bash moduleuser
+USER moduleuser
+CMD ["./main"]

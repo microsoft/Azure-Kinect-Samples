@@ -1,0 +1,15 @@
+{
+  "$schema-version": "0.0.1",
+  "description": "",
+  "image": {
+    "repository": "localhost:5000/k4amodule",
+    "tag": {
+      "version": "0.0.1",
+      "platforms": {
+        "amd64": "./Dockerfile.amd64"
+      }
+    },
+    "buildOptions": []
+  },
+  "language": "c"
+}
