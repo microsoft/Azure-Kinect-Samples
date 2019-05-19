@@ -55,7 +55,7 @@ These instructions will guide you throug initial Docker setup, installing Azure 
 # Samples
 ![NodeJS](images/logo_nodejs.png)
 
-We provided rich set of NodeJS samples for you. You can find all NodeJS samples at [nodejs](nodejs) folder.  
+We provided rich set of NodeJS samples for you. NodeJS samples can be found at [nodejs](nodejs) folder.
 Please see start page at http://localhost:8888, once you run Azure Kinect Streaming Service container to run sample and learn more how to use Websocket URL parameters to access Azure Kinect streams.  
 http://localhost:8888 web page provides instructions how to build container with your own NodeJS solution, using Azure Kinect Streaming Service!  
   
