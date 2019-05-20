@@ -4,7 +4,7 @@
 Set of samples for to demonstrate how to access Azure Kinect DK streams from javascript. 
 
 ## Prerequisites
-- NoddJS installed (Instructions [HERE](https://nodejs.org/en/))
+- NodeJS installed (Instructions [HERE](https://nodejs.org/en/))
 - Azure Kinect Streaming Service running
 
 ## Run Samples
