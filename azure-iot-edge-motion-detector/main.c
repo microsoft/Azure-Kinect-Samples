@@ -32,7 +32,7 @@ typedef struct MOTION_DETECTOR_TAG
 static void ModuleTwinCallback(DEVICE_TWIN_UPDATE_STATE updateState, const unsigned char *payLoad, size_t size, void *userContextCallback)
 {
     printf("\r\nTwin callback called with (state=%s, size=%zu):\r\n%s\r\n",
-          ENUM_TO_STRING(DEVICE_TWIN_UPDATE_STATE, updateState), size, payLoad);
+          MU_ENUM_TO_STRING(DEVICE_TWIN_UPDATE_STATE, updateState), size, payLoad);
 
     JSON_Value *root_value = json_parse_string(payLoad);
     JSON_Object *root_object = json_value_get_object(root_value);
@@ -86,7 +86,7 @@ static int SetupCallbacksForModule(IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubModuleCl
     if (IoTHubModuleClient_LL_SetModuleTwinCallback(iotHubModuleClientHandle, ModuleTwinCallback, (void *)iotHubModuleClientHandle) != IOTHUB_CLIENT_OK)
     {
         printf("ERROR: IoTHubModuleClient_LL_SetModuleTwinCallback(default)..........FAILED!\r\n");
-        ret = __FAILURE__;
+        ret = MU_FAILURE;
     }
     else
     {
