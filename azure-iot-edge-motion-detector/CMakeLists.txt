@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
+find_package(k4a 1.1 REQUIRED)
+
 macro(compileAsC99)
   if (CMAKE_VERSION VERSION_LESS "3.1")
     if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -49,5 +51,5 @@ target_link_libraries(main
     m
     uuid
     my_parson
-    k4a
+    k4a::k4a
 )
