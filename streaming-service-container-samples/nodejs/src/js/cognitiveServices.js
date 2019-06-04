@@ -33,7 +33,7 @@ var CognitiveServices = function(uri, subscriptionKey)
         
         requestInProgress = true;
 
-        var queryURL = uriBase + "?" + faceRecognitionParams;
+        var queryURL = uriBase + '/face/v1.0/detect?' + faceRecognitionParams;
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', queryURL, true);

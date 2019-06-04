@@ -6,15 +6,12 @@ module.exports =
 {
   entry: 
   [
+    __dirname + "/src/index.html",
     __dirname + "/src/depth.html",
     __dirname + "/src/infrared.html",
     __dirname + "/src/multiplex.html",
     __dirname + "/src/cognitive.html",
-    __dirname + "/src/color.html",
-    __dirname + "/src/examples.css",
-    __dirname + "/src/core.css",
-    __dirname + "/src/azurekinect.jpg",
-    __dirname + "/src/latest.woff2"
+    __dirname + "/src/color.html"
   ],
   output: 
   {
@@ -50,6 +47,11 @@ module.exports =
   },
   devtool: 'source-map',
   plugins: [
+    new HtmlWebPackPlugin({
+        title: 'Kinect for Azure - RGB',
+        template: __dirname + "/src/index.html",
+        filename: "index.html"
+    }),
     new HtmlWebPackPlugin({
       title: 'Kinect for Azure - Depth',
       template: __dirname + "/src/depth.html",
