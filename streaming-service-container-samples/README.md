@@ -4,7 +4,7 @@
 Azure Kinect Streaming Service is executable deployed as Docker container, that exposes Azure Kinect streams using [WebSocket](https://www.websocket.org/) protocol, [RFC 6455](https://tools.ietf.org/html/rfc6455). 
 Websocket is supported by most popular languages to write machine learning code: 
 
-![C#](images\logo_Csharp.png) ![NodeJS](images\logo_nodejs.png)	![Python](images\logo_python.png) ![Java](images\logo_java.png)	![Go](images\logo_go.png)
+![C#](images/logo_Csharp.png) ![NodeJS](images/logo_nodejs.png)	![Python](images/logo_python.png) ![Java](images/logo_java.png)	![Go](images/logo_go.png)
 
 Azure Kinect Streaming Service provides is fastest way to integrate your Azure Kinect device with [Microsoft Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/).
 
@@ -42,13 +42,13 @@ These instructions will guide you throug initial Docker setup, installing Azure 
 - To verify access please follow C# sample instructions below to place **Endpoint** and **Service Subscription Key** to proper places in code.
 
 # Samples
-![NodeJS](images\logo_nodejs.png)
+![NodeJS](images/logo_nodejs.png)
 
 We provided rich set of NodeJS samples for you. You can find all NodeJS samples at [nodejs](nodejs) folder.  
 Please see start page at http://localhost:8888, once you run Azure Kinect Streaming Service container to run sample and learn more how to use Websocket URL parameters to access Azure Kinect streams.  
 http://localhost:8888 web page provides instructions how to build container with your own NodeJS solution, using Azure Kinect Streaming Service!  
   
-![C#](images\logo_Csharp.png)
+![C#](images/logo_Csharp.png)
 
 [Face Detection](c-sharp) sample demonstrates how to build C# solution to access Azure Kinect color stream remotely and use it with [Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/) to detect face.  
 Pattern in sample can be easily used to access other Azure Kinect streams and use them with other Cognitive Servcies to build rich computer vision and speech applications.
@@ -59,7 +59,7 @@ Pattern in sample can be easily used to access other Azure Kinect streams and us
 - For more information how to access other Azure Kinect streams, please run Azure Kinect Streaming Servcie container, and see http://localhost:8888, API menu option.
 - For more information how to use other [Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/), please follow up tutorials for [Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/) of your interest.
 
-![Python](images\logo_python.png)
+![Python](images/logo_python.png)
 
 [colorStream.py](python/colorStream.py) is simple Python application to demonstrate how to access Azure Kinect color stream, exposed by Azure Kinect Streaming Service.
 - **Instructions** to install dependencies necessary for colorStream.py to work:
