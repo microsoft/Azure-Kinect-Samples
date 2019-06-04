@@ -22,6 +22,6 @@ Set of samples for to demonstrate how to access Azure Kinect DK streams from jav
 In order to run Cognitive Services - Face Detection sample you have to setup Cognitive Services Access. 
 
 - Please follow [instructions](../README.md), **Setup Congitive Services Access** section.
-- Replace *\<Service Subscription Key\>* and *\<Endpoint\>* strings, in cognition.html file, with values from previous step.
+- Replace *\<Service Subscription Key\>* and *\<Endpoint\>* strings, in cognitive.html file, with values from previous step.
 
 
