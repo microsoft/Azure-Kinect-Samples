@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
@@ -12,7 +15,6 @@ namespace FaceDetection
         static object   _lock = new object();
         static string   cameraUrl = "localhost";
         static string   framerate = "15";
-        static bool     terminate = false;
 
         /// <summary>
         /// Main thread procedure to drive DisplayStream form message processing.
@@ -148,7 +150,6 @@ namespace FaceDetection
                 displayThread.Join();
             }
 
-            terminate = true;
             colorStreamThread.Join();
             depthStreamThread.Join();
         }

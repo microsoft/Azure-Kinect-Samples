@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 var FaceRecognitionVisualizer = function(surfaceElementId, contentElementId)
 {
     "use strict";
@@ -124,6 +127,127 @@ var FaceRecognitionVisualizer = function(surfaceElementId, contentElementId)
     function Round(value, decimals) 
     {
         return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+    }
+}
+
+// Body Tracking Visualization
+var AudioVisualizer = function(surfaceCanvasId, samplingRate, numOfChannels)
+{
+    "use strict";
+
+    var surfaceId = surfaceCanvasId;
+    var surfaceContext = surfaceId.getContext('2d');
+    var samplingRate = samplingRate;
+    var numOfChannels = numOfChannels;
+
+    const AUDIO_CONTENT_SIZE = 5;
+    const VISUALIZATION_INTERVAL = 100;                  // We will try to draw frames for number of milliseconds showed here.
+    var audioContent = new Array(AUDIO_CONTENT_SIZE);   
+    var readingPosition = 0;
+    var pushingPosition = 0;
+    
+    // Drawing members
+    var timerInterval;                                          // Reference to interval we set for drawing wave length 
+    var readingPointer = 0;                                     // Sample reading pointer.
+
+    this.PushAudioData = function(audioData)
+    {
+        audioContent[pushingPosition++] = audioData;
+
+        pushingPosition %= AUDIO_CONTENT_SIZE;
+    }
+
+    this.Start = function()
+    {
+        timerInterval = window.setInterval(VisualizeAudio, VISUALIZATION_INTERVAL);
+        console.log(surfaceContext);
+    }
+
+    this.Stop = function()
+    {
+        window.clearInterval(timerInterval);
+    }
+
+    // Function will check if there are enough samples to read from audioContent.
+    function IsThereEnoughSamples(numOfSamples)
+    {
+        var retVal = false;
+        var availableSamples = 0;
+        var currentPos = readingPosition;
+
+        if (currentPos != pushingPosition)
+        {
+            availableSamples = (audioContent[currentPos].length - readingPointer) / numOfChannels;
+            if (availableSamples < numOfSamples)
+            {
+                ++currentPos;
+                currentPos %= AUDIO_CONTENT_SIZE;
+                while (currentPos != pushingPosition)
+                {
+                    availableSamples += audioContent[currentPos++].length / numOfChannels;
+                    currentPos %= AUDIO_CONTENT_SIZE;
+                    if (availableSamples >= numOfSamples)
+                    {
+                        retVal = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                retVal = true;
+            }
+        }
+
+        return retVal;
+    }
+
+    function VisualizeAudio()
+    {
+        if (readingPosition != pushingPosition)
+        {
+            var frameInterval = samplingRate / VISUALIZATION_INTERVAL;
+
+            while(IsThereEnoughSamples(frameInterval) == true)
+            {
+                surfaceContext.clearRect(0, 0, surfaceId.width, surfaceId.height);
+                var stepX = surfaceId.width / frameInterval;
+                var stepY = surfaceId.height / (numOfChannels + 1);
+                surfaceContext.beginPath();
+                
+                var tempReadingPointer = readingPointer;
+                var teampReadingPosition = readingPosition;
+
+                for (var channelNo = 0; channelNo < numOfChannels; channelNo++)
+                {
+                    readingPointer = tempReadingPointer;
+                    readingPosition = teampReadingPosition;
+                    for (var i = 0; i < frameInterval; i++)
+                    {
+                        const x = i * stepX;
+                        const y = (channelNo * stepY) + (0.5 + (audioContent[readingPosition][readingPointer + channelNo] / 2)) * 200;
+                        
+                        readingPointer += numOfChannels;
+                        if (readingPointer > audioContent[readingPosition].length)
+                        {
+                            readingPointer = 0;
+                            ++readingPosition;
+                            readingPosition %= AUDIO_CONTENT_SIZE;
+                        }
+
+                        if (i == 0)
+                        {
+                            surfaceContext.moveTo(x, y);
+                        }
+                        else
+                        {
+                            surfaceContext.lineTo(x, y);
+                        }
+                    }
+                }
+                surfaceContext.stroke();
+            }
+        }
     }
 }
 
