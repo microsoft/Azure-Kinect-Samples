@@ -20,19 +20,23 @@ Instructions will guide you throug initial Docker setup, installing Azure Kinect
   - Please follow [instructions](https://hub.docker.com/editions/community/docker-ce-desktop-windows) to download, install and run **Edge** version of docker for windows.
   - Switch to use windows containers. Detailed instructions can be found [here](https://docs.docker.com/docker-for-windows/#docker-settings-dialog), section *Switch between Windows and Linux containers*. 
 ### Install Azure Kinect Streaming Service Container
-- Login to Azure Container Registry (ACR) and get image. [Anonymous read-only access]((https://feedback.azure.com/forums/903958-azure-container-registry/suggestions/31655977-configure-permissions-at-a-repository-level)) is not yet available.
+Azure Kinect Streaming Service containers are stored in Azure Container Registry (ACR). The following steps will guide you to login with ACR and download latest version of containers.
+- Follow [instructions](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest) to download and install latest version of Azure CLI.
+- Login to Azure Container Registry (ACR) and get image using CMD window:
 	```
-	docker login samplecontainers.azurecr.io -u samplecontainers -p dRiESWMFW36DE3iqazuCq+xk3FOwTn8u
-	docker pull samplecontainers.azurecr.io/k4astreaming:1903
+    az login --service-principal --username a7fe827c-b58b-435a-9811-c657da7d4b19 --password 1391f64e-6ecf-4dd0-aa2e-bb91ac218fe1 --tenant 72f988bf-86f1-41af-91ab-2d7cd011db47
+    az acr login -n samplecontainers
+    docker pull samplecontainers.azurecr.io/k4astreaming:1903
 	``` 
 ### Run Azure Kinect Streaming Service in Container
 - Plug in Azure Kinect Camera
-- Run cmd with elevated privilege (As Administrator).
+- Start Azure Kinect Streaming Service container using CMD window:
 	```
 	docker run --device "class/F18A0E88-C30C-11D0-8815-00A0C906BED8" --device "class/A5DCBF10-6530-11D2-901F-00C04FB951ED" --device "class/875CFCC8-678E-4C12-BA03-5119D706A3F0" --device "class/65E8773D-8F56-11D0-A3B9-00A0C9223196" --device "class/875CFCC8-678E-4C12-BA03-5119D706A3F0" --device "class/AAF9A6D4-E299-4D55-990D-6F6F7324A717" --device "class/F97EE10A-5022-44BF-B0D0-729D453A33C6" --publish 8888:8888 --isolation process -it samplecontainers.azurecr.io/k4astreaming:1903
 	```
     - *--device* argument lists all hardware devices from host OS to be forwarded to container. They represent all USB hardware devices used by Azure Kinect.
 - To verify installation, click on link http://localhost:8888. On web page, select Camera Samples/Color Stream, pres Start and you should see color stream from camera.
+
 
 ## Getting Started (Linux Containers, Ubuntu 18.04, NVIDIA GPU)
 Instructions will guied you through initial Docker setup, installing Azure Kinect Streaming Service container and run samples on Linux Ubuntu 18.04 LTS operating system. This instructions will work with NVIDIA GPUs.
@@ -74,10 +78,13 @@ By default, only root users can access Azure Kinect sensor. For Docker container
 - Reboot your computer
 
 ### Install Azure Kinect Streaming Service Container
-- Login to Azure Container Registry (ACR) and get image. [Anonymous read-only access]((https://feedback.azure.com/forums/903958-azure-container-registry/suggestions/31655977-configure-permissions-at-a-repository-level)) is not yet available, using bash:
+Azure Kinect Streaming Service containers are stored in Azure Container Registry (ACR). The following steps will guide you to login with ACR and download latest version of containers.
+- Follow [instructions](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest) to download and install latest version of Azure CLI.
+- Login to Azure Container Registry (ACR) and get image using bash:
 	```
-	docker login samplecontainers.azurecr.io -u samplecontainers -p dRiESWMFW36DE3iqazuCq+xk3FOwTn8u
-	docker pull samplecontainers.azurecr.io/k4astreaming:18.04.nv430
+    az login --service-principal --username a7fe827c-b58b-435a-9811-c657da7d4b19 --password 1391f64e-6ecf-4dd0-aa2e-bb91ac218fe1 --tenant 72f988bf-86f1-41af-91ab-2d7cd011db47
+    az acr login -n samplecontainers
+    docker pull samplecontainers.azurecr.io/k4astreaming:18.04.nv430
 	``` 
 ### Run Azure Kinect Streaming Service in Container
 - Plug in Azure Kinect Sensor
