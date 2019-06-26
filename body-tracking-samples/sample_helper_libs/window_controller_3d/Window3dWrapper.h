@@ -44,7 +44,7 @@ public:
     void AddBone(k4a_float3_t joint1Position, k4a_float3_t joint2Position, Color color);
 
     // Helper function to directly add the whole body for rendering instead of adding separate joints and bones
-    void AddBody(const k4abt_body_t& body);
+    void AddBody(const k4abt_body_t& body, Color color);
 
     void Render();
 

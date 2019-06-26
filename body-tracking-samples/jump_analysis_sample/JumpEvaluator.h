@@ -6,7 +6,7 @@
 #include <vector>
 #include <k4abt.h>
 
-#include "HandRaiseDetector.h"
+#include "HandRaisedDetector.h"
 #include "Window3dWrapper.h"
 
 enum JumpStatus
@@ -40,35 +40,38 @@ private:
 
     float GetMinKneeAngleFromBody(k4abt_body_t body);
 
-    float GetTorsoAngleFromBody(k4abt_body_t body);
+    IndexValueTuple CalcualateJumpStartingPoint(const std::vector<float>& velocity, const std::vector<IndexValueTuple>& velocityPhases);
 
-    IndexValueTuple CalcualateJumpEndingPoint(const std::vector<float>& velocity);
+    IndexValueTuple CalcualateJumpEndingPoint(const std::vector<float>& velocity, const std::vector<IndexValueTuple>& velocityPhases);
 
-    IndexValueTuple CalcualateJumpStartingPoint(const std::vector<float>& velocity);
+    // Calculate characteristic points of velocity signal
     std::vector<IndexValueTuple> CalculatePhasesFromVelocity(const std::vector<float>& velocity);
 
     float CalculateStartHeight(std::vector<float> signal, size_t startingPoint = 10, size_t endingPoint = 30);
 
-    k4a_float3_t CalculateStartingPosition(int jumpStartIndex, int firstSquatIndex);
+    k4a_float3_t CalculateStandingPosition(int jumpStartIndex, int firstSquatIndex);
 
     void CreateRenderWindow(
         Window3dWrapper& window,
         std::string windowName,
         const k4abt_body_t& body,
         int windowIndex,
-        k4a_float3_t jumpStartPosition);
+        k4a_float3_t standingPosition);
 
 private:
+    // Constant settings for digial signal processing
+    const size_t MinimumBodyNumber = 20;  // Minimum number of bodies required in the body list to perform the jump analysis
+    const int AverageFilterWindowSize = 6;
+
+    // Internal status
     bool m_reviewWindowIsRunning = false;
+    JumpStatus m_jumpStatus = JumpStatus::Idle;
 
     std::vector<k4abt_body_t> m_listOfBodyPositions;
     std::vector<float> m_framesTimestampInUsec;
 
-    std::vector<k4abt_body_t> m_bodyArray;
-
-    JumpStatus m_jumpStatus = JumpStatus::Idle;
-    HandRaiseDetector m_handRaiseDetector;
-    bool m_previousHandsAreRaising = false;
+    HandRaisedDetector m_handRaisedDetector;
+    bool m_previousHandsAreRaised = false;
 
     Window3dWrapper m_window3dSquatPose;
     Window3dWrapper m_window3dJumpPeakPose;
