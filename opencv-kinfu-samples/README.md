@@ -12,16 +12,16 @@ If the user has OpenCV/OpenCV_Contrib/VTK installed, the OpenCV-specific code in
 - We pre-configured kinfu_example.vcxproj with opencv/opencv_contrib include/lib dependencies paths, the following is a list of dependencies we need for this sample:
 	```
 	Includes:
-	- extern\opencv-4.1.0\include
-	- extern\opencv_contrib-4.1.0\modules\rgbd\include
-	- extern\opencv_contrib-4.1.0\modules\viz\include
+	  extern\opencv-4.1.0\include
+	  extern\opencv_contrib-4.1.0\modules\rgbd\include
+	  extern\opencv_contrib-4.1.0\modules\viz\include
 	Libs:
-	- extern\lib\$(Configuration)\opencv_core410d.lib
-	- extern\lib\$(Configuration)\opencv_calib3d410d.lib
-	- extern\lib\$(Configuration)\opencv_rgbd410d.lib
-	- extern\lib\$(Configuration)\opencv_highgui410d.lib
-	- extern\lib\$(Configuration)\opencv_viz410d.lib
-	- extern\lib\$(Configuration)\opencv_imgproc410d.lib
+	  extern\lib\$(Configuration)\opencv_core410d.lib
+	  extern\lib\$(Configuration)\opencv_calib3d410d.lib
+	  extern\lib\$(Configuration)\opencv_rgbd410d.lib
+	  extern\lib\$(Configuration)\opencv_highgui410d.lib
+	  extern\lib\$(Configuration)\opencv_viz410d.lib
+	  extern\lib\$(Configuration)\opencv_imgproc410d.lib
 	```
 - You need to copy the opencv/opencv_contrib dlls as well as VTK dlls to the Visual Studio output bin folder which contains kinfu_example.exe and Azure Kinect binaries before running the application.
 
