@@ -19,7 +19,7 @@ namespace DSP
 
     std::vector<float> FirstDerivate(const std::vector<float>& signal);
 
-    std::vector<float> Divide2Arrays(std::vector<float>& dividend, std::vector<float>& divisor);
+    std::vector<float> DivideTwoArrays(std::vector<float>& dividend, std::vector<float>& divisor);
 
     IndexValueTuple FindMaximum(const std::vector<float>& signal, size_t minIdx, size_t maxIdx);
 

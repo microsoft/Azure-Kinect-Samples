@@ -19,13 +19,13 @@ void PrintAppUsage()
 {
     printf("\n");
     printf(" Basic Usage:\n\n");
-    printf(" 1. Make sure you place the camera parallel to the floor\n");
-    printf(" 2. Raise both of your hands above your head or hit 'space' key to start the jump session\n");
-    printf(" 3. Perform a jump. Try to land at the same location as the starting point\n");
-    printf(" 4. Raise both of your hands above your head or hit 'space' key again to finish the session\n");
-    printf(" 5. Three 3d windows will pop up to show the moment of your deepest squat, jump peak and a replay of your full jump session\n");
-    printf("    Your jump analysis results will also be printed out on the command prompt\n");
-    printf(" 6. Close any of the 3d windows to go back to the idle stage\n");
+    printf(" 1. Make sure you place the camera parallel to the floor and there is only one person in the scene.\n");
+    printf(" 2. Raise both of your hands above your head or hit 'space' key to start the jump session.\n");
+    printf(" 3. Perform a jump. Try to land at the same location as the starting point.\n");
+    printf(" 4. Raise both of your hands above your head or hit 'space' key again to finish the session.\n");
+    printf(" 5. Three 3d windows will pop up to show the moment of your deepest squat, jump peak and a replay of your full jump session.\n");
+    printf("    Your jump analysis results will also be printed out on the command prompt.\n");
+    printf(" 6. Close any of the 3d windows to go back to the idle stage.\n");
     printf("\n");
 }
 
@@ -75,8 +75,6 @@ int main()
     k4a_calibration_t sensorCalibration;
     VERIFY(k4a_device_get_calibration(device, deviceConfig.depth_mode, deviceConfig.color_resolution, &sensorCalibration),
         "Get depth camera calibration failed!");
-    int depthWidth = sensorCalibration.depth_camera_calibration.resolution_width;
-    int depthHeight = sensorCalibration.depth_camera_calibration.resolution_height;
 
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
@@ -126,26 +124,28 @@ int main()
 
             // Obtain original capture that generates the body tracking result
             k4a_capture_t originalCapture = k4abt_frame_get_capture(bodyFrame);
-            k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
 
-            std::vector<Color> pointCloudColors(depthWidth * depthHeight, { 1.f, 1.f, 1.f, 1.f });
+#pragma region Jump Analysis
+            // Update jump evaluator status
+            jumpEvaluator.UpdateStatus(s_spaceHit);
+            s_spaceHit = false;
 
-            // Read body index map and assign colors
-            k4a_image_t bodyIndexMap = k4abt_frame_get_body_index_map(bodyFrame);
-            const uint8_t* bodyIndexMapBuffer = k4a_image_get_buffer(bodyIndexMap);
-            for (int i = 0; i < depthWidth * depthHeight; i++)
+            // Add new body tracking result to the jump evaluator
+            const size_t JumpEvaluationBodyIndex = 0; // For simplicity, only run jump evaluation on body 0
+            if (k4abt_frame_get_num_bodies(bodyFrame) > 0)
             {
-                uint8_t bodyIndex = bodyIndexMapBuffer[i];
-                if (bodyIndex != K4ABT_BODY_INDEX_MAP_BACKGROUND)
-                {
-                    uint32_t bodyId = k4abt_frame_get_body_id(bodyFrame, bodyIndex);
-                    pointCloudColors[i] = g_bodyColors[bodyId % g_bodyColors.size()];
-                }
+                k4abt_body_t body;
+                VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, JumpEvaluationBodyIndex, &body.skeleton), "Get skeleton from body frame failed!");
+                body.id = k4abt_frame_get_body_id(bodyFrame, JumpEvaluationBodyIndex);
+
+                uint64_t timestampUsec = k4abt_frame_get_timestamp_usec(bodyFrame);
+                jumpEvaluator.UpdateData(body, timestampUsec);
             }
-            k4a_image_release(bodyIndexMap);
+#pragma endregion
 
             // Visualize point cloud
-            window3d.UpdatePointClouds(depthImage, pointCloudColors);
+            k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
+            window3d.UpdatePointClouds(depthImage);
 
             // Visualize the skeleton data
             window3d.CleanJointsAndBones();
@@ -156,26 +156,11 @@ int main()
                 VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
                 body.id = k4abt_frame_get_body_id(bodyFrame, i);
 
-                window3d.AddBody(body);
+                Color color = g_bodyColors[body.id % g_bodyColors.size()];
+                color.a = i == JumpEvaluationBodyIndex ? 0.8f : 0.1f;
+
+                window3d.AddBody(body, color);
             }
-
-#pragma region Jump Analysis
-            // Update jump evaluator status
-            jumpEvaluator.UpdateStatus(s_spaceHit);
-            s_spaceHit = false;
-
-            // Add new body tracking result to the jump evaluator
-            if (k4abt_frame_get_num_bodies(bodyFrame) > 0)
-            {
-                // For simplicity, only run jump evaluation on body 0
-                k4abt_body_t body;
-                VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, 0, &body.skeleton), "Get skeleton from body frame failed!");
-                body.id = k4abt_frame_get_body_id(bodyFrame, 0);
-
-                uint64_t timestampUsec = k4abt_frame_get_timestamp_usec(bodyFrame);
-                jumpEvaluator.UpdateData(body, timestampUsec);
-            }
-#pragma endregion
 
             k4a_capture_release(originalCapture);
             k4a_image_release(depthImage);

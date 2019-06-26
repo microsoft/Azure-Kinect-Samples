@@ -48,7 +48,7 @@ std::vector<float> DSP::FirstDerivate(const std::vector<float>& signal)
     return outputSignal;
 }
 
-std::vector<float> DSP::Divide2Arrays(std::vector<float>& dividend, std::vector<float>& divisor)
+std::vector<float> DSP::DivideTwoArrays(std::vector<float>& dividend, std::vector<float>& divisor)
 {
     if (dividend.size() != divisor.size())
     {

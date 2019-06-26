@@ -14,17 +14,17 @@ using namespace std::chrono;
 
 struct JumpResultsData
 {
+    // Jump analysis results
     float Height = 0;
-    float BeginSquatDepth = 0;
-    float EndSquatDepth = 0;
-    float MaxVelocity = 0;
+    float PreparationSquatDepth = 0;
+    float LandingSquatDepth = 0;
+    float PushOffVelocity = 0;
     float KneeAngle = 0;
-    float TorzoAngle = 0;
-    k4a_float3_t JumpStartPosition;
+
+    // Fields that help to visualize the results
+    k4a_float3_t StandingPosition;
     int PeakIndex = 0;
     int SquatPointIndex = 0;
-    int JumpStartPoint = 0;
-    int JumpEndPoint = 0;
     bool JumpSuccess = false;
 };
 
@@ -36,15 +36,15 @@ void JumpEvaluator::UpdateData(k4abt_body_t selectedBody, uint64_t currentTimest
 {
 #pragma region Hand Raise Detector
     // Update hand raise detector data
-    m_handRaiseDetector.UpdateData(selectedBody, currentTimestampUsec);
+    m_handRaisedDetector.UpdateData(selectedBody, currentTimestampUsec);
 
     // Use hand raise detector to decide whether we should initialize/end a jump session
-    bool handsAreRaising = m_handRaiseDetector.AreBothHandsRaising();
-    if (!m_previousHandsAreRaising && handsAreRaising)
+    bool handsAreRaised = m_handRaisedDetector.AreBothHandsRaised();
+    if (!m_previousHandsAreRaised && handsAreRaised)
     {
         UpdateStatus(true);
     }
-    m_previousHandsAreRaising = handsAreRaising;
+    m_previousHandsAreRaised = handsAreRaised;
 #pragma endregion
 
     // Collect jump data
@@ -103,40 +103,43 @@ JumpResultsData JumpEvaluator::CalculateJumpResults()
     jumpResults.JumpSuccess = false;
 
     // Make sure we have enough data point
-    if (m_listOfBodyPositions.size() <= 20)
+    if (m_listOfBodyPositions.size() <= MinimumBodyNumber)
     {
         return jumpResults;
     }
 
     try
     {
+        // Y direction of the sensor coordinate is pointing down. We need to inverse the Y direction to make sure it
+        // points towards the jump direction
         std::vector<float> posY = GetInverseHeightInfoFromBodies(K4ABT_JOINT_PELVIS);
         std::vector<float>& timestamp = m_framesTimestampInUsec;
 
-        std::vector<float> heightFiltered = DSP::MovingAverage(posY, 6);
+        std::vector<float> heightFiltered = DSP::MovingAverage(posY, AverageFilterWindowSize);
 
-        // Calculate key phases based on height.
+        // Calculate key phases based on height
         IndexValueTuple maxHeight = DSP::FindMaximum(heightFiltered, 0, heightFiltered.size());
-        IndexValueTuple beginSquatPoint = DSP::FindMinimum(heightFiltered, 0, maxHeight.Index);
-        IndexValueTuple endSquatPoint = DSP::FindMinimum(heightFiltered, maxHeight.Index, heightFiltered.size());
+        IndexValueTuple preparationSquatPoint = DSP::FindMinimum(heightFiltered, 0, maxHeight.Index);
+        IndexValueTuple landingSquatPoint = DSP::FindMinimum(heightFiltered, maxHeight.Index, heightFiltered.size());
 
         std::vector<float> heightDerivative = DSP::FirstDerivate(heightFiltered);
 
-        // Calculate key phases based on height derivative (vertical velocity).
-        IndexValueTuple jumpStartingPoint = CalcualateJumpStartingPoint(heightDerivative);
-        IndexValueTuple jumpEndingPoint = CalcualateJumpEndingPoint(heightDerivative);
+        // Calculate key phases based on height derivative (vertical velocity)
+        std::vector<IndexValueTuple> velocityPhases = CalculatePhasesFromVelocity(heightDerivative);
+        IndexValueTuple jumpStartingPoint = CalcualateJumpStartingPoint(heightDerivative, velocityPhases);
+        IndexValueTuple jumpEndingPoint = CalcualateJumpEndingPoint(heightDerivative, velocityPhases);
 
-        // First derivate of timestamp array.
+        // First derivate of timestamp array
         std::vector<float> timeFirstDerivate = DSP::FirstDerivate(timestamp);
-        // Calculate unit velocity by dV/dt.
-        std::vector<float> velocityY = DSP::Divide2Arrays(heightDerivative, timeFirstDerivate);
 
-        // Maximum velocity.
-        IndexValueTuple maxVelocityInMMperUsec = DSP::FindMaximum(velocityY, 0, velocityY.size());
+        // Calculate unit velocity by dV/dt
+        std::vector<float> velocityY = DSP::DivideTwoArrays(heightDerivative, timeFirstDerivate);
 
-        // Knee and torso angles.
-        float kneeAngleRes = GetMinKneeAngleFromBody(m_listOfBodyPositions[beginSquatPoint.Index]);
-        float torsoAngleRes = GetTorsoAngleFromBody(m_listOfBodyPositions[beginSquatPoint.Index]);
+        // Maximum velocity
+        IndexValueTuple maxVelocityInMmPerUsec = DSP::FindMaximum(velocityY, 0, velocityY.size());
+
+        // Knee angles
+        float kneeAngleRes = GetMinKneeAngleFromBody(m_listOfBodyPositions[preparationSquatPoint.Index]);
 
         int jumpStartIndex = jumpStartingPoint.Index;
 
@@ -147,20 +150,18 @@ JumpResultsData JumpEvaluator::CalculateJumpResults()
             startHeight = CalculateStartHeight(posY, jumpStartIndex - calculationWindowWidth, jumpStartIndex);
         }
 
-        k4a_float3_t jumpStartPosition = CalculateStartingPosition(jumpStartIndex, beginSquatPoint.Index);
+        k4a_float3_t standingPosition = CalculateStandingPosition(jumpStartIndex, preparationSquatPoint.Index);
 
+        const float UsecToSecond = 1e-6f;
         jumpResults.JumpSuccess = true;
         jumpResults.Height = maxHeight.Value - startHeight;
-        jumpResults.BeginSquatDepth = beginSquatPoint.Value - startHeight;
-        jumpResults.EndSquatDepth = endSquatPoint.Value - startHeight;
-        jumpResults.MaxVelocity = maxVelocityInMMperUsec.Value * 1000000;
+        jumpResults.PreparationSquatDepth = preparationSquatPoint.Value - startHeight;
+        jumpResults.LandingSquatDepth = landingSquatPoint.Value - startHeight;
+        jumpResults.PushOffVelocity = maxVelocityInMmPerUsec.Value / UsecToSecond;
         jumpResults.KneeAngle = kneeAngleRes;
-        jumpResults.TorzoAngle = torsoAngleRes;
-        jumpResults.JumpStartPosition = jumpStartPosition;
+        jumpResults.StandingPosition = standingPosition;
         jumpResults.PeakIndex = maxHeight.Index;
-        jumpResults.SquatPointIndex = beginSquatPoint.Index;
-        jumpResults.JumpStartPoint = jumpStartingPoint.Index;
-        jumpResults.JumpEndPoint = jumpEndingPoint.Index;
+        jumpResults.SquatPointIndex = preparationSquatPoint.Index;
     }
     catch (const std::runtime_error&)
     {
@@ -177,8 +178,8 @@ void JumpEvaluator::PrintJumpResults(const JumpResultsData& jumpResults)
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << "Jump Analysis: " << std::endl;
         std::cout << "   Height (cm): " << jumpResults.Height / 10.f << std::endl;
-        std::cout << "   Countermovement (cm): " << -jumpResults.BeginSquatDepth / 10.f << std::endl;
-        std::cout << "   Push-off Velocity (m/second): " << jumpResults.MaxVelocity / 1000.f << std::endl;
+        std::cout << "   Countermovement (cm): " << -jumpResults.PreparationSquatDepth / 10.f << std::endl;
+        std::cout << "   Push-off Velocity (m/second): " << jumpResults.PushOffVelocity / 1000.f << std::endl;
         std::cout << "   Knee Angle (degree): " << jumpResults.KneeAngle << std::endl;
     }
     else
@@ -192,9 +193,9 @@ void JumpEvaluator::PrintJumpResults(const JumpResultsData& jumpResults)
 
 void JumpEvaluator::ReviewJumpResults(const JumpResultsData& jumpResults)
 {
-    CreateRenderWindow(m_window3dSquatPose, "Squat Pose", m_listOfBodyPositions[jumpResults.SquatPointIndex], 0, jumpResults.JumpStartPosition);
-    CreateRenderWindow(m_window3dJumpPeakPose, "Jump Peak Pose", m_listOfBodyPositions[jumpResults.PeakIndex], 1, jumpResults.JumpStartPosition);
-    CreateRenderWindow(m_window3dReplay, "Replay", m_listOfBodyPositions[0], 2, jumpResults.JumpStartPosition);
+    CreateRenderWindow(m_window3dSquatPose, "Squat Pose", m_listOfBodyPositions[jumpResults.SquatPointIndex], 0, jumpResults.StandingPosition);
+    CreateRenderWindow(m_window3dJumpPeakPose, "Jump Peak Pose", m_listOfBodyPositions[jumpResults.PeakIndex], 1, jumpResults.StandingPosition);
+    CreateRenderWindow(m_window3dReplay, "Replay", m_listOfBodyPositions[0], 2, jumpResults.StandingPosition);
 
     milliseconds duration = milliseconds::zero();
     milliseconds expectedFrameDuration = milliseconds(33);
@@ -216,7 +217,7 @@ void JumpEvaluator::ReviewJumpResults(const JumpResultsData& jumpResults)
             }
 
             m_window3dReplay.CleanJointsAndBones();
-            m_window3dReplay.AddBody(m_listOfBodyPositions[currentReplayIndex]);
+            m_window3dReplay.AddBody(m_listOfBodyPositions[currentReplayIndex], g_bodyColors[0]);
             duration = milliseconds::zero();
         }
 
@@ -276,40 +277,11 @@ float JumpEvaluator::GetMinKneeAngleFromBody(k4abt_body_t body)
     return std::min(leftKneeAngle, rightKneeAngle);
 }
 
-float JumpEvaluator::GetTorsoAngleFromBody(k4abt_body_t body)
+IndexValueTuple JumpEvaluator::CalcualateJumpStartingPoint(
+    const std::vector<float>& velocity,
+    const std::vector<IndexValueTuple>& velocityPhases)
 {
-    k4a_float3_t knee = body.skeleton.joints[K4ABT_JOINT_KNEE_LEFT].position;
-    k4a_float3_t torzo = body.skeleton.joints[K4ABT_JOINT_HIP_LEFT].position;
-    k4a_float3_t shoulder = body.skeleton.joints[K4ABT_JOINT_SHOULDER_LEFT].position;
-    return DSP::Angle(torzo, knee, shoulder);
-}
-
-IndexValueTuple JumpEvaluator::CalcualateJumpEndingPoint(const std::vector<float>& velocity)
-{
-    std::vector<IndexValueTuple> velocityPhases = CalculatePhasesFromVelocity(velocity);
-    float maximumValuePrecent = 0.02f;
-
-    int i = velocityPhases[3].Index - 1;
-    if (i < 0)
-    {
-        i = 0;
-    }
-
-    while (velocity[i] > maximumValuePrecent * velocityPhases[3].Value)
-    {
-        i++;
-        if (i == velocity.size() - 1)
-        {
-            throw std::runtime_error("Data error");
-        }
-    }
-    return { i, velocity[i] };
-}
-
-IndexValueTuple JumpEvaluator::CalcualateJumpStartingPoint(const std::vector<float>& velocity)
-{
-    std::vector<IndexValueTuple> velocityPhases = CalculatePhasesFromVelocity(velocity);
-    float minimumValuePrecent = 0.03f;
+    const float MinimumValuePrecent = 0.03f;
 
     int i = velocityPhases[0].Index - 1;
     if (i < 0)
@@ -317,7 +289,7 @@ IndexValueTuple JumpEvaluator::CalcualateJumpStartingPoint(const std::vector<flo
         i = 0;
     }
 
-    while (velocity[i] < minimumValuePrecent * velocityPhases[0].Value)
+    while (velocity[i] < MinimumValuePrecent * velocityPhases[0].Value)
     {
         i--;
         if (i <= 0)
@@ -329,7 +301,29 @@ IndexValueTuple JumpEvaluator::CalcualateJumpStartingPoint(const std::vector<flo
     return { i, velocity[i] };
 }
 
-// Calculate characteristic points of velocity signal.
+IndexValueTuple JumpEvaluator::CalcualateJumpEndingPoint(
+    const std::vector<float>& velocity,
+    const std::vector<IndexValueTuple>& velocityPhases)
+{
+    const float MaximumValuePrecent = 0.02f;
+
+    int i = velocityPhases[3].Index - 1;
+    if (i < 0)
+    {
+        i = 0;
+    }
+
+    while (velocity[i] > MaximumValuePrecent * velocityPhases[3].Value)
+    {
+        i++;
+        if (i == velocity.size() - 1)
+        {
+            throw std::runtime_error("Data error");
+        }
+    }
+    return { i, velocity[i] };
+}
+
 std::vector<IndexValueTuple> JumpEvaluator::CalculatePhasesFromVelocity(const std::vector<float>& velocity)
 {
     IndexValueTuple firstMax = DSP::FindMaximum(velocity, 0, velocity.size());
@@ -345,7 +339,6 @@ std::vector<IndexValueTuple> JumpEvaluator::CalculatePhasesFromVelocity(const st
     return result;
 }
 
-// Calculate offset.
 float JumpEvaluator::CalculateStartHeight(std::vector<float> signal, size_t startingPoint, size_t endingPoint)
 {
     if (startingPoint > signal.size() || startingPoint < 0 || startingPoint > endingPoint || endingPoint <= startingPoint)
@@ -366,7 +359,7 @@ float JumpEvaluator::CalculateStartHeight(std::vector<float> signal, size_t star
     return sum / (endingPoint - startingPoint);
 }
 
-k4a_float3_t JumpEvaluator::CalculateStartingPosition(int jumpStartIndex, int firstSquatIndex)
+k4a_float3_t JumpEvaluator::CalculateStandingPosition(int jumpStartIndex, int firstSquatIndex)
 {
     float xPos = m_listOfBodyPositions[jumpStartIndex].skeleton.joints[K4ABT_JOINT_PELVIS].position.xyz.x;
     float zPos = m_listOfBodyPositions[jumpStartIndex].skeleton.joints[K4ABT_JOINT_PELVIS].position.xyz.z;
@@ -392,12 +385,12 @@ void JumpEvaluator::CreateRenderWindow(
     std::string windowName,
     const k4abt_body_t& body,
     int windowIndex,
-    k4a_float3_t jumpStartPosition)
+    k4a_float3_t standingPosition)
 {
     window.Create(windowName.c_str(), K4A_DEPTH_MODE_WFOV_2X2BINNED);
     window.SetCloseCallback(ReviewWindowCloseCallback, &m_reviewWindowIsRunning);
-    window.AddBody(body);
-    window.SetFloorRendering(true, jumpStartPosition.v[0] / 1000.f, jumpStartPosition.v[1] / 1000.f, jumpStartPosition.v[2] / 1000.f);
+    window.AddBody(body, g_bodyColors[0]);
+    window.SetFloorRendering(true, standingPosition.v[0] / 1000.f, standingPosition.v[1] / 1000.f, standingPosition.v[2] / 1000.f);
 
     int xPos = windowIndex * 640;
     int yPos = 100;

@@ -167,11 +167,8 @@ void Window3dWrapper::AddBone(k4a_float3_t joint1Position, k4a_float3_t joint2Po
     m_window3d.AddBone(bone);
 }
 
-void Window3dWrapper::AddBody(const k4abt_body_t& body)
+void Window3dWrapper::AddBody(const k4abt_body_t& body, Color color)
 {
-    Color color = g_bodyColors[body.id % g_bodyColors.size()];
-    color.a = 0.4f;
-
     for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
     {
         const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;

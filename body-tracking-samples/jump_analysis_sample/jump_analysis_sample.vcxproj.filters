@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HandRaiseDetector.cpp">
+    <ClCompile Include="HandRaisedDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JumpEvaluator.cpp">
@@ -32,7 +32,7 @@
     <ClInclude Include="JumpEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HandRaiseDetector.h">
+    <ClInclude Include="HandRaisedDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DSP.h">
