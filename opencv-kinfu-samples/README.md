@@ -35,8 +35,8 @@ If the user has OpenCV/OpenCV_Contrib/VTK installed, the OpenCV-specific code in
 
     Usage: kinfu_example.exe
     Keys:	q - Quit
-        r - Reset KinFu
-        v - Enable Viz Render Cloud (default is OFF, enable it slows down frame rate)
+            r - Reset KinFu
+            v - Enable Viz Render Cloud (default is OFF, enable it slows down frame rate)
     The application will generate a file (kinectfusion_output.ply) in the same folder when you quit use key q
 
 Example:
