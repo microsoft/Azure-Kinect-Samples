@@ -162,16 +162,22 @@ void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
 }
 #endif
 
+void PrintUsage() 
+{
+    printf("Usage: kinfu_example.exe\n");
+    printf("Keys:   q - Quit\n");
+    printf("        r - Reset KinFu\n");
+    printf("        v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n\n");
+}
+
 int main(int argc, char ** /*argv*/)
 {
+    PrintUsage();
+
     k4a_device_t device = NULL;
 
     if (argc != 1)
     {
-        printf("Usage: kinfu_example.exe\n");
-        printf("Keys:   q - Quit\n");
-        printf("        r - Reset KinFu\n");
-        printf("        v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n");
         return 2;
     }
 
