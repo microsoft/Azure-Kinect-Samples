@@ -10,35 +10,35 @@ If the user has OpenCV/OpenCV_Contrib/VTK installed, the OpenCV-specific code in
 - Download VTK-8.2.0 from https://vtk.org/download/ and build the source accordingly
 - Please follow the instruction from opencv_contrib (https://github.com/opencv/opencv_contrib) to build opencv with extra modules (we used cmake-gui to generate opencv sln file and built opencv and opencv_contrib modules with Visual Studio 2017, user needs to configure the WITH_VTK and VTK_DIR in the cmake-gui before generating sln)
 - We pre-configured kinfu_example.vcxproj with opencv/opencv_contrib include/lib dependencies paths, the following is a list of dependencies we need for this sample:
-	```
-	Includes:
-		extern\opencv-4.1.0\include
-		extern\opencv_contrib-4.1.0\modules\rgbd\include
-		extern\opencv_contrib-4.1.0\modules\viz\include
-	Libs:
-		extern\lib\Debug\opencv_calib3d410d.lib
-		extern\lib\Debug\opencv_core410d.lib
-		extern\lib\Debug\opencv_highgui410d.lib
-		extern\lib\Debug\opencv_imgproc410d.lib
-		extern\lib\Debug\opencv_rgbd410d.lib
-		extern\lib\Debug\opencv_viz410d.lib
-		extern\lib\Release\opencv_calib3d410.lib
-		extern\lib\Release\opencv_core410.lib
-		extern\lib\Release\opencv_highgui410.lib
-		extern\lib\Release\opencv_imgproc410.lib
-		extern\lib\Release\opencv_rgbd410.lib
-		extern\lib\Release\opencv_viz410.lib
-	```
+    ```
+    Includes:
+        extern\opencv-4.1.0\include
+        extern\opencv_contrib-4.1.0\modules\rgbd\include
+        extern\opencv_contrib-4.1.0\modules\viz\include
+    Libs:
+        extern\lib\Debug\opencv_calib3d410d.lib
+        extern\lib\Debug\opencv_core410d.lib
+        extern\lib\Debug\opencv_highgui410d.lib
+        extern\lib\Debug\opencv_imgproc410d.lib
+        extern\lib\Debug\opencv_rgbd410d.lib
+        extern\lib\Debug\opencv_viz410d.lib
+        extern\lib\Release\opencv_calib3d410.lib
+        extern\lib\Release\opencv_core410.lib
+        extern\lib\Release\opencv_highgui410.lib
+        extern\lib\Release\opencv_imgproc410.lib
+        extern\lib\Release\opencv_rgbd410.lib
+        extern\lib\Release\opencv_viz410.lib
+    ```
 - You need to copy the opencv/opencv_contrib dlls as well as VTK dlls to the Visual Studio output bin folder which contains kinfu_example.exe and Azure Kinect binaries before running the application.
 
 ## Usage Info
 
-	Usage: kinfu_example.exe
-	Keys:	q - Quit
-		r - Reset KinFu
-		v - Enable Viz Render Cloud (default is OFF, enable it slows down frame rate)
-	The application will generate a file (kinectfusion_output.ply) in the same folder when you quit use key q
+    Usage: kinfu_example.exe
+    Keys:	q - Quit
+        r - Reset KinFu
+        v - Enable Viz Render Cloud (default is OFF, enable it slows down frame rate)
+    The application will generate a file (kinectfusion_output.ply) in the same folder when you quit use key q
 
 Example:
 
-	Usage: kinfu_example.exe
+    Usage: kinfu_example.exe
