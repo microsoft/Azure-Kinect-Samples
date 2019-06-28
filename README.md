@@ -6,6 +6,8 @@ For more information about the Azure Kinect DK and available documentation, see 
 
 Each sample includes a README file that explains how to run and use the sample.
 
+[![Build Status](https://microsoft.visualstudio.com/Analog/_apis/build/status/Analog/AI/depthcamera/microsoft.Azure-Kinect-Samples?branchName=master)](https://microsoft.visualstudio.com/Analog/_build/latest?definitionId=41402&branchName=master)
+
 ## Contribute
 
 We welcome your contributions and suggestions! Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [](https://cla.microsoft.com).
