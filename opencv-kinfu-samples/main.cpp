@@ -9,8 +9,7 @@
 
 using namespace std;
 
-// Enable HAVE_OPENCV macro after you installed opencv and opencv contrib modules (kinfu, viz), please refer to
-// README.md
+// Enable HAVE_OPENCV macro after you installed opencv and opencv contrib modules (kinfu, viz), please refer to README.md
 // #define HAVE_OPENCV
 #ifdef HAVE_OPENCV
 #include <opencv2/core.hpp>
@@ -167,7 +166,10 @@ void PrintUsage()
     printf("Usage: kinfu_example.exe\n");
     printf("Keys:   q - Quit\n");
     printf("        r - Reset KinFu\n");
-    printf("        v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n\n");
+    printf("        v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n");
+    printf("The application will generate a file (kinectfusion_output.ply) in the same folder of the kinfu_example.exe when you quit use key q\n");
+    printf("Please ensure you uncommented HAVE_OPENCV pound define to enable the opencv code that runs kinfu before building the kinfu_example.exe\n");
+    printf("Please ensure you have copied the opencv/opencv_contrib dlls as well as VTK dlls to the same folder of the kinfu_example.exe before running the application\n\n");
 }
 
 int main(int argc, char ** /*argv*/)
@@ -196,8 +198,9 @@ int main(int argc, char ** /*argv*/)
         return 1;
     }
 
+    // This is just an example depth mode configuration, you can change the configuration as you wish here
     k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-    config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+    config.depth_mode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
     config.camera_fps = K4A_FRAMES_PER_SECOND_30;
 
     // Retrive calibration
