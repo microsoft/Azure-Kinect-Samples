@@ -29,7 +29,11 @@ The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The followi
         extern\lib\Release\opencv_rgbd410.lib
         extern\lib\Release\opencv_viz410.lib
     ```
-- Please add opencv lib dependencies in the kinfu_example.vcxproj file (e.g. for Release configuration: <AdditionalDependencies>%(AdditionalDependencies);opencv_core410.lib;opencv_calib3d410.lib;opencv_rgbd410.lib;opencv_highgui410.lib;opencv_viz410.lib;opencv_imgproc410.lib;</AdditionalDependencies>, you can do the similar for Debug configuration).
+- Please add opencv lib dependencies in the kinfu_example.vcxproj file. E.g. for release configuration, you can do: 
+    ```
+    <AdditionalDependencies>%(AdditionalDependencies);opencv_core410.lib;opencv_calib3d410.lib;
+    opencv_rgbd410.lib;opencv_highgui410.lib;opencv_viz410.lib;opencv_imgproc410.lib;</AdditionalDependencies>
+    ```
 - Uncommenting the HAVE_OPENCV pound define in the main.cpp and build the kinfu_example.sln.
 - You need to copy the opencv/opencv_contrib dlls as well as VTK dlls to the Visual Studio output bin folder which contains kinfu_example.exe and Azure Kinect binaries before running the application.
 
