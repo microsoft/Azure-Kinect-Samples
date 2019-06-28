@@ -329,5 +329,4 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-# Unignore everything within body-tracking-samples folders
-!/body-tracking-samples/**/*
+
