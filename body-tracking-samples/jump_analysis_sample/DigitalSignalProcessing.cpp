@@ -4,6 +4,7 @@
 #include "DigitalSignalProcessing.h"
 
 #include <limits>
+#include <cmath>
 
 std::vector<float> DSP::MovingAverage(const std::vector<float>& signal, size_t numOfPoints)
 {
