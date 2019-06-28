@@ -10,7 +10,7 @@
 using namespace std;
 
 // Enable HAVE_OPENCV macro after you installed opencv and opencv contrib modules (kinfu, viz), please refer to README.md
-// #define HAVE_OPENCV
+#define HAVE_OPENCV
 #ifdef HAVE_OPENCV
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>
@@ -200,7 +200,7 @@ int main(int argc, char ** /*argv*/)
 
     // This is just an example depth mode configuration, you can change the configuration as you wish here
     k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-    config.depth_mode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+    config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
     config.camera_fps = K4A_FRAMES_PER_SECOND_30;
 
     // Retrive calibration
