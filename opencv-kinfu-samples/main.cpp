@@ -448,22 +448,18 @@ int main(int argc, char** argv)
             ofs << "property float nx" << endl;
             ofs << "property float ny" << endl;
             ofs << "property float nz" << endl;
-            ofs << "property uchar red" << endl;
-            ofs << "property uchar green" << endl;
-            ofs << "property uchar blue" << endl;
             ofs << PLY_END_HEADER << endl;
             ofs.close();
 
             stringstream ss;
             for (int i = 0; i < out_points.rows; ++i)
             {
-                // image data is BGR
-                ss << out_points.at<float>(i, 0) << " " << out_points.at<float>(i, 1) << " "
-                   << out_points.at<float>(i, 2);
-                ss << out_normals.at<float>(i, 0) << " " << out_normals.at<float>(i, 1) << " "
-                   << out_normals.at<float>(i, 2);
-                ss << " " << 255 << " " << 255 << " " << 255;
-                ss << endl;
+                ss << out_points.at<float>(i, 0)  << " " 
+                   << out_points.at<float>(i, 1)  << " " 
+                   << out_points.at<float>(i, 2)  << " " 
+                   << out_normals.at<float>(i, 0) << " " 
+                   << out_normals.at<float>(i, 1) << " " 
+                   << out_normals.at<float>(i, 2) << endl;
             }
             ofstream ofs_text(output_file_name, ios::out | ios::app);
             ofs_text.write(ss.str().c_str(), (streamsize)ss.str().length());
