@@ -155,7 +155,7 @@ void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
             dst_data[i] = (uint16_t)(neighbors[0] * (1.0f - (lut_data[i].weight[0] + lut_data[i].weight[1] + lut_data[i].weight[2])) +
                                      neighbors[1] * lut_data[i].weight[0] + 
                                      neighbors[2] * lut_data[i].weight[1] +
-                                     neighbors[3] * lut_data[i].weight[2]);
+                                     neighbors[3] * lut_data[i].weight[2] + 0.5f);
         }
     }
 }
