@@ -44,7 +44,7 @@ The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The followi
     Keys:   q - Quit
             r - Reset KinFu
             v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)
-    * A point cloud (kf_output.ply) file will be generated in the running folder after quit
+            w - Write out the kf_output.ply point cloud file in the running folder
     * Please ensure to uncomment HAVE_OPENCV pound define to enable the opencv code that runs kinfu
     * Please ensure to copy opencv/opencv_contrib/vtk dlls to the running folder
 

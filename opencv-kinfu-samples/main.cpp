@@ -168,7 +168,7 @@ void PrintUsage()
     printf("    Keys:   q - Quit\n");
     printf("            r - Reset KinFu\n");
     printf("            v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n");
-    printf("    * A point cloud (kf_output.ply) file will be generated in the running folder after quit\n");
+    printf("            w - Write out the kf_output.ply point cloud file in the running folder\n");
     printf("    * Please ensure to uncomment HAVE_OPENCV pound define to enable the opencv code that runs kinfu\n");
     printf("    * Please ensure to copy opencv/opencv_contrib/vtk dlls to the running folder\n\n");
 }
@@ -183,21 +183,6 @@ int main(int argc, char** argv)
     {
         printf("Please read the Usage\n");
         return 2;
-    }
-
-    uint32_t device_count = k4a_device_get_installed_count();
-
-    if (device_count == 0)
-    {
-        printf("No K4A devices found\n");
-        return 1;
-    }
-
-    if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device))
-    {
-        printf("Failed to open device\n");
-        k4a_device_close(device);
-        return 1;
     }
 
     // Configure the depth mode and fps
@@ -223,11 +208,30 @@ int main(int argc, char** argv)
         {
             config.depth_mode = K4A_DEPTH_MODE_NFOV_2X2BINNED;
         }
+        else if (!_stricmp(argv[1], "/?"))
+        {
+            return 0;
+        }
         else
         {
             printf("Depth mode not supported!\n");
             return 1;
         }
+    }
+
+    uint32_t device_count = k4a_device_get_installed_count();
+
+    if (device_count == 0)
+    {
+        printf("No K4A devices found\n");
+        return 1;
+    }
+
+    if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device))
+    {
+        printf("Failed to open device\n");
+        k4a_device_close(device);
+        return 1;
     }
 
     // Retrive calibration
@@ -420,10 +424,8 @@ int main(int argc, char** argv)
         {
             renderViz = true;
         }
-        else if (key == 'q')
+        else if (key == 'w')
         {
-            stop = true;
-
             // Output the fused point cloud from KinectFusion
             Mat out_points;
             Mat out_normals;
@@ -454,15 +456,19 @@ int main(int argc, char** argv)
             stringstream ss;
             for (int i = 0; i < out_points.rows; ++i)
             {
-                ss << out_points.at<float>(i, 0)  << " " 
-                   << out_points.at<float>(i, 1)  << " " 
-                   << out_points.at<float>(i, 2)  << " " 
-                   << out_normals.at<float>(i, 0) << " " 
-                   << out_normals.at<float>(i, 1) << " " 
-                   << out_normals.at<float>(i, 2) << endl;
+                ss << out_points.at<float>(i, 0) << " "
+                    << out_points.at<float>(i, 1) << " "
+                    << out_points.at<float>(i, 2) << " "
+                    << out_normals.at<float>(i, 0) << " "
+                    << out_normals.at<float>(i, 1) << " "
+                    << out_normals.at<float>(i, 2) << endl;
             }
             ofstream ofs_text(output_file_name, ios::out | ios::app);
             ofs_text.write(ss.str().c_str(), (streamsize)ss.str().length());
+        }
+        else if (key == 'q')
+        {
+            stop = true;
         }
 
         k4a_image_release(depth_image);
