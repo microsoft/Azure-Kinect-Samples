@@ -155,7 +155,7 @@ void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
             dst_data[i] = (uint16_t)(neighbors[0] * (1.0f - (lut_data[i].weight[0] + lut_data[i].weight[1] + lut_data[i].weight[2])) +
                                      neighbors[1] * lut_data[i].weight[0] + 
                                      neighbors[2] * lut_data[i].weight[1] +
-                                     neighbors[3] * lut_data[i].weight[2]);
+                                     neighbors[3] * lut_data[i].weight[2] + 0.5f);
         }
     }
 }
@@ -163,24 +163,60 @@ void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
 
 void PrintUsage() 
 {
-    printf("Usage: kinfu_example.exe\n");
-    printf("Keys:   q - Quit\n");
-    printf("        r - Reset KinFu\n");
-    printf("        v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n");
-    printf("The application will generate a file (kinectfusion_output.ply) in the same folder of the kinfu_example.exe when you quit use key q\n");
-    printf("Please ensure you uncommented HAVE_OPENCV pound define to enable the opencv code that runs kinfu before building the kinfu_example.exe\n");
-    printf("Please ensure you have copied the opencv/opencv_contrib dlls as well as VTK dlls to the same folder of the kinfu_example.exe before running the application\n\n");
+    printf("Usage: kinfu_example.exe [Optional]<Mode>\n");
+    printf("    Mode: nfov_unbinned(default), wfov_2x2binned, wfov_unbinned, nfov_2x2binned\n");
+    printf("    Keys:   q - Quit\n");
+    printf("            r - Reset KinFu\n");
+    printf("            v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)\n");
+    printf("            w - Write out the kf_output.ply point cloud file in the running folder\n");
+    printf("    * Please ensure to uncomment HAVE_OPENCV pound define to enable the opencv code that runs kinfu\n");
+    printf("    * Please ensure to copy opencv/opencv_contrib/vtk dlls to the running folder\n\n");
 }
 
-int main(int argc, char ** /*argv*/)
+int main(int argc, char** argv)
 {
     PrintUsage();
 
     k4a_device_t device = NULL;
 
-    if (argc != 1)
+    if (argc > 2)
     {
+        printf("Please read the Usage\n");
         return 2;
+    }
+
+    // Configure the depth mode and fps
+    k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
+    config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+    config.camera_fps = K4A_FRAMES_PER_SECOND_30;
+    if (argc == 2)
+    {
+        if (!_stricmp(argv[1], "nfov_unbinned"))
+        {
+            config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+        }
+        else if (!_stricmp(argv[1], "wfov_2x2binned"))
+        {
+            config.depth_mode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+        }
+        else if (!_stricmp(argv[1], "wfov_unbinned"))
+        {
+            config.depth_mode = K4A_DEPTH_MODE_WFOV_UNBINNED;
+            config.camera_fps = K4A_FRAMES_PER_SECOND_15;
+        }
+        else if (!_stricmp(argv[1], "nfov_2x2binned"))
+        {
+            config.depth_mode = K4A_DEPTH_MODE_NFOV_2X2BINNED;
+        }
+        else if (!_stricmp(argv[1], "/?"))
+        {
+            return 0;
+        }
+        else
+        {
+            printf("Depth mode not supported!\n");
+            return 1;
+        }
     }
 
     uint32_t device_count = k4a_device_get_installed_count();
@@ -197,11 +233,6 @@ int main(int argc, char ** /*argv*/)
         k4a_device_close(device);
         return 1;
     }
-
-    // This is just an example depth mode configuration, you can change the configuration as you wish here
-    k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-    config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
-    config.camera_fps = K4A_FRAMES_PER_SECOND_30;
 
     // Retrive calibration
     k4a_calibration_t calibration;
@@ -393,13 +424,13 @@ int main(int argc, char ** /*argv*/)
         {
             renderViz = true;
         }
-        else if (key == 'q')
+        else if (key == 'w')
         {
-            stop = true;
-
             // Output the fused point cloud from KinectFusion
             Mat out_points;
+            Mat out_normals;
             points.copyTo(out_points);
+            normals.copyTo(out_normals);
 
             printf("Saving fused point cloud into ply file ...\n");
 
@@ -408,7 +439,7 @@ int main(int argc, char ** /*argv*/)
 #define PLY_END_HEADER "end_header"
 #define PLY_ASCII "format ascii 1.0"
 #define PLY_ELEMENT_VERTEX "element vertex"
-            string output_file_name = "kinectfusion_output.ply";
+            string output_file_name = "kf_output.ply";
             ofstream ofs(output_file_name); // text mode first
             ofs << PLY_START_HEADER << endl;
             ofs << PLY_ASCII << endl;
@@ -416,23 +447,28 @@ int main(int argc, char ** /*argv*/)
             ofs << "property float x" << endl;
             ofs << "property float y" << endl;
             ofs << "property float z" << endl;
-            ofs << "property uchar red" << endl;
-            ofs << "property uchar green" << endl;
-            ofs << "property uchar blue" << endl;
+            ofs << "property float nx" << endl;
+            ofs << "property float ny" << endl;
+            ofs << "property float nz" << endl;
             ofs << PLY_END_HEADER << endl;
             ofs.close();
 
             stringstream ss;
             for (int i = 0; i < out_points.rows; ++i)
             {
-                // image data is BGR
-                ss << out_points.at<float>(i, 0) << " " << out_points.at<float>(i, 1) << " "
-                   << out_points.at<float>(i, 2);
-                ss << " " << 255 << " " << 255 << " " << 255;
-                ss << endl;
+                ss << out_points.at<float>(i, 0) << " "
+                    << out_points.at<float>(i, 1) << " "
+                    << out_points.at<float>(i, 2) << " "
+                    << out_normals.at<float>(i, 0) << " "
+                    << out_normals.at<float>(i, 1) << " "
+                    << out_normals.at<float>(i, 2) << endl;
             }
             ofstream ofs_text(output_file_name, ios::out | ios::app);
             ofs_text.write(ss.str().c_str(), (streamsize)ss.str().length());
+        }
+        else if (key == 'q')
+        {
+            stop = true;
         }
 
         k4a_image_release(depth_image);

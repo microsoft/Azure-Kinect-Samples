@@ -39,13 +39,14 @@ The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The followi
 
 ## Usage Info
 
-    Usage: kinfu_example.exe
-    Keys:	q - Quit
+    Usage: kinfu_example.exe [Optional]<Mode>
+    Mode: nfov_unbinned(default), wfov_2x2binned, wfov_unbinned, nfov_2x2binned
+    Keys:   q - Quit
             r - Reset KinFu
-            v - Enable Viz Render Cloud (default is OFF, enable it slows down frame rate)
-    The application will generate a file (kinectfusion_output.ply) in the same folder when you quit use key q
-	Please ensure you uncommented HAVE_OPENCV pound define to enable the opencv code that runs kinfu before building the kinfu_example.exe
-    Please ensure you have copied the opencv/opencv_contrib dlls as well as VTK dlls to the same folder of the kinfu_example.exe before running the application
+            v - Enable Viz Render Cloud (default is OFF, enable it will slow down frame rate)
+            w - Write out the kf_output.ply point cloud file in the running folder
+    * Please ensure to uncomment HAVE_OPENCV pound define to enable the opencv code that runs kinfu
+    * Please ensure to copy opencv/opencv_contrib/vtk dlls to the running folder
 
 Example:
 
