@@ -15,6 +15,7 @@
 
 #include "JumpEvaluator.h"
 
+#pragma region Global State and Helper Functions
 void PrintAppUsage()
 {
     printf("\n");
@@ -58,6 +59,8 @@ int64_t CloseCallback(void* /*context*/)
     return 1;
 }
 
+#pragma endregion
+
 int main()
 {
     PrintAppUsage();
@@ -71,20 +74,26 @@ int main()
     deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_OFF;
     VERIFY(k4a_device_start_cameras(device, &deviceConfig), "Start K4A cameras failed!");
 
+#pragma region  Get calibration information
     // Get calibration information
     k4a_calibration_t sensorCalibration;
     VERIFY(k4a_device_get_calibration(device, deviceConfig.depth_mode, deviceConfig.color_resolution, &sensorCalibration),
         "Get depth camera calibration failed!");
+#pragma endregion
 
+#pragma region  Create Body Tracker
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
     VERIFY(k4abt_tracker_create(&sensorCalibration, &tracker), "Body tracker initialization failed!");
+#pragma endregion
 
+#pragma region  Initialize the 3d window controller
     // Initialize the 3d window controller
     Window3dWrapper window3d;
     window3d.Create("3D Visualization", sensorCalibration);
     window3d.SetCloseCallback(CloseCallback);
     window3d.SetKeyCallback(ProcessKey);
+#pragma endregion
 
     // Initialize the jump evaluator
     JumpEvaluator jumpEvaluator;
@@ -102,17 +111,6 @@ int main()
 
             // Release the sensor capture once it is no longer needed.
             k4a_capture_release(sensorCapture);
-
-            if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
-            {
-                std::cout << "Error! Add capture to tracker process queue failed!" << std::endl;
-                break;
-            }
-        }
-        else if (getCaptureResult != K4A_WAIT_RESULT_TIMEOUT)
-        {
-            std::cout << "Get depth capture returned error: " << getCaptureResult << std::endl;
-            break;
         }
 
         // Pop Result from Body Tracker
@@ -143,6 +141,7 @@ int main()
             }
 #pragma endregion
 
+#pragma region Visualize Body Tracking
             // Visualize point cloud
             k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
             window3d.UpdatePointClouds(depthImage);
@@ -164,6 +163,8 @@ int main()
 
             k4a_capture_release(originalCapture);
             k4a_image_release(depthImage);
+#pragma endregion
+
             k4abt_frame_release(bodyFrame);
         }
 

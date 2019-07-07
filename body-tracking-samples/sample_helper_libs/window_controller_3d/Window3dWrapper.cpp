@@ -29,6 +29,7 @@ void Window3dWrapper::Create(
 {
     m_window3d.Create(name);
     m_window3d.SetMirrorMode(true);
+    m_window3d.SetSkeletonRenderMode(Visualization::SkeletonRenderMode::SkeletonOverlay);
 
     switch (depthMode)
     {

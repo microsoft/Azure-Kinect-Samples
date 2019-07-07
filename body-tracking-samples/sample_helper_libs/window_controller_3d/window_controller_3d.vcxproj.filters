@@ -111,5 +111,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="dnn_model.onnx" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\content\**\*.*" />
   </ItemGroup>
 </Project>

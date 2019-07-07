@@ -47,16 +47,19 @@ void JumpEvaluator::UpdateData(k4abt_body_t selectedBody, uint64_t currentTimest
     m_previousHandsAreRaised = handsAreRaised;
 #pragma endregion
 
-    // Collect jump data
-    if (m_jumpStatus == JumpStatus::CollectJumpData)
+    if (m_jumpStatus == JumpStatus::Idle)
     {
+        return;
+    }
+    else if (m_jumpStatus == JumpStatus::CollectJumpData)
+    {
+        // Collect jump data
         m_listOfBodyPositions.push_back(selectedBody);
         m_framesTimestampInUsec.push_back(static_cast<float>(currentTimestampUsec));
     }
-
-    // Calculate jump results
-    if (m_jumpStatus == JumpStatus::EvaluateAndReview)
+    else if (m_jumpStatus == JumpStatus::EvaluateAndReview)
     {
+        // Calculate jump results
         JumpResultsData jumpResults = CalculateJumpResults();
         PrintJumpResults(jumpResults);
 
