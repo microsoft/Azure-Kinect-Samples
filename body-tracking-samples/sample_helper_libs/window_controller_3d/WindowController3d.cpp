@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <thread>
+#include <limits>
 
 #include "ViewControl.h"
 #include "Helpers.h"
@@ -282,7 +283,8 @@ void WindowController3d::RenderScene(ViewControl& viewControl, Viewport viewport
     }
 
     // Render Camera Pivot Point when interacting with the view control.
-    const bool ctrl = GetAsyncKeyState(VK_CONTROL) != 0;
+
+    const bool ctrl = glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL);
     if (m_cameraPivotPointRenderCount > 0 || m_mouseButtonLeftPressed || m_mouseButtonRightPressed || ctrl)
     {
         m_cameraPivotPointRenderCount = std::max(0, m_cameraPivotPointRenderCount - 1);
@@ -438,7 +440,7 @@ void WindowController3d::FrameBufferSizeCallback(GLFWwindow* /*window*/, int wid
     m_windowHeight = height;
 }
 
-void WindowController3d::GetCursorPosInScreenCoordinates(GLFWwindow* window, linmath::vec2 screenPos)
+void WindowController3d::GetCursorPosInScreenCoordinates(GLFWwindow* window, linmath::vec2 outScreenPos)
 {
     // NOTE: Cursor coordinates are relative to the upper-left corner of the window content area.
     double cursorPosX, cursorPosY;
@@ -446,17 +448,17 @@ void WindowController3d::GetCursorPosInScreenCoordinates(GLFWwindow* window, lin
 
     // Convert cursor coordinates to OpenGL screen coordinates.
     // NOTE: OpenGL screen coordinates are relative to the lower-left corner of the window content area.
-    GetCursorPosInScreenCoordinates(cursorPosX, cursorPosY, screenPos);
+    GetCursorPosInScreenCoordinates(cursorPosX, cursorPosY, outScreenPos);
 }
 
-void WindowController3d::GetCursorPosInScreenCoordinates(double cursorPosX, double cursorPosY, linmath::vec2 screenPos)
+void WindowController3d::GetCursorPosInScreenCoordinates(double cursorPosX, double cursorPosY, linmath::vec2 outScreenPos)
 {
     // NOTE: Cursor coordinates are relative to the upper-left corner of the window content area.
 
     // Convert cursor coordinates to OpenGL screen coordinates.
     // NOTE: OpenGL screen coordinates are relative to the lower-left corner of the window content area.
-    screenPos[0] = (float)cursorPosX;
-    screenPos[1] = (float)(m_windowHeight - cursorPosY - 1.);
+    outScreenPos[0] = (float)cursorPosX;
+    outScreenPos[1] = (float)(m_windowHeight - cursorPosY - 1.);
 }
 
 void WindowController3d::UpdateRenderersViewProjection(linmath::mat4x4 view, linmath::mat4x4 projection)
@@ -507,7 +509,7 @@ void WindowController3d::MouseMovementCallback(GLFWwindow* window, double xpos, 
     vec2 screenPos;
     GetCursorPosInScreenCoordinates(xpos, ypos, screenPos);
 
-    const bool ctrl = GetAsyncKeyState(VK_CONTROL) != 0;
+    const bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
     if (ctrl)
     {
         m_viewControl.ProcessPositionalMovement(m_prevMouseScreenPos, screenPos);
@@ -525,7 +527,7 @@ void WindowController3d::MouseMovementCallback(GLFWwindow* window, double xpos, 
 
 void WindowController3d::ChangeCameraPivotPoint(ViewControl& viewControl, linmath::vec2 screenPos)
 {
-    float minDist = FLT_MAX;
+    float minDist = std::numeric_limits<float>::max();
     vec3 selectedPoint;
     const auto &joints = m_skeletonRenderer.GetJoints();
     for (auto j : joints)
@@ -542,15 +544,15 @@ void WindowController3d::ChangeCameraPivotPoint(ViewControl& viewControl, linmat
             }
         }
     }
-    if (minDist != FLT_MAX)
+    if (minDist != std::numeric_limits<float>::max())
     {
         viewControl.SetViewTarget(selectedPoint);
     }
 }
 
-void WindowController3d::MouseScrollCallback(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
+void WindowController3d::MouseScrollCallback(GLFWwindow* window, double /*xoffset*/, double yoffset)
 {
-    m_viewControl.ProcessMouseScroll((float)yoffset);
+    m_viewControl.ProcessMouseScroll(window, (float)yoffset);
     TriggerCameraPivotPointRendering();
 }
 

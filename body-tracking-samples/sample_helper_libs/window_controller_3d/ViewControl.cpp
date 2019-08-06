@@ -12,14 +12,9 @@ using namespace linmath;
 #define M_PI       3.14159265358979323846   // pi
 #endif
 
-static __forceinline float DegreesToRadians(float angleInDegrees)
+static inline float DegreesToRadians(float angleInDegrees)
 {
     return (float)(angleInDegrees / 180.f * M_PI);
-}
-
-static __forceinline float RadiansToDegrees(float angleInRadians)
-{
-    return (float)(angleInRadians * 180.f / M_PI);
 }
 
 // Default camera values
@@ -204,9 +199,9 @@ void ViewControl::ProcessPositionalMovement(const linmath::vec2 startScreenPos, 
 }
 
 // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-void ViewControl::ProcessMouseScroll(float yoffset)
+void ViewControl::ProcessMouseScroll(GLFWwindow* window, float yoffset)
 {
-    const bool shift = GetAsyncKeyState(VK_SHIFT) != 0;
+    const bool shift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
     if (shift)
     {
         m_perspectiveFactor += yoffset * m_mouseSensitivity;

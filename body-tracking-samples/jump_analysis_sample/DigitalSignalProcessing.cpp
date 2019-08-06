@@ -3,8 +3,8 @@
 
 #include "DigitalSignalProcessing.h"
 
-#include <limits>
 #include <cmath>
+#include <limits>
 
 std::vector<float> DSP::MovingAverage(const std::vector<float>& signal, size_t numOfPoints)
 {
@@ -74,7 +74,7 @@ std::vector<float> DSP::DivideTwoArrays(std::vector<float>& dividend, std::vecto
 
 IndexValueTuple DSP::FindMaximum(const std::vector<float>& signal, size_t minIdx, size_t maxIdx)
 {
-    if (minIdx < 0 || minIdx > signal.size() || maxIdx < 0 || minIdx > signal.size() || minIdx > maxIdx)
+    if (minIdx > signal.size() || minIdx > signal.size() || minIdx > maxIdx)
     {
         return IndexValueTuple();
     }
@@ -94,7 +94,7 @@ IndexValueTuple DSP::FindMaximum(const std::vector<float>& signal, size_t minIdx
 
 IndexValueTuple DSP::FindMinimum(const std::vector<float>& signal, size_t minIdx, size_t maxIdx)
 {
-    if (minIdx < 0 || minIdx > signal.size() || maxIdx < 0 || minIdx > signal.size() || minIdx > maxIdx)
+    if (minIdx > signal.size() || minIdx > signal.size() || minIdx > maxIdx)
     {
         return IndexValueTuple();
     }
@@ -125,8 +125,8 @@ float DSP::Angle(k4a_float3_t A, k4a_float3_t B, k4a_float3_t C)
     BcVector.xyz.y = C.xyz.y - B.xyz.y;
     BcVector.xyz.z = C.xyz.z - B.xyz.z;
 
-    float AbNorm = (float)std::sqrt(AbVector.xyz.x * AbVector.xyz.x + AbVector.xyz.y * AbVector.xyz.y + AbVector.xyz.z * AbVector.xyz.z);
-    float BcNorm = (float)std::sqrt(BcVector.xyz.x * BcVector.xyz.x + BcVector.xyz.y * BcVector.xyz.y + BcVector.xyz.z * BcVector.xyz.z);
+    float AbNorm = (float)sqrt(AbVector.xyz.x * AbVector.xyz.x + AbVector.xyz.y * AbVector.xyz.y + AbVector.xyz.z * AbVector.xyz.z);
+    float BcNorm = (float)sqrt(BcVector.xyz.x * BcVector.xyz.x + BcVector.xyz.y * BcVector.xyz.y + BcVector.xyz.z * BcVector.xyz.z);
 
     k4a_float3_t AbVectorNorm;
     k4a_float3_t BcVectorNorm;
