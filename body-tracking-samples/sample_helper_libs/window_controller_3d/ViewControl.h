@@ -4,6 +4,7 @@
 #pragma once
 
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "linmath.h" // https://github.com/datenwolf/linmath.h
 
 enum class ViewPoint
@@ -86,7 +87,7 @@ public:
     void ProcessPositionalMovement(const linmath::vec2 startScreenPos, const linmath::vec2 endScreenPos);
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float yoffset);
+    void ProcessMouseScroll(GLFWwindow* window, float yoffset);
 
     // Set the location the camera points to.
     void SetViewTarget(const linmath::vec3 target);

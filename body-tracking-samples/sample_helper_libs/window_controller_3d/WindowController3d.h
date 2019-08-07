@@ -108,8 +108,8 @@ namespace Visualization
         void RenderScene(ViewControl& viewControl, Viewport viewport);
         void TriggerCameraPivotPointRendering();
         void ChangeCameraPivotPoint(ViewControl& viewControl, linmath::vec2 screenPos);
-        void GetCursorPosInScreenCoordinates(GLFWwindow* window, _Out_ linmath::vec2 screenPos);
-        void GetCursorPosInScreenCoordinates(double cursorPosX, double cursorPosY, _Out_ linmath::vec2 screenPos);
+        void GetCursorPosInScreenCoordinates(GLFWwindow* window, linmath::vec2 outScreenPos);
+        void GetCursorPosInScreenCoordinates(double cursorPosX, double cursorPosY, linmath::vec2 outScreenPos);
         void UpdateRenderersViewProjection(linmath::mat4x4 view, linmath::mat4x4 projection);
 
         bool m_initialized = false;

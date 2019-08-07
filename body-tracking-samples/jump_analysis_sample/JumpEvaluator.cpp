@@ -127,7 +127,6 @@ JumpResultsData JumpEvaluator::CalculateJumpResults()
         // Calculate key phases based on height derivative (vertical velocity)
         std::vector<IndexValueTuple> velocityPhases = CalculatePhasesFromVelocity(heightDerivative);
         IndexValueTuple jumpStartingPoint = CalcualateJumpStartingPoint(heightDerivative, velocityPhases);
-        IndexValueTuple jumpEndingPoint = CalcualateJumpEndingPoint(heightDerivative, velocityPhases);
 
         // First derivate of timestamp array
         std::vector<float> timeFirstDerivate = DSP::FirstDerivate(timestamp);
@@ -316,7 +315,7 @@ IndexValueTuple JumpEvaluator::CalcualateJumpEndingPoint(
     while (velocity[i] > MaximumValuePrecent * velocityPhases[3].Value)
     {
         i++;
-        if (i == velocity.size() - 1)
+        if (i == static_cast<int>(velocity.size()) - 1)
         {
             throw std::runtime_error("Data error");
         }
@@ -341,7 +340,7 @@ std::vector<IndexValueTuple> JumpEvaluator::CalculatePhasesFromVelocity(const st
 
 float JumpEvaluator::CalculateStartHeight(std::vector<float> signal, size_t startingPoint, size_t endingPoint)
 {
-    if (startingPoint > signal.size() || startingPoint < 0 || startingPoint > endingPoint || endingPoint <= startingPoint)
+    if (startingPoint > signal.size() || startingPoint > endingPoint || endingPoint <= startingPoint)
     {
         throw std::runtime_error("Data error");
     }
@@ -373,7 +372,7 @@ k4a_float3_t JumpEvaluator::CalculateStandingPosition(int jumpStartIndex, int fi
     return { xPos, yPos, zPos };
 }
 
-LRESULT ReviewWindowCloseCallback(void* context)
+int64_t ReviewWindowCloseCallback(void* context)
 {
     bool* running = (bool*)context;
     *running = false;
