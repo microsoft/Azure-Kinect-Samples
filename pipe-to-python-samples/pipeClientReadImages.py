@@ -9,14 +9,11 @@ import os, os.path
 import cv2
 import matplotlib.pyplot as plt
 
-
-# LTN mode, depth/ab
+# The image size of depth/ir
+# Assuming depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED, change it otherwise
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 576
-
-# Save the visualized frames or not
-save_frames = False
-
+BYTES_PER_PIXEL = 2
 
 if __name__ == "__main__":
 
@@ -29,40 +26,31 @@ if __name__ == "__main__":
 
     # For visualization
     cv2.namedWindow('vis', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('vis', 800, 400)
-    
-    f_idx =0
+    cv2.resizeWindow('vis', 1300, 600)
+
     while True:
         # Send request to pipe server
-        win32file.WriteFile(fileHandle, np.array([1]).tobytes())
+        request_msg = "Request depth image and ir image"
+        win32file.WriteFile(fileHandle, request_msg.encode())
         # Read reply data, need to be in same order/size as how you write them in the pipe server in pipe_streaming_example/main.cpp
-        depth_data = win32file.ReadFile(fileHandle, FRAME_WIDTH*FRAME_HEIGHT*2)
-        ab_data = win32file.ReadFile(fileHandle, FRAME_WIDTH*FRAME_HEIGHT*2)
+        depth_data = win32file.ReadFile(fileHandle, FRAME_WIDTH * FRAME_HEIGHT * BYTES_PER_PIXEL)
+        ab_data = win32file.ReadFile(fileHandle, FRAME_WIDTH * FRAME_HEIGHT * BYTES_PER_PIXEL)
         # Reshape for image visualization
         depth_img_full = np.frombuffer(depth_data[1], dtype=np.uint16).reshape(FRAME_HEIGHT, FRAME_WIDTH).copy()
         ab_img_full = np.frombuffer(ab_data[1], dtype=np.uint16).reshape(FRAME_HEIGHT, FRAME_WIDTH).copy()
         
-        depth_vis = (plt.get_cmap("gray")(depth_img_full/512.0)[..., :3]*255.0).astype(np.uint8)
+        depth_vis = (plt.get_cmap("gray")(depth_img_full/8000.0)[..., :3]*255.0).astype(np.uint8)
         ab_vis = (plt.get_cmap("gray")(ab_img_full/512.0)[..., :3]*255.0).astype(np.uint8)
         
         # Visualize the images
         vis = np.hstack([depth_vis, ab_vis])
-   
         vis = cv2.cvtColor(vis, cv2.COLOR_BGR2RGB)
-        
-        f_idx = f_idx + 1
 
         cv2.imshow("vis", vis)
-        if save_frames:
-            vis_frames.append(vis)
 
         key = cv2.waitKey(1)
         if key == 27: # Esc key to stop
             break 
-
-    if save_frames:
-        for f_idx, vis in enumerate(vis_frames):
-            cv2.imwrite("C:\Temp\F%06d.png"%f_idx, vis)
 
     win32file.CloseHandle(fileHandle)
 

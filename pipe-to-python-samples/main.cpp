@@ -302,20 +302,18 @@ VOID GetAnswerToRequest(LPTSTR pchRequest,
                 k4a_image_get_width_pixels(ir_image),
                 k4a_image_get_stride_bytes(ir_image));
 
+            printf("\n");
+            // Write depth image data to reply
             uint8_t *depth_image_buf = k4a_image_get_buffer(depth_image);
             size_t depth_buf_size = k4a_image_get_size(depth_image);
+            printf("Write depth image to buffer, data size = %d\n", static_cast<int>(depth_buf_size));
             memcpy(&pchReply[0], depth_image_buf, depth_buf_size);
 
-            printf("depth_buf_size = %d\n", static_cast<int>(depth_buf_size));
-
+            // Write ir/ab image data to reply
             uint8_t *ir_image_buf = k4a_image_get_buffer(ir_image);
             size_t ir_buf_size = k4a_image_get_size(ir_image);
-
-            printf("ir_buf_size = %d\n", static_cast<int>(ir_buf_size));
-
-            printf("FRAME_BUFSIZE = %d\n", FRAME_BUFSIZE);
+            printf("Write ir/ab image to buffer, data size = %d\n", static_cast<int>(ir_buf_size));
             memcpy(&pchReply[FRAME_BUFSIZE / 2], ir_image_buf, ir_buf_size);
-
 
             k4a_image_release(depth_image);
             k4a_image_release(ir_image);

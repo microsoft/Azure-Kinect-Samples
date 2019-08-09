@@ -8,15 +8,9 @@ PS: It is created by combining the NamedPipe example from https://docs.microsoft
 and Azure-Kinect-Sensor-SDK streaming example from https://github.com/microsoft/Azure-Kinect-Sensor-SDK/tree/develop/examples/streaming
 
 () PipeClient in python: pipeClientReadImages.py creates a pipe client to read the streamed images and visualize them in opencv, you need to:
-     pip install matplotlib, scikit-image, opencv-python, Pypiwin32
- 
+     pip install matplotlib, opencv-python, Pypiwin32
 
 Use on the command line as follows:
 
     pipe_streaming_example.exe // start a pipe server to stream depth/ab frames
     python.exe pipeClientReadImages.py // read the streamed images out in python, then do your stuff on these images in python....
-
-
-TBC:
-- tidyup the constants in the code.
-- stream also rgb in c++, and in python add decoding rgb data and visualize it.
