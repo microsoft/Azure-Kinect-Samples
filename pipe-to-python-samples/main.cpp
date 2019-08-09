@@ -11,17 +11,20 @@
 #include <tchar.h>
 #include <strsafe.h>
 
-
+// Buffer size for client requests
 #define BUFSIZE 512
+// Buffer size for writing frame data to pipe
+// Assuming depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED, change it otherwise
 #define FRAME_WIDTH 640
 #define FRAME_HEIGHT 576
 #define BYTES_PER_PIXEL 2
+// Assuming streaming 2 channels: depth & ab, change it otherwise
 #define FRAME_CHANNEL 2
-#define FRAME_BUFSIZE FRAME_CHANNEL*FRAME_WIDTH*FRAME_HEIGHT *BYTES_PER_PIXEL
+#define FRAME_BUFSIZE FRAME_CHANNEL * FRAME_WIDTH * FRAME_HEIGHT * BYTES_PER_PIXEL
+
 
 DWORD WINAPI InstanceThread(LPVOID);
 VOID GetAnswerToRequest(LPTSTR, LPTSTR, LPDWORD);
-
 
 k4a_device_t device = NULL;
 
