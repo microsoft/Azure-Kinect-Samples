@@ -43,10 +43,6 @@ template<typename T> Mat create_mat_from_buffer(T *data, int width, int height, 
 }
 #endif
 
-// Enable CUSTOM_UNDISTORTION macro for better undistortion algorithm on depth with bilinear interpolation + depth 
-// invalidation aware
-#define CUSTOM_UNDISTORTION
-#ifdef CUSTOM_UNDISTORTION
 #define INVALID INT32_MIN
 typedef struct _pinhole_t
 {
@@ -63,15 +59,135 @@ typedef struct _coordinate_t
 {
     int x;
     int y;
-    float weight[3];
+    float weight[4];
 } coordinate_t;
 
-void create_undistortion_lut(const k4a_calibration_t *calibration,
-                             const k4a_calibration_type_t camera,
-                             const pinhole_t *pinhole,
-                             k4a_image_t lut)
+typedef enum
 {
-    coordinate_t *lut_data = (coordinate_t *)(void *)k4a_image_get_buffer(lut);
+    INTERPOLATION_NEARESTNEIGHBOR, /**< Nearest neighbor interpolation */
+    INTERPOLATION_BILINEAR,        /**< Bilinear interpolation */
+    INTERPOLATION_BILINEAR_DEPTH   /**< Bilinear interpolation with invalidation when neighbor contain invalid
+                                                data with value 0 */
+} interpolation_t;
+
+// Compute a conservative bounding box on the unit plane in which all the points have valid projections
+static void compute_xy_range(const k4a_calibration_t* calibration,
+    const k4a_calibration_type_t camera,
+    const int width,
+    const int height,
+    float& x_min,
+    float& x_max,
+    float& y_min,
+    float& y_max)
+{
+    // Step outward from the centre point until we find the bounds of valid projection
+    const float step_u = 0.25f;
+    const float step_v = 0.25f;
+    const float min_u = 0;
+    const float min_v = 0;
+    const float max_u = (float)width - 1;
+    const float max_v = (float)height - 1;
+    const float center_u = 0.5f * width;
+    const float center_v = 0.5f * height;
+
+    int valid;
+    k4a_float2_t p;
+    k4a_float3_t ray;
+
+    // search x_min
+    for (float uv[2] = { center_u, center_v }; uv[0] >= min_u; uv[0] -= step_u)
+    {
+        p.xy.x = uv[0];
+        p.xy.y = uv[1];
+        k4a_calibration_2d_to_3d(calibration, &p, 1.f, camera, camera, &ray, &valid);
+
+        if (!valid)
+        {
+            break;
+        }
+        x_min = ray.xyz.x;
+    }
+
+    // search x_max
+    for (float uv[2] = { center_u, center_v }; uv[0] <= max_u; uv[0] += step_u)
+    {
+        p.xy.x = uv[0];
+        p.xy.y = uv[1];
+        k4a_calibration_2d_to_3d(calibration, &p, 1.f, camera, camera, &ray, &valid);
+
+        if (!valid)
+        {
+            break;
+        }
+        x_max = ray.xyz.x;
+    }
+
+    // search y_min
+    for (float uv[2] = { center_u, center_v }; uv[1] >= min_v; uv[1] -= step_v)
+    {
+        p.xy.x = uv[0];
+        p.xy.y = uv[1];
+        k4a_calibration_2d_to_3d(calibration, &p, 1.f, camera, camera, &ray, &valid);
+
+        if (!valid)
+        {
+            break;
+        }
+        y_min = ray.xyz.y;
+    }
+
+    // search y_max
+    for (float uv[2] = { center_u, center_v }; uv[1] <= max_v; uv[1] += step_v)
+    {
+        p.xy.x = uv[0];
+        p.xy.y = uv[1];
+        k4a_calibration_2d_to_3d(calibration, &p, 1.f, camera, camera, &ray, &valid);
+
+        if (!valid)
+        {
+            break;
+        }
+        y_max = ray.xyz.y;
+    }
+}
+
+static pinhole_t create_pinhole_from_xy_range(const k4a_calibration_t* calibration, const k4a_calibration_type_t camera)
+{
+    int width = calibration->depth_camera_calibration.resolution_width;
+    int height = calibration->depth_camera_calibration.resolution_height;
+    if (camera == K4A_CALIBRATION_TYPE_COLOR)
+    {
+        width = calibration->color_camera_calibration.resolution_width;
+        height = calibration->color_camera_calibration.resolution_height;
+    }
+
+    float x_min = 0, x_max = 0, y_min = 0, y_max = 0;
+    compute_xy_range(calibration, K4A_CALIBRATION_TYPE_DEPTH, width, height, x_min, x_max, y_min, y_max);
+
+    pinhole_t pinhole;
+
+    float fx = 1.f / (x_max - x_min);
+    float fy = 1.f / (y_max - y_min);
+    float px = -x_min * fx;
+    float py = -y_min * fy;
+
+    pinhole.fx = fx * width;
+    pinhole.fy = fy * height;
+    pinhole.px = px * width;
+    pinhole.py = py * height;
+    pinhole.width = width;
+    pinhole.height = height;
+
+    return pinhole;
+}
+
+static void create_undistortion_lut(const k4a_calibration_t* calibration,
+    const k4a_calibration_type_t camera,
+    const pinhole_t* pinhole,
+    k4a_image_t lut,
+    interpolation_t type)
+{
+    coordinate_t* lut_data = (coordinate_t*)(void*)k4a_image_get_buffer(lut);
 
     k4a_float3_t ray;
     ray.xyz.z = 1.f;
@@ -96,28 +212,46 @@ void create_undistortion_lut(const k4a_calibration_t *calibration,
             int valid;
             k4a_calibration_3d_to_2d(calibration, &ray, camera, camera, &distorted, &valid);
 
-            // Remapping via bilieanr interpolation
             coordinate_t src;
-            src.x = (int)floorf(distorted.xy.x);
-            src.y = (int)floorf(distorted.xy.y);
+            if (type == INTERPOLATION_NEARESTNEIGHBOR)
+            {
+                // Remapping via nearest neighbor interpolation
+                src.x = (int)floorf(distorted.xy.x + 0.5f);
+                src.y = (int)floorf(distorted.xy.y + 0.5f);
+            }
+            else if (type == INTERPOLATION_BILINEAR || type == INTERPOLATION_BILINEAR_DEPTH)
+            {
+                // Remapping via bilinear interpolation
+                src.x = (int)floorf(distorted.xy.x);
+                src.y = (int)floorf(distorted.xy.y);
+            }
+            else
+            {
+                printf("Unexpected interpolation type!\n");
+                exit(-1);
+            }
 
             if (valid && src.x >= 0 && src.x < src_width && src.y >= 0 && src.y < src_height)
             {
                 lut_data[idx] = src;
 
-                // compute the floating point weights, using the distance from projected point uv_src_flt to the image
-                // coordinate of the upper left neighbor
-                float w_x = distorted.xy.x - src.x;
-                float w_y = distorted.xy.y - src.y;
-                // float w0 = (1.f - w_x) * (1.f - w_y); // reference only
-                float w1 = w_x * (1.f - w_y);
-                float w2 = (1.f - w_x) * w_y;
-                float w3 = w_x * w_y;
+                if (type == INTERPOLATION_BILINEAR || type == INTERPOLATION_BILINEAR_DEPTH)
+                {
+                    // Compute the floating point weights, using the distance from projected point src to the
+                    // image coordinate of the upper left neighbor
+                    float w_x = distorted.xy.x - src.x;
+                    float w_y = distorted.xy.y - src.y;
+                    float w0 = (1.f - w_x) * (1.f - w_y);
+                    float w1 = w_x * (1.f - w_y);
+                    float w2 = (1.f - w_x) * w_y;
+                    float w3 = w_x * w_y;
 
-                // compute the fixed point weights
-                lut_data[idx].weight[0] = w1;
-                lut_data[idx].weight[1] = w2;
-                lut_data[idx].weight[2] = w3;
+                    // Fill into lut
+                    lut_data[idx].weight[0] = w0;
+                    lut_data[idx].weight[1] = w1;
+                    lut_data[idx].weight[2] = w2;
+                    lut_data[idx].weight[3] = w3;
+                }
             }
             else
             {
@@ -128,15 +262,15 @@ void create_undistortion_lut(const k4a_calibration_t *calibration,
     }
 }
 
-void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
+static void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst, interpolation_t type)
 {
     int src_width = k4a_image_get_width_pixels(src);
     int dst_width = k4a_image_get_width_pixels(dst);
     int dst_height = k4a_image_get_height_pixels(dst);
 
-    uint16_t *src_data = (uint16_t *)(void *)k4a_image_get_buffer(src);
-    uint16_t *dst_data = (uint16_t *)(void *)k4a_image_get_buffer(dst);
-    coordinate_t *lut_data = (coordinate_t *)(void *)k4a_image_get_buffer(lut);
+    uint16_t* src_data = (uint16_t*)(void*)k4a_image_get_buffer(src);
+    uint16_t* dst_data = (uint16_t*)(void*)k4a_image_get_buffer(dst);
+    coordinate_t* lut_data = (coordinate_t*)(void*)k4a_image_get_buffer(lut);
 
     memset(dst_data, 0, (size_t)dst_width * (size_t)dst_height * sizeof(uint16_t));
 
@@ -144,22 +278,39 @@ void remap(const k4a_image_t src, const k4a_image_t lut, k4a_image_t dst)
     {
         if (lut_data[i].x != INVALID && lut_data[i].y != INVALID)
         {
-            const uint16_t neighbors[4]{ src_data[lut_data[i].y * src_width + lut_data[i].x],
-                                         src_data[lut_data[i].y * src_width + lut_data[i].x + 1],
-                                         src_data[(lut_data[i].y + 1) * src_width + lut_data[i].x],
-                                         src_data[(lut_data[i].y + 1) * src_width + lut_data[i].x + 1] };
+            if (type == INTERPOLATION_NEARESTNEIGHBOR)
+            {
+                dst_data[i] = src_data[lut_data[i].y * src_width + lut_data[i].x];
+            }
+            else if (type == INTERPOLATION_BILINEAR || type == INTERPOLATION_BILINEAR_DEPTH)
+            {
+                const uint16_t neighbors[4]{ src_data[lut_data[i].y * src_width + lut_data[i].x],
+                                             src_data[lut_data[i].y * src_width + lut_data[i].x + 1],
+                                             src_data[(lut_data[i].y + 1) * src_width + lut_data[i].x],
+                                             src_data[(lut_data[i].y + 1) * src_width + lut_data[i].x + 1] };
 
-            if (neighbors[0] == 0 || neighbors[1] == 0 || neighbors[2] == 0 || neighbors[3] == 0)
-                continue;
+                // If the image contains invalid data, e.g. depth image contains value 0, ignore the bilinear
+                // interpolation for current target pixel if one of the neighbors contains invalid data to avoid
+                // introduce noise on the edge. If the image is color or ir images, user should use
+                // INTERPOLATION_BILINEAR
+                if (type == INTERPOLATION_BILINEAR_DEPTH)
+                {
+                    if (neighbors[0] == 0 || neighbors[1] == 0 || neighbors[2] == 0 || neighbors[3] == 0)
+                        continue;
+                }
 
-            dst_data[i] = (uint16_t)(neighbors[0] * (1.0f - (lut_data[i].weight[0] + lut_data[i].weight[1] + lut_data[i].weight[2])) +
-                                     neighbors[1] * lut_data[i].weight[0] + 
-                                     neighbors[2] * lut_data[i].weight[1] +
-                                     neighbors[3] * lut_data[i].weight[2] + 0.5f);
+                dst_data[i] = (uint16_t)(neighbors[0] * lut_data[i].weight[0] + neighbors[1] * lut_data[i].weight[1] +
+                    neighbors[2] * lut_data[i].weight[2] + neighbors[3] * lut_data[i].weight[3] +
+                    0.5f);
+            }
+            else
+            {
+                printf("Unexpected interpolation type!\n");
+                exit(-1);
+            }
         }
     }
 }
-#endif
 
 void PrintUsage() 
 {
@@ -252,6 +403,10 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // Generate a pinhole model for depth camera
+    pinhole_t pinhole = create_pinhole_from_xy_range(&calibration, K4A_CALIBRATION_TYPE_DEPTH);
+    interpolation_t interpolation_type = INTERPOLATION_BILINEAR_DEPTH;
+
 #ifdef HAVE_OPENCV
     setUseOptimized(true);
 
@@ -264,7 +419,7 @@ int main(int argc, char** argv)
     Ptr<kinfu::Params> params;
     params = kinfu::Params::defaultParams();
     initialize_kinfu_params(
-        *params, width, height, intrinsics->param.fx, intrinsics->param.fy, intrinsics->param.cx, intrinsics->param.cy);
+        *params, width, height, pinhole.fx, pinhole.fy, pinhole.px, pinhole.py);
 
     // Distortion coefficients
     Matx<float, 1, 8> distCoeffs;
@@ -277,15 +432,6 @@ int main(int argc, char** argv)
     distCoeffs(6) = intrinsics->param.k5;
     distCoeffs(7) = intrinsics->param.k6;
 
-#ifdef CUSTOM_UNDISTORTION
-    pinhole_t pinhole;
-    pinhole.px = intrinsics->param.cx;
-    pinhole.py = intrinsics->param.cy;
-    pinhole.fx = intrinsics->param.fx;
-    pinhole.fy = intrinsics->param.fy;
-    pinhole.width = width;
-    pinhole.height = height;
-
     k4a_image_t lut = NULL;
     k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM,
                      pinhole.width,
@@ -293,12 +439,7 @@ int main(int argc, char** argv)
                      pinhole.width * (int)sizeof(coordinate_t),
                      &lut);
 
-    create_undistortion_lut(&calibration, K4A_CALIBRATION_TYPE_DEPTH, &pinhole, lut);
-#else
-    // Initialize undistort maps
-    UMat map1, map2;
-    initUndistortRectifyMap(params->intr, distCoeffs, noArray(), params->intr, params->frameSize, CV_16SC2, map1, map2);
-#endif
+    create_undistortion_lut(&calibration, K4A_CALIBRATION_TYPE_DEPTH, &pinhole, lut, interpolation_type);
 
     // Create KinectFusion module instance
     Ptr<kinfu::KinFu> kf;
@@ -338,39 +479,23 @@ int main(int argc, char** argv)
             continue;
         }
 
-#ifdef CUSTOM_UNDISTORTION
         k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16,
                          pinhole.width,
                          pinhole.height,
                          pinhole.width * (int)sizeof(uint16_t),
                          &undistorted_depth_image);
-        remap(depth_image, lut, undistorted_depth_image);
+        remap(depth_image, lut, undistorted_depth_image, interpolation_type);
 
         // Create frame from depth buffer
         uint8_t *buffer = k4a_image_get_buffer(undistorted_depth_image);
         uint16_t *depth_buffer = reinterpret_cast<uint16_t *>(buffer);
         UMat undistortedFrame;
         create_mat_from_buffer<uint16_t>(depth_buffer, width, height).copyTo(undistortedFrame);
-#else
-        // Create frame from depth buffer
-        uint8_t *buffer = k4a_image_get_buffer(depth_image);
-        uint16_t *depth_buffer = reinterpret_cast<uint16_t *>(buffer);
-        UMat frame;
-        create_mat_from_buffer<uint16_t>(depth_buffer, width, height).copyTo(frame);
 
-        // Undistort the depth frame (INTER_LINEAR will introduce floating noise between valid and invalid depth. As a
-        // demonstration, this example here uses the naive INTER_NEAREST mode, which can generate some "ring" artifacts.
-        // One can implement bilinear undistortion with invalid depth pixels awareness and edge preserving without
-        // introducing the artificial noise between invalid and valid depth pixels.
-        UMat undistortedFrame;
-        remap(frame, undistortedFrame, map1, map2, INTER_NEAREST);
-#endif
         if (undistortedFrame.empty())
         {
             k4a_image_release(depth_image);
-#ifdef CUSTOM_UNDISTORTION
             k4a_image_release(undistorted_depth_image);
-#endif
             k4a_capture_release(capture);
             continue;
         }
@@ -381,9 +506,7 @@ int main(int argc, char** argv)
             printf("Reset KinectFusion\n");
             kf->reset();
             k4a_image_release(depth_image);
-#ifdef CUSTOM_UNDISTORTION
             k4a_image_release(undistorted_depth_image);
-#endif
             k4a_capture_release(capture);
             continue;
         }
@@ -472,15 +595,11 @@ int main(int argc, char** argv)
         }
 
         k4a_image_release(depth_image);
-#ifdef CUSTOM_UNDISTORTION
         k4a_image_release(undistorted_depth_image);
-#endif
         k4a_capture_release(capture);
     }
 
-#ifdef CUSTOM_UNDISTORTION
     k4a_image_release(lut);
-#endif
 
     destroyAllWindows();
 #endif
