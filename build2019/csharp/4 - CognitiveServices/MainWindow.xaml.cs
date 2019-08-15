@@ -65,7 +65,7 @@ namespace Microsoft.Samples.AzureKinectBasics
         /// <summary>
         /// Subscription key for Cognitive Services
         /// </summary>
-        private const string subscriptionKey = "2311cb49e955465a871c779b80465e20";
+        private const string subscriptionKey = "YOUR SUBSCRIPTION KEY HERE";
 
         /// <summary>
         /// Connection to Azure Computer Vision Cognitive Service
