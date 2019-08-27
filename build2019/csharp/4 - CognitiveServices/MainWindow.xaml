@@ -1,0 +1,61 @@
+﻿<Window x:Class="Microsoft.Samples.AzureKinectBasics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kinect Basics" 
+        Height="600" Width="700" 
+        Closing="MainWindow_Closing" Loaded="Window_Loaded">
+    <Window.Resources>
+        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
+        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f" />
+        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2" />
+        <Style TargetType="{x:Type Image}">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+        <Style TargetType="{x:Type Button}" x:Key="ScreenshotButton" >
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" Background="Transparent">
+                                <TextBlock x:Name="ScreenshotText" Text="{TemplateBinding Content}" TextAlignment="Left"  VerticalAlignment="Center" Foreground="{StaticResource KinectPurpleBrush}" FontSize="15" />
+                                <Grid Margin="9,0,0,0">
+                                    <Image x:Name="ScreenshotNormal" Source="Images\ScreenshotNormal.png" Stretch="None" HorizontalAlignment="Center" />
+                                    <Image x:Name="ScreenshotHover" Source="Images\ScreenshotHover.png" Stretch="None" HorizontalAlignment="Center" Visibility="Collapsed" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Visibility" Value="Collapsed" TargetName="ScreenshotNormal" />
+                                <Setter Property="Visibility" Value="Visible" TargetName="ScreenshotHover" />
+                                <Setter Property="Foreground" Value="{StaticResource KinectBlueBrush}" TargetName="ScreenshotText" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="10 0 10 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Image Grid.Row="0" Source="Images\Logo.png" HorizontalAlignment="Left" Height="32" Width="81" Margin="0 10 0 5" />
+
+        <Viewbox Grid.Row="1" HorizontalAlignment="Center">
+            <Grid Name="CompositeImage">
+                <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+            </Grid>
+        </Viewbox>
+
+
+        <StatusBar Grid.Row="2" HorizontalAlignment="Left" Name="statusBar" VerticalAlignment="Center" Background="Transparent" Foreground="{StaticResource MediumGreyBrush}">
+            <StatusBarItem Content="{Binding StatusText}" FontFamily="Segoe UI" FontSize="18"/>
+        </StatusBar>
+        <Button Grid.Row="2" Style="{StaticResource ScreenshotButton}" Content="Screenshot" Height="Auto" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10 10 0 10" Click="ScreenshotButton_Click" />
+
+    </Grid>
+</Window>
