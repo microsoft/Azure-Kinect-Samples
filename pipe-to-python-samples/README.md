@@ -7,10 +7,10 @@ It first creates a pipe server in c++ to read depth and ab captures from Azure K
 PS: It is created by combining the NamedPipe example from https://docs.microsoft.com/en-us/windows/win32/ipc/multithreaded-pipe-server
 and Azure-Kinect-Sensor-SDK streaming example from https://github.com/microsoft/Azure-Kinect-Sensor-SDK/tree/develop/examples/streaming
 
-() PipeClient in python: pipeClientReadImages.py creates a pipe client to read the streamed images and visualize them in opencv, you need to:
+() PipeClient in python (tested with Python3.6): pipeClientReadImages.py creates a pipe client to read the streamed images and visualize them in opencv, you need to:
      pip install matplotlib, opencv-python, Pypiwin32
 
 Use on the command line as follows:
 
     pipe_streaming_example.exe // start a pipe server to stream depth/ab frames
-    python.exe pipeClientReadImages.py // read the streamed images out in python, then do your stuff on these images in python....
+    python.exe pipeClientReadImages.py // read the streamed images out in python, then do your stuff on these images in python, exit by pressing "Esc"....

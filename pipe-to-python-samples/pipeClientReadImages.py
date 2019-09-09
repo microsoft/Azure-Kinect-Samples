@@ -15,6 +15,10 @@ FRAME_WIDTH = 640
 FRAME_HEIGHT = 576
 BYTES_PER_PIXEL = 2
 
+# For gray visulization
+MAX_DEPTH_FOR_VIS = 8000.0
+MAX_AB_FOR_VIS = 512.0
+
 if __name__ == "__main__":
 
     # Create pipe client
@@ -26,7 +30,7 @@ if __name__ == "__main__":
 
     # For visualization
     cv2.namedWindow('vis', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('vis', 1300, 600)
+    cv2.resizeWindow('vis', FRAME_WIDTH * 2, FRAME_HEIGHT)
 
     while True:
         # Send request to pipe server
@@ -39,8 +43,8 @@ if __name__ == "__main__":
         depth_img_full = np.frombuffer(depth_data[1], dtype=np.uint16).reshape(FRAME_HEIGHT, FRAME_WIDTH).copy()
         ab_img_full = np.frombuffer(ab_data[1], dtype=np.uint16).reshape(FRAME_HEIGHT, FRAME_WIDTH).copy()
         
-        depth_vis = (plt.get_cmap("gray")(depth_img_full/8000.0)[..., :3]*255.0).astype(np.uint8)
-        ab_vis = (plt.get_cmap("gray")(ab_img_full/512.0)[..., :3]*255.0).astype(np.uint8)
+        depth_vis = (plt.get_cmap("gray")(depth_img_full / MAX_DEPTH_FOR_VIS)[..., :3]*255.0).astype(np.uint8)
+        ab_vis = (plt.get_cmap("gray")(ab_img_full / MAX_AB_FOR_VIS)[..., :3]*255.0).astype(np.uint8)
         
         # Visualize the images
         vis = np.hstack([depth_vis, ab_vis])

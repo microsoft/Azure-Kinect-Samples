@@ -20,13 +20,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -88,12 +88,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="packages\Microsoft.Azure.Kinect.Sensor.1.1.0\build\native\Microsoft.Azure.Kinect.Sensor.targets" Condition="Exists('packages\Microsoft.Azure.Kinect.Sensor.1.1.0\build\native\Microsoft.Azure.Kinect.Sensor.targets')" />
+    <Import Project="packages\Microsoft.Azure.Kinect.Sensor.1.2.0\build\native\Microsoft.Azure.Kinect.Sensor.targets" Condition="Exists('packages\Microsoft.Azure.Kinect.Sensor.1.2.0\build\native\Microsoft.Azure.Kinect.Sensor.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Microsoft.Azure.Kinect.Sensor.1.1.0\build\native\Microsoft.Azure.Kinect.Sensor.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Azure.Kinect.Sensor.1.1.0\build\native\Microsoft.Azure.Kinect.Sensor.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.Azure.Kinect.Sensor.1.2.0\build\native\Microsoft.Azure.Kinect.Sensor.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Azure.Kinect.Sensor.1.2.0\build\native\Microsoft.Azure.Kinect.Sensor.targets'))" />
   </Target>
 </Project>
