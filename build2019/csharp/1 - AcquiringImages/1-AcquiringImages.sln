@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28809.33
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1-AcquiringImages", "1-AcquiringImages.csproj", "{4BB6C393-9003-4608-BD70-F3FDA26378AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BB6C393-9003-4608-BD70-F3FDA26378AA}.Debug|x64.ActiveCfg = Debug|x64
+		{4BB6C393-9003-4608-BD70-F3FDA26378AA}.Debug|x64.Build.0 = Debug|x64
+		{4BB6C393-9003-4608-BD70-F3FDA26378AA}.Release|x64.ActiveCfg = Release|x64
+		{4BB6C393-9003-4608-BD70-F3FDA26378AA}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45D8CA51-8EE0-4864-A96B-E3A05A4329E9}
+	EndGlobalSection
+EndGlobal
