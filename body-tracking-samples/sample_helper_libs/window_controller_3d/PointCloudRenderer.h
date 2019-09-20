@@ -39,10 +39,11 @@ namespace Visualization
         void Render() override;
         void Render(int width, int height);
 
-        void ChangePointCloudSize(std::optional<float> pointCloudSize);
+        void ChangePointCloudSize(float pointCloudSize);
 
     private:
         // Render settings
+        const GLfloat m_defaultPointCloudSize = 0.5f;
         std::optional<GLfloat> m_pointCloudSize;
         bool m_enableShading = false;
 

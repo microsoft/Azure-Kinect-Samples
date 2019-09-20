@@ -188,14 +188,17 @@ void PointCloudRenderer::Render(int width, int height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float pointSize;
-
     if (m_pointCloudSize)
     {
         pointSize = m_pointCloudSize.value();
     }
+    else if (m_width == 0 || m_height == 0)
+    {
+        pointSize = m_defaultPointCloudSize;
+    }
     else
     {
-        pointSize = std::min(width / (float)m_width, height / (float)m_height);
+        pointSize = std::min(2.f * width / (float)m_width, 2.f * height / (float)m_height);
     }
     glPointSize(pointSize);
 
@@ -214,7 +217,7 @@ void PointCloudRenderer::Render(int width, int height)
     glBindVertexArray(0);
 }
 
-void PointCloudRenderer::ChangePointCloudSize(std::optional<float> pointCloudSize)
+void PointCloudRenderer::ChangePointCloudSize(float pointCloudSize)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 

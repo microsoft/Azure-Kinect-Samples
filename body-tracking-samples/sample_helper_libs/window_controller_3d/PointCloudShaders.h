@@ -73,7 +73,7 @@ static const char* const glslPointCloudVertexShader = GLSL_STRING(
             {
                 vec3 lightDirection = normalize(lightPosition - vertexPosition);
                 // Use mix function to reduce the strength of the diffuse effect
-                float defuseRatio = 0.5f;
+                float defuseRatio = 0.7f;
                 diffuse = mix(1.0f, abs(dot(normalize(vertexNormal), lightDirection)), defuseRatio);
             }
 

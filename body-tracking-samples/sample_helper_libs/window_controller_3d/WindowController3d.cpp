@@ -392,7 +392,7 @@ void WindowController3d::SetLayout3d(Layout3d layout3d)
     m_layout3d = layout3d;
 }
 
-void WindowController3d::ChangePointCloudSize(std::optional<float> pointCloudSize)
+void WindowController3d::ChangePointCloudSize(float pointCloudSize)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
