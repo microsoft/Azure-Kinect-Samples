@@ -121,8 +121,8 @@ int main(int argc, char** argv)
 
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
-    VERIFY(k4abt_tracker_create(&sensorCalibration, &tracker), "Body tracker initialization failed!");
-
+    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
     // Initialize the 3d window controller
     Window3dWrapper window3d;
     window3d.Create("3D Visualization", sensorCalibration);

@@ -112,7 +112,7 @@ void Window3dWrapper::UpdatePointClouds(k4a_image_t depthImage, std::vector<Colo
                 continue;
             }
 
-            linmath::vec4 color = { 1.f, 1.f, 1.f, 0.8f };
+            linmath::vec4 color = { 0.8f, 0.8f, 0.8f, 1.f };
             linmath::ivec2 pixelLocation = { w, h };
 
             if (pointCloudColors.size() > 0)

@@ -64,7 +64,8 @@ int main()
         "Get depth camera calibration failed!");
 
     k4abt_tracker_t tracker = NULL;
-    VERIFY(k4abt_tracker_create(&sensor_calibration, &tracker), "Body tracker initialization failed!");
+    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
     int frame_count = 0;
     do

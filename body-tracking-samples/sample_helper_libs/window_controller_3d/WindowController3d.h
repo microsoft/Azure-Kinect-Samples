@@ -87,7 +87,7 @@ namespace Visualization
 
         void SetLayout3d(Layout3d layout3d);
 
-        void ChangePointCloudSize(std::optional<float> pointCloudSize);
+        void ChangePointCloudSize(float pointCloudSize);
 
         void SetFloorRendering(bool enableFloorRendering, linmath::vec3 floorPosition, linmath::quaternion floorOrientation);
 
