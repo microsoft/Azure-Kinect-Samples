@@ -25,9 +25,11 @@ Window3dWrapper::~Window3dWrapper()
 
 void Window3dWrapper::Create(
     const char* name,
-    k4a_depth_mode_t depthMode)
+    k4a_depth_mode_t depthMode,
+    int windowWidth,
+    int windowHeight)
 {
-    m_window3d.Create(name);
+    m_window3d.Create(name, true, windowWidth, windowHeight);
     m_window3d.SetMirrorMode(true);
 
     switch (depthMode)
@@ -169,12 +171,21 @@ void Window3dWrapper::AddBone(k4a_float3_t joint1Position, k4a_float3_t joint2Po
 
 void Window3dWrapper::AddBody(const k4abt_body_t& body, Color color)
 {
+    Color lowConfidenceColor = color;
+    lowConfidenceColor.a = color.a / 4;
+
     for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
     {
-        const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
-        const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
+        if (body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+        {
+            const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
+            const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
 
-        AddJoint(jointPosition, jointOrientation, color);
+            AddJoint(
+                jointPosition,
+                jointOrientation,
+                body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM ? color : lowConfidenceColor);
+        }
     }
 
     for (size_t boneIdx = 0; boneIdx < g_boneList.size(); boneIdx++)
@@ -182,10 +193,16 @@ void Window3dWrapper::AddBody(const k4abt_body_t& body, Color color)
         k4abt_joint_id_t joint1 = g_boneList[boneIdx].first;
         k4abt_joint_id_t joint2 = g_boneList[boneIdx].second;
 
-        const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
-        const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
+        if (body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW &&
+            body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+        {
+            bool confidentBone = body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM &&
+                body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM;
+            const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
+            const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
 
-        AddBone(joint1Position, joint2Position, color);
+            AddBone(joint1Position, joint2Position, confidentBone ? color : lowConfidenceColor);
+        }
     }
 }
 

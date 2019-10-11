@@ -18,7 +18,9 @@ public:
     // Create Window3d wrapper without point cloud shading
     void Create(
         const char* name,
-        k4a_depth_mode_t depthMode);
+        k4a_depth_mode_t depthMode,
+        int windowWidth = -1,
+        int windowHeight = -1);
 
     // Create Window3d wrapper with point cloud shading
     void Create(

@@ -15,9 +15,14 @@
 
 void PrintUsage()
 {
-    printf("\nUSAGE: (k4abt_)simple_3d_viewer.exe Mode[NFOV_UNBINNED, WFOV_BINNED]\n");
-    printf("    NFOV_UNBINNED (default) - Narraw Field of View Unbinned Mode [Resolution: 640x576; FOI: 75 degree x 65 degree]\n");
-    printf("    WFOV_BINNED             - Wide Field of View Binned Mode [Resolution: 512x512; FOI: 120 degree x 120 degree]\n");
+    printf("\nUSAGE: (k4abt_)simple_3d_viewer.exe SensorMode[NFOV_UNBINNED, WFOV_BINNED](optional) RuntimeMode[CPU](optional)\n");
+    printf("  - SensorMode: \n");
+    printf("      NFOV_UNBINNED (default) - Narraw Field of View Unbinned Mode [Resolution: 640x576; FOI: 75 degree x 65 degree]\n");
+    printf("      WFOV_BINNED             - Wide Field of View Binned Mode [Resolution: 512x512; FOI: 120 degree x 120 degree]\n");
+    printf("  - RuntimeMode: \n");
+    printf("      CPU - Use the CPU only mode. It runs on machines without a GPU but it will be much slower\n");
+    printf("e.g.   (k4abt_)simple_3d_viewer.exe WFOV_BINNED CPU\n");
+    printf("e.g.   (k4abt_)simple_3d_viewer.exe CPU\n");
     printf("e.g.   (k4abt_)simple_3d_viewer.exe WFOV_BINNED\n");
 }
 
@@ -71,32 +76,41 @@ int64_t CloseCallback(void* /*context*/)
     return 1;
 }
 
-k4a_depth_mode_t ParseDepthModeFromArg(int argc, char** argv)
+struct InputSettings
 {
-    k4a_depth_mode_t depthCameraMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
-    if (argc > 1)
+    k4a_depth_mode_t DepthCameraMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+    bool CpuOnlyMode = false;
+};
+
+bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettings)
+{
+    for (int i = 1; i < argc; i++)
     {
-        std::string inputArg(argv[1]);
+        std::string inputArg(argv[i]);
         if (inputArg == std::string("NFOV_UNBINNED"))
         {
-            depthCameraMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+            inputSettings.DepthCameraMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
         }
         else if (inputArg == std::string("WFOV_BINNED"))
         {
-            depthCameraMode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+            inputSettings.DepthCameraMode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
+        }
+        else if (inputArg == std::string("CPU"))
+        {
+            inputSettings.CpuOnlyMode = true;
         }
         else
         {
-            depthCameraMode = K4A_DEPTH_MODE_OFF;
+            return false;
         }
     }
-    return depthCameraMode;
+    return true;
 }
 
 int main(int argc, char** argv)
 {
-    k4a_depth_mode_t depthCameraMode = ParseDepthModeFromArg(argc, argv);
-    if (depthCameraMode == K4A_DEPTH_MODE_OFF)
+    InputSettings inputSettings;
+    if (!ParseInputSettingsFromArg(argc, argv, inputSettings))
     {
         PrintUsage();
         return -1;
@@ -108,7 +122,7 @@ int main(int argc, char** argv)
 
     // Start camera. Make sure depth camera is enabled.
     k4a_device_configuration_t deviceConfig = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-    deviceConfig.depth_mode = depthCameraMode;
+    deviceConfig.depth_mode = inputSettings.DepthCameraMode;
     deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_OFF;
     VERIFY(k4a_device_start_cameras(device, &deviceConfig), "Start K4A cameras failed!");
 
@@ -122,6 +136,7 @@ int main(int argc, char** argv)
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    tracker_config.cpu_only_mode = inputSettings.CpuOnlyMode;
     VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
     // Initialize the 3d window controller
     Window3dWrapper window3d;
@@ -197,14 +212,22 @@ int main(int argc, char** argv)
                 // Assign the correct color based on the body id
                 Color color = g_bodyColors[body.id % g_bodyColors.size()];
                 color.a = 0.4f;
+                Color lowConfidenceColor = color;
+                lowConfidenceColor.a = 0.1f;
 
                 // Visualize joints
                 for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
                 {
-                    const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
-                    const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
+                    if (body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+                    {
+                        const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
+                        const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
 
-                    window3d.AddJoint(jointPosition, jointOrientation, color);
+                        window3d.AddJoint(
+                            jointPosition, 
+                            jointOrientation, 
+                            body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM ? color : lowConfidenceColor);
+                    }
                 }
 
                 // Visualize bones
@@ -213,10 +236,16 @@ int main(int argc, char** argv)
                     k4abt_joint_id_t joint1 = g_boneList[boneIdx].first;
                     k4abt_joint_id_t joint2 = g_boneList[boneIdx].second;
 
-                    const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
-                    const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
+                    if (body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW &&
+                        body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+                    {
+                        bool confidentBone = body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM &&
+                                             body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM;
+                        const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
+                        const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
 
-                    window3d.AddBone(joint1Position, joint2Position, color);
+                        window3d.AddBone(joint1Position, joint2Position, confidentBone ? color : lowConfidenceColor);
+                    }
                 }
             }
 
