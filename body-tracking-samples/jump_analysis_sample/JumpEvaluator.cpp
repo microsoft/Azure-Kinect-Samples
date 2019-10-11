@@ -386,12 +386,12 @@ void JumpEvaluator::CreateRenderWindow(
     int windowIndex,
     k4a_float3_t standingPosition)
 {
-    window.Create(windowName.c_str(), K4A_DEPTH_MODE_WFOV_2X2BINNED);
+    window.Create(windowName.c_str(), K4A_DEPTH_MODE_WFOV_2X2BINNED, m_defaultWindowWidth, m_defaultWindowHeight);
     window.SetCloseCallback(ReviewWindowCloseCallback, &m_reviewWindowIsRunning);
     window.AddBody(body, g_bodyColors[0]);
     window.SetFloorRendering(true, standingPosition.v[0] / 1000.f, standingPosition.v[1] / 1000.f, standingPosition.v[2] / 1000.f);
 
-    int xPos = windowIndex * 640;
+    int xPos = windowIndex * m_defaultWindowWidth;
     int yPos = 100;
     window.SetWindowPosition(xPos, yPos);
 }

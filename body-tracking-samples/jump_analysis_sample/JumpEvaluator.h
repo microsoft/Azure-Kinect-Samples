@@ -73,6 +73,10 @@ private:
     HandRaisedDetector m_handRaisedDetector;
     bool m_previousHandsAreRaised = false;
 
+    // Default jump analysis window size
+    const int m_defaultWindowWidth = 640;
+    const int m_defaultWindowHeight = 576;
+
     Window3dWrapper m_window3dSquatPose;
     Window3dWrapper m_window3dJumpPeakPose;
     Window3dWrapper m_window3dReplay;
