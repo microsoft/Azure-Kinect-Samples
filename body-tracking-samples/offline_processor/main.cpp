@@ -124,10 +124,8 @@ bool process_mkv_offline(const char* input_path, const char* output_path)
     json_output["bone_list"] = json::array();
     for (int i = 0; i < (int)g_boneList.size(); i++)
     {
-        json_output["bone_list"].push_back(
-            basic_json(pair<string, string>(
-                g_jointNames.find(g_boneList[i].first)->second,
-                g_jointNames.find(g_boneList[i].second)->second)));
+        json_output["bone_list"].push_back({ g_jointNames.find(g_boneList[i].first)->second,
+                                             g_jointNames.find(g_boneList[i].second)->second });
     }
 
     cout << "Tracking " << input_path << endl;
