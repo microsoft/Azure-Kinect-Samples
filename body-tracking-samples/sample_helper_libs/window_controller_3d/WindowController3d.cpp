@@ -73,8 +73,21 @@ void WindowController3d::Create(const char* name, bool showWindow, int width, in
     {
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
     }
-    m_windowWidth = width;
-    m_windowHeight = height;
+
+    const GLFWvidmode* displayInfo = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    if (width <= 0 || height <= 0)
+    {
+        m_windowWidth = static_cast<int>(displayInfo->width * m_defaultWindowWidthRatio);
+        m_windowHeight = static_cast<int>(displayInfo->height * m_defaultWindowHeightRatio);
+    }
+    else
+    {
+        m_windowWidth = width;
+        m_windowHeight = height;
+    }
+
+    m_windowStartPositionX = (displayInfo->width - m_windowWidth) / 2;
+    m_windowStartPositionY = (displayInfo->height - m_windowHeight) / 2;
 
     // Get monitor for full screen
     GLFWmonitor* monitor = nullptr;
@@ -105,6 +118,8 @@ void WindowController3d::Create(const char* name, bool showWindow, int width, in
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+
+    glfwSetWindowPos(m_window, m_windowStartPositionX, m_windowStartPositionY);
 
     // In to use the member function as callback, set the current class as the Window User Pointer
     glfwSetWindowUserPointer(m_window, this);

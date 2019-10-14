@@ -14,8 +14,9 @@ void print_body_information(k4abt_body_t body)
     {
         k4a_float3_t position = body.skeleton.joints[i].position;
         k4a_quaternion_t orientation = body.skeleton.joints[i].orientation;
-        printf("Joint[%d]: Position[mm] ( %f, %f, %f ); Orientation ( %f, %f, %f, %f) \n",
-            i, position.v[0], position.v[1], position.v[2], orientation.v[0], orientation.v[1], orientation.v[2], orientation.v[3]);
+        k4abt_joint_confidence_level_t confidence_level = body.skeleton.joints[i].confidence_level;
+        printf("Joint[%d]: Position[mm] ( %f, %f, %f ); Orientation ( %f, %f, %f, %f); Confidence Level (%d)  \n",
+            i, position.v[0], position.v[1], position.v[2], orientation.v[0], orientation.v[1], orientation.v[2], orientation.v[3], confidence_level);
     }
 }
 
