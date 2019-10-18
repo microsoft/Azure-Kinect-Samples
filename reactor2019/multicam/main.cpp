@@ -179,15 +179,14 @@ void green_screen(double app_duration,
         secondary_depth_to_main_color->depth_image_to_color_camera(secondary_depth_image,
             &secondary_depth_in_main_color);
 
-        cv::Mat cv_main_depth_in_main_color = depth_to_opencv(main_depth_in_main_color);
         cv::Mat cv_main_color_image = color_to_opencv(main_color_image);
+        cv::Mat cv_main_depth_in_main_color = depth_to_opencv(main_depth_in_main_color);
+        cv::Mat cv_secondary_depth_in_main_color = depth_to_opencv(secondary_depth_in_main_color);
 
         // create the image that will be be used as output
         // make a green background
         cv::Scalar green_pixel(0, 255, 0);
         cv::Mat output_image(cv_main_color_image.rows, cv_main_color_image.cols, CV_8UC3, green_pixel);
-
-        cv::Mat cv_secondary_depth_in_main_color = depth_to_opencv(secondary_depth_in_main_color);
 
         // Build a mask of what pixels are valid. 0 in the depth data means we did not get a depth for that pixel.
         cv::Mat main_valid_mask = cv_main_depth_in_main_color != 0;
