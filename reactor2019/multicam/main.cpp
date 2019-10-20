@@ -225,7 +225,6 @@ void green_screen(double app_duration,
         /* END LAB 4*/
 
         cv::imshow("Green Screen", output_image);
-        /* END LAB_2.2 */
         cv::waitKey(1);
     }
 }
