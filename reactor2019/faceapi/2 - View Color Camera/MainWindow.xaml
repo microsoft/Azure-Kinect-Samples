@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AzureKinectFaceApi"
         mc:Ignorable="d"
-        Title="Azure Kinect &amp; Face API" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Azure Kinect &amp; Face API - 02 View Color Camera" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <StackPanel>
             <Label x:Name="lblStatus" FontSize="30" />

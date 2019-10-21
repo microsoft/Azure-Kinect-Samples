@@ -44,7 +44,7 @@ namespace AzureKinectFaceApi
 
         public static async Task<IList<DetectedFace>> GetFaces(IFaceClient client, Stream image)
         {
-            CancellationTokenSource cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            CancellationTokenSource cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
             return await client.Face.DetectWithStreamAsync(
                 image,
