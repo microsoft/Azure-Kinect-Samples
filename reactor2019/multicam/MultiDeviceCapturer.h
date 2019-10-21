@@ -14,15 +14,19 @@ constexpr int64_t WAIT_FOR_SYNCHRONIZED_CAPTURE_TIMEOUT = 60000;
 
 static void log_lagging_time(const char *lagger, k4a::capture &master, k4a::capture &sub)
 {
+#ifdef _DEBUG
     std::cout << std::setw(6) << lagger << " lagging: mc:" << std::setw(6)
               << master.get_color_image().get_device_timestamp().count() << "us sc:" << std::setw(6)
               << sub.get_color_image().get_device_timestamp().count() << "us\n";
+#endif
 }
 
 static void log_synced_image_time(k4a::capture &master, k4a::capture &sub)
 {
+#ifdef _DEBUG
     std::cout << "Sync'd capture: mc:" << std::setw(6) << master.get_color_image().get_device_timestamp().count()
               << "us sc:" << std::setw(6) << sub.get_color_image().get_device_timestamp().count() << "us\n";
+#endif
 }
 
 class MultiDeviceCapturer
