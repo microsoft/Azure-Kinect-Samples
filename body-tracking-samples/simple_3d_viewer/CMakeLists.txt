@@ -10,3 +10,12 @@ target_link_libraries(simple_3d_viewer PRIVATE
     window_controller_3d
     glfw::glfw
     )
+
+#install(
+#    TARGETS
+#        simple_3d_viewer
+#    RUNTIME DESTINATION
+#        ${VIEWER_INSTALL_LOCATION}
+#    COMPONENT
+#        runtime
+#)
