@@ -1,3 +1,0 @@
-[submodule "body-tracking-samples/extern/glfw"]
-	path = body-tracking-samples/extern/glfw
-	url = https://github.com/glfw/glfw.git
