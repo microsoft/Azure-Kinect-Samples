@@ -9,7 +9,6 @@
 #include "WindowController3d.h"
 
 
-
 // This is a wrapper library that convert the types from the k4abt types to the window3d visualization library types
 class Window3dWrapper
 {
