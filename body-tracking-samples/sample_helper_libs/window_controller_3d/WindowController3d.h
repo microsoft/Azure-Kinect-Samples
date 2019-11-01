@@ -16,7 +16,6 @@
 #include "SkeletonRenderer.h"
 #include "FloorRenderer.h"
 
-
 namespace Visualization
 {
     typedef int64_t(*CloseCallbackType)(void* context);
