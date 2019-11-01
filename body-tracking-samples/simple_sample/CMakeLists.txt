@@ -7,7 +7,6 @@ add_executable(simple_sample main.c)
 target_link_libraries(simple_sample PRIVATE 
     k4a
     k4abt
-#    glfw::glfw
     )
 
 
