@@ -14,8 +14,8 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
-FIND_PACKAGE(k4a)
-FIND_PACKAGE(k4abt)
+FIND_PACKAGE(k4a REQUIRED)
+FIND_PACKAGE(k4abt REQUIRED)
 
 # These specific settings tell the loader to search the directory of the
 # executable for shared objects. This is done on Linux to emulate the default
