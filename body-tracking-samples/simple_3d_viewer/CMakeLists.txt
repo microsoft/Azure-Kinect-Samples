@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
 add_executable(simple_3d_viewer main.cpp)
 
 target_include_directories(simple_3d_viewer PRIVATE ../sample_helper_includes ../sample_helper_libs/window_controller_3d)
@@ -14,11 +13,3 @@ target_link_libraries(simple_3d_viewer PRIVATE
     glfw::glfw
     )
 
-#install(
-#    TARGETS
-#        simple_3d_viewer
-#    RUNTIME DESTINATION
-#        ${VIEWER_INSTALL_LOCATION}
-#    COMPONENT
-#        runtime
-#)

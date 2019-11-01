@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-add_library(window_controller_3d SHARED
+add_library(window_controller_3d STATIC
             CoordinateAxes.cpp
             Cylinder.cpp
             FloorRenderer.cpp

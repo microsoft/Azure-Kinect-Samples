@@ -14,51 +14,51 @@
 class Window3dWrapper
 {
 public:
-    LIB_EXPORT ~Window3dWrapper();
+    ~Window3dWrapper();
 
     // Create Window3d wrapper without point cloud shading
-    LIB_EXPORT void Create(
+    void Create(
         const char* name,
         k4a_depth_mode_t depthMode,
         int windowWidth = -1,
         int windowHeight = -1);
 
     // Create Window3d wrapper with point cloud shading
-    LIB_EXPORT void Create(
+    void Create(
         const char* name,
         const k4a_calibration_t& sensorCalibration);
 
-    LIB_EXPORT void SetCloseCallback(
+    void SetCloseCallback(
         Visualization::CloseCallbackType closeCallback,
         void* closeCallbackContext = nullptr);
 
-    LIB_EXPORT void SetKeyCallback(
+    void SetKeyCallback(
         Visualization::KeyCallbackType keyCallback,
         void* keyCallbackContext = nullptr);
 
-    LIB_EXPORT void Delete();
+    void Delete();
 
-    LIB_EXPORT void UpdatePointClouds(k4a_image_t depthImage, std::vector<Color> pointCloudColors = std::vector<Color>());
+    void UpdatePointClouds(k4a_image_t depthImage, std::vector<Color> pointCloudColors = std::vector<Color>());
 
-    LIB_EXPORT void CleanJointsAndBones();
+    void CleanJointsAndBones();
 
-    LIB_EXPORT void AddJoint(k4a_float3_t position, k4a_quaternion_t orientation, Color color);
+    void AddJoint(k4a_float3_t position, k4a_quaternion_t orientation, Color color);
 
-    LIB_EXPORT void AddBone(k4a_float3_t joint1Position, k4a_float3_t joint2Position, Color color);
+    void AddBone(k4a_float3_t joint1Position, k4a_float3_t joint2Position, Color color);
 
     // Helper function to directly add the whole body for rendering instead of adding separate joints and bones
-    LIB_EXPORT void AddBody(const k4abt_body_t& body, Color color);
+    void AddBody(const k4abt_body_t& body, Color color);
 
-    LIB_EXPORT void Render();
+    void Render();
 
     // Window Configuration Functions
-    LIB_EXPORT void SetFloorRendering(bool enableFloorRendering, float floorPositionX, float floorPositionY, float floorPositionZ);
+    void SetFloorRendering(bool enableFloorRendering, float floorPositionX, float floorPositionY, float floorPositionZ);
 
-    LIB_EXPORT void SetWindowPosition(int xPos, int yPos);
+    void SetWindowPosition(int xPos, int yPos);
 
     // Render Setting Functions
-    LIB_EXPORT void SetLayout3d(Visualization::Layout3d layout3d);
-    LIB_EXPORT void SetJointFrameVisualization(bool enableJointFrameVisualization);
+    void SetLayout3d(Visualization::Layout3d layout3d);
+    void SetJointFrameVisualization(bool enableJointFrameVisualization);
 
 private:
     void InitializeCalibration(const k4a_calibration_t& sensorCalibration);
