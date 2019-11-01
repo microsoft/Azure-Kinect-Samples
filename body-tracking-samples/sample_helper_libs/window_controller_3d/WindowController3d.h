@@ -16,6 +16,17 @@
 #include "SkeletonRenderer.h"
 #include "FloorRenderer.h"
 
+#if defined(_MSC_VER)
+    #define LIB_EXPORT
+#elif defined(__GNUC__)
+    // Linux by default exports all functions. Projects settings override that default and hide them. As a result
+    // exported functions need to be marked
+    #define LIB_EXPORT __attribute__((visibility("default")))
+#else
+    #pragma warning Unknown lib link import/export semantics.
+#endif
+
+
 namespace Visualization
 {
     typedef int64_t(*CloseCallbackType)(void* context);
@@ -39,7 +50,7 @@ namespace Visualization
     class WindowController3d
     {
     public:
-        WindowController3d();
+        LIB_EXPORT WindowController3d();
 
         void Create(
             const char *name,

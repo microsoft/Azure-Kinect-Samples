@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.9.0)
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 add_library(window_controller_3d SHARED
             CoordinateAxes.cpp
