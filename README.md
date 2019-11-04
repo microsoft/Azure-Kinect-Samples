@@ -40,6 +40,12 @@ Install the prerequisites
 ```
 apt install libk4abt0.9-dev
 apt install libxi-dev
+libxinerama-dev
+libxrandr-dev
+libxxf86vm-dev
+libxcursor-dev
+
+
 ```
 
 From the root of the git project
