@@ -22,8 +22,7 @@ FIND_PACKAGE(k4abt REQUIRED)
 # behavior of the Windows loader, which searches for DLLs in the path of the
 # executable.
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH YES)
-    set(CMAKE_INSTALL_RPATH "\$ORIGIN")
+    set(CMAKE_BUILD_RPATH "\$ORIGIN")
 endif()
 
 # If using clang or GCC, set default visibilty to hidden
