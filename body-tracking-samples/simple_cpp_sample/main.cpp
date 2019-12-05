@@ -76,10 +76,10 @@ int main()
                 k4abt::frame body_frame = tracker.pop_result();
                 if (body_frame != nullptr)
                 {
-                    size_t num_bodies = body_frame.get_num_bodies();
+                    uint32_t num_bodies = body_frame.get_num_bodies();
                     std::cout << num_bodies << " bodies are detected!" << std::endl;
 
-                    for (size_t i = 0; i < num_bodies; i++)
+                    for (uint32_t i = 0; i < num_bodies; i++)
                     {
                         k4abt_body_t body = body_frame.get_body(i);
                         print_body_information(body);

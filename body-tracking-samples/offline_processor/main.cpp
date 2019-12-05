@@ -34,7 +34,7 @@ bool predict_joints(json &frames_json, int frame_count, k4abt_tracker_t tracker,
         return false;
     }
 
-    size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
+    uint32_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
     uint64_t timestamp = k4abt_frame_get_device_timestamp_usec(body_frame);
 
     json frame_result_json;
@@ -42,7 +42,7 @@ bool predict_joints(json &frames_json, int frame_count, k4abt_tracker_t tracker,
     frame_result_json["frame_id"] = frame_count;
     frame_result_json["num_bodies"] = num_bodies;
     frame_result_json["bodies"] = json::array();
-    for (size_t i = 0; i < num_bodies; i++)
+    for (uint32_t i = 0; i < num_bodies; i++)
     {
         k4abt_skeleton_t skeleton;
         VERIFY(k4abt_frame_get_body_skeleton(body_frame, i, &skeleton), "Get body from body frame failed!");
