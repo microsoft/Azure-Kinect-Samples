@@ -136,7 +136,7 @@ int main(int argc, char** argv)
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
-    tracker_config.cpu_only_mode = inputSettings.CpuOnlyMode;
+    tracker_config.processing_mode = inputSettings.CpuOnlyMode ? K4ABT_TRACKER_PROCESSING_MODE_CPU : K4ABT_TRACKER_PROCESSING_MODE_GPU;
     VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
     // Initialize the 3d window controller
     Window3dWrapper window3d;
@@ -202,8 +202,8 @@ int main(int argc, char** argv)
 
             // Visualize the skeleton data
             window3d.CleanJointsAndBones();
-            size_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-            for (size_t i = 0; i < numBodies; i++)
+            uint32_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
+            for (uint32_t i = 0; i < numBodies; i++)
             {
                 k4abt_body_t body;
                 VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
@@ -224,8 +224,8 @@ int main(int argc, char** argv)
                         const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
 
                         window3d.AddJoint(
-                            jointPosition, 
-                            jointOrientation, 
+                            jointPosition,
+                            jointOrientation,
                             body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM ? color : lowConfidenceColor);
                     }
                 }

@@ -98,10 +98,10 @@ int main()
             k4a_wait_result_t pop_frame_result = k4abt_tracker_pop_result(tracker, &body_frame, K4A_WAIT_INFINITE);
             if (pop_frame_result == K4A_WAIT_RESULT_SUCCEEDED)
             {
-                size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
-                printf("%zu bodies are detected!\n", num_bodies);
+                uint32_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
+                printf("%u bodies are detected!\n", num_bodies);
 
-                for (size_t i = 0; i < num_bodies; i++)
+                for (uint32_t i = 0; i < num_bodies; i++)
                 {
                     k4abt_body_t body;
                     VERIFY(k4abt_frame_get_body_skeleton(body_frame, i, &body.skeleton), "Get body from body frame failed!");

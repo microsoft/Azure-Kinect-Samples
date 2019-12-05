@@ -10,8 +10,8 @@
 // Define the bone list based on the documentation
 const std::array<std::pair<k4abt_joint_id_t, k4abt_joint_id_t>, 31> g_boneList =
 {
-    std::make_pair(K4ABT_JOINT_SPINE_CHEST, K4ABT_JOINT_SPINE_NAVAL),
-    std::make_pair(K4ABT_JOINT_SPINE_NAVAL, K4ABT_JOINT_PELVIS),
+    std::make_pair(K4ABT_JOINT_SPINE_CHEST, K4ABT_JOINT_SPINE_NAVEL),
+    std::make_pair(K4ABT_JOINT_SPINE_NAVEL, K4ABT_JOINT_PELVIS),
     std::make_pair(K4ABT_JOINT_SPINE_CHEST, K4ABT_JOINT_NECK),
     std::make_pair(K4ABT_JOINT_NECK, K4ABT_JOINT_HEAD),
     std::make_pair(K4ABT_JOINT_HEAD, K4ABT_JOINT_NOSE),
@@ -49,7 +49,7 @@ const std::array<std::pair<k4abt_joint_id_t, k4abt_joint_id_t>, 31> g_boneList =
 const std::unordered_map<k4abt_joint_id_t, std::string> g_jointNames =
 {
     std::make_pair(K4ABT_JOINT_PELVIS,        "PELVIS"),
-    std::make_pair(K4ABT_JOINT_SPINE_NAVAL,   "SPINE_NAVAL"),
+    std::make_pair(K4ABT_JOINT_SPINE_NAVEL,   "SPINE_NAVEL"),
     std::make_pair(K4ABT_JOINT_SPINE_CHEST,   "SPINE_CHEST"),
     std::make_pair(K4ABT_JOINT_NECK,          "NECK"),
     std::make_pair(K4ABT_JOINT_CLAVICLE_LEFT, "CLAVICLE_LEFT"),
