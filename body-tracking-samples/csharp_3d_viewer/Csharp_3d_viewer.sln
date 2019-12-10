@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csharp_3d_viewer", "Csharp_3d_viewer.csproj", "{4F26D730-0F8A-413A-ACF3-B2F0DB8BEDD7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F26D730-0F8A-413A-ACF3-B2F0DB8BEDD7}.Debug|x64.ActiveCfg = Debug|x64
+		{4F26D730-0F8A-413A-ACF3-B2F0DB8BEDD7}.Debug|x64.Build.0 = Debug|x64
+		{4F26D730-0F8A-413A-ACF3-B2F0DB8BEDD7}.Release|x64.ActiveCfg = Release|x64
+		{4F26D730-0F8A-413A-ACF3-B2F0DB8BEDD7}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A706D05-5A84-4DC0-8D0C-AAFEEADBF91A}
+	EndGlobalSection
+EndGlobal
