@@ -150,8 +150,8 @@ int main()
 
             // Visualize the skeleton data
             window3d.CleanJointsAndBones();
-            size_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-            for (size_t i = 0; i < numBodies; i++)
+            uint32_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
+            for (uint32_t i = 0; i < numBodies; i++)
             {
                 k4abt_body_t body;
                 VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");

@@ -13,12 +13,23 @@
 *.userprefs
 
 # Build results
+[Bb]uild/
+[Bb]uild32/
+[Bb]uild64/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
 x86/
+x64Release/
+x64Debug/
+x86Release/
+x86Debug/
+Win32Debug/
+Win32Release/
+arm64Release/
+arm64Debug/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -26,6 +37,8 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+# Visual Studio code
+.vscode
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
