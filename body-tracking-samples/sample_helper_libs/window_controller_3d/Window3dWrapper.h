@@ -52,6 +52,7 @@ public:
 
     // Window Configuration Functions
     void SetFloorRendering(bool enableFloorRendering, float floorPositionX, float floorPositionY, float floorPositionZ);
+    void SetFloorRendering(bool enableFloorRendering, float floorPositionX, float floorPositionY, float floorPositionZ, float normalX, float normalY, float normalZ);
 
     void SetWindowPosition(int xPos, int yPos);
 
