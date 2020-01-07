@@ -38,6 +38,10 @@ namespace DSP
         }
         void Update(const std::chrono::microseconds& timestamp, float v)
         {
+            // Remove nans
+            if (v != v)
+                return;
+
             m_circularIndex = (m_circularIndex + 1) % m_window.size();
 
             m_movingAverageDelta = (v - m_window[m_circularIndex]) / m_window.size();

@@ -114,7 +114,7 @@ void Window3dWrapper::UpdatePointClouds(k4a_image_t depthImage, std::vector<Colo
                 continue;
             }
 
-            linmath::vec4 color = { 0.8f, 0.8f, 0.8f, 1.f };
+            linmath::vec4 color = { 0.8f, 0.8f, 0.8f, 0.6f };
             linmath::ivec2 pixelLocation = { w, h };
 
             if (pointCloudColors.size() > 0)
@@ -241,6 +241,23 @@ void Window3dWrapper::SetFloorRendering(bool enableFloorRendering, float floorPo
 {
     linmath::vec3 position = { floorPositionX, floorPositionY, floorPositionZ };
     m_window3d.SetFloorRendering(enableFloorRendering, position, {1.f, 0.f, 0.f, 0.f});
+}
+
+void Window3dWrapper::SetFloorRendering(bool enableFloorRendering, float floorPositionX, float floorPositionY, float floorPositionZ, float normalX, float normalY, float normalZ)
+{
+    linmath::vec3 position = { floorPositionX, floorPositionY, floorPositionZ };
+    linmath::vec3 n = { normalX , normalY , normalZ };
+    linmath::vec3_norm(n,n);
+    linmath::vec3 up = { 0, -1, 0 };
+
+    linmath::vec3 ax;
+    linmath::vec3_mul_cross(ax, up, n);
+    linmath::vec3_norm(ax, ax);
+
+    float ang = acos(linmath::vec3_mul_inner(up, n));
+    float hs = sin(ang / 2);
+    linmath::quaternion q = { cos(ang / 2), hs * ax[0], hs * ax[1], hs * ax[2] };
+    m_window3d.SetFloorRendering(enableFloorRendering, position, q);
 }
 
 void Window3dWrapper::InitializeCalibration(const k4a_calibration_t& sensorCalibration)

@@ -12,9 +12,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{A7D2F1BE-0030-4436-B391-FEDE1E756B02}</ProjectGuid>
-    <RootNamespace>simplecppsample</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{D50DDE2C-13FB-4121-BB86-942CC8E81019}</ProjectGuid>
+    <RootNamespace>floor_detector_sample</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -43,18 +43,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>..\sample_helper_libs\window_controller_3d;..\sample_helper_includes;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\build\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\build\temp\$(Configuration)\$(MSBuildProjectName)\</IntDir>
-    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>..\sample_helper_libs\window_controller_3d;..\sample_helper_includes;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\build\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\build\temp\$(Configuration)\$(MSBuildProjectName)\</IntDir>
-    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -62,6 +62,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -75,6 +76,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -83,11 +85,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FloorDetector.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PointCloudGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="dnn_model_2_0.onnx" />
+    <ProjectReference Include="..\sample_helper_libs\window_controller_3d\window_controller_3d.vcxproj">
+      <Project>{9e78b4cc-b641-42a1-8375-75a2cc8b3124}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FloorDetector.h" />
+    <ClInclude Include="PointCloudGenerator.h" />
+    <ClInclude Include="SampleMathTypes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
@@ -95,6 +108,7 @@
     <Import Project="$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.5\build\native\Microsoft.Azure.Kinect.BodyTracking.targets" Condition="Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.5\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" />
     <Import Project="$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets" Condition="Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets')" />
     <Import Project="$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets" Condition="Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets')" />
+    <Import Project="$(SolutionDir)\packages\glfw.3.3.0\build\native\glfw.targets" Condition="Exists('$(SolutionDir)\packages\glfw.3.3.0\build\native\glfw.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -104,5 +118,6 @@
     <Error Condition="!Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.5\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.5\build\native\Microsoft.Azure.Kinect.BodyTracking.targets'))" />
     <Error Condition="!Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets'))" />
     <Error Condition="!Exists('$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\glfw.3.3.0\build\native\glfw.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\glfw.3.3.0\build\native\glfw.targets'))" />
   </Target>
 </Project>

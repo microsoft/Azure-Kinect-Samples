@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
+
 #define EXIT_IF(_expression_, _message_)                                                                                       \
     if((_expression_))                                                                                                         \
     {                                                                                                                          \
