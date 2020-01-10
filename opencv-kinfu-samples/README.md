@@ -51,3 +51,15 @@ The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The followi
 Example:
 
     Usage: kinfu_example.exe
+
+## For Linux
+
+- Uncomment the HAVE_OPENCV pound define in the main.cpp
+- From the folder containing the CMakeLists.txt file,
+    ```
+    $ mkdir build
+    $ cd  build
+    $ cmake ..
+    $ make
+    $ ./kinfu-example
+    ```

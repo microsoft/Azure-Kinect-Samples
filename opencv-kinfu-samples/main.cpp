@@ -10,6 +10,19 @@
 
 using namespace std;
 
+#ifdef __linux__
+int _stricmp(const char *a, const char *b) {
+  int ca, cb;
+  do {
+     ca = (unsigned char) *a++;
+     cb = (unsigned char) *b++;
+     ca = tolower(toupper(ca));
+     cb = tolower(toupper(cb));
+   } while (ca == cb && ca != '\0');
+   return ca - cb;
+}
+#endif
+
 // Enable HAVE_OPENCV macro after you installed opencv and opencv contrib modules (kinfu, viz), please refer to README.md
 // #define HAVE_OPENCV
 #ifdef HAVE_OPENCV
