@@ -15,23 +15,14 @@ steps:
 
 # NuGet Restore Task
 - task: 333b11bd-d341-40d9-afcf-b32d5ce6f23b@2
-  displayName: 'NuGet Restore Task'
   inputs:
     restoreSolution: '$(solution)'
 
-- task: VSBuild@1
-  displayName: 'Build Debug Flavor'
-  inputs:
-    solution: '$(solution)'
-    clean: true
-    configuration: debug
-
-- task: VSBuild@1
-  displayName: 'Build Release Flavor'
-  inputs:
-    solution: '$(solution)'
-    clean: true
-    configuration: release
+# The build output exceeds the maximum size of build machine.
+# Temporarily disable the auto build check until we figure out a way to prune the build results.
+#- task: VSBuild@1
+#  inputs:
+#    solution: '$(solution)'
 
 - task: VSTest@2
 
