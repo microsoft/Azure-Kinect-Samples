@@ -18,9 +18,11 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
+# The build output exceeds the maximum size of build machine.
+# Temporarily disable the auto build check until we figure out a way to prune the build results.
+#- task: VSBuild@1
+#  inputs:
+#    solution: '$(solution)'
 
 - task: VSTest@2
 
