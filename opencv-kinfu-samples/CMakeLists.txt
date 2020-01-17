@@ -7,4 +7,4 @@ include_directories(${K4A_INCLUDE_DIRS})
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(kinfu-example PRIVATE k4a::k4a opencv_world)
+target_link_libraries(kinfu-example PRIVATE k4a::k4a opencv_rgbd opencv_viz)
