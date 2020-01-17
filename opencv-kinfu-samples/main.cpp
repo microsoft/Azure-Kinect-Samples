@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <k4a/k4a.h>
+#include <math.h>
 
 using namespace std;
 
