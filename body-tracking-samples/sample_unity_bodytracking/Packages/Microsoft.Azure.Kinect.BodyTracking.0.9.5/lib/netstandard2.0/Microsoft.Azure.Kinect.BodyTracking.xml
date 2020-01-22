@@ -1,0 +1,723 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Azure.Kinect.BodyTracking</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Body">
+            <summary>
+            Helper stack structure that allows easier access to body data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Body.InvalidId">
+            <summary>
+            The invalid body id value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Body.Frame">
+            <summary>
+            Gets frame on which this body was detected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Body.Index">
+            <summary>
+            Gets the body index in frame.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Body.Id">
+            <summary>
+            Get the body id for a particular person <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Index"/> from stored <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Frame"/>.
+            </summary>
+            <remarks>Called when the user has received a <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Frame"/> and wants to access the id of the body given a particular <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Index"/>.</remarks>
+            <seealso cref="M:Microsoft.Azure.Kinect.BodyTracking.Frame.GetBodyId(System.UInt32)"/>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Body.Skeleton">
+            <summary>
+            Get the joint information for a particular person <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Index"/> from stored <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Frame"/>.
+            </summary>
+            <remarks>Called when the user has received a <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Frame"/> and wants to access the skeleton of the body given a particular <see cref="P:Microsoft.Azure.Kinect.BodyTracking.Body.Index"/>.</remarks>
+            <seealso cref="M:Microsoft.Azure.Kinect.BodyTracking.Frame.GetBodySkeleton(System.UInt32)"/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException">
+            <summary>
+            Represents errors that occur when creating a tracker with the Azure Kinect Sensor Body Tracking SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException"/> class
+            with a specified error message and a reference to the inner exception that is the
+            cause of this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingCreateException"/> class
+            with serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException">
+            <summary>
+            Represents errors that occur when interacting with the Azure Kinect Body Tracking SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException"/> class
+            with a specified error message and a reference to the inner exception that is the
+            cause of this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Exceptions.AzureKinectBodyTrackingException"/> class
+            with serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Frame">
+            <summary>
+            Represents body tracking frame.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Frame.BodyIndexMapBackground">
+            <summary>
+            The pixel value that indicates the pixel belong to the background in the body id map.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Frame.NumberOfBodies">
+            <summary>
+            Get the number of people.
+            </summary>
+            <value>The number of detected bodies. 0 if the call fails.</value>
+            <remarks>Called when the user has received a body frame and wants to access the data contained in it.</remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Frame.DeviceTimestamp">
+            <summary>
+            Get the body frame's device timestamp.
+            </summary>
+            <value>
+            The timestamp of the body frame. If the frame is invalid this call will return 0. It is
+            also possible for 0 to be a valid timestamp originating from the beginning of a recording or the start of streaming.
+            </value>
+            <remarks>Called when the user has received a body frame and wants to access the data contained in it.</remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Frame.BodyIndexMap">
+             <summary>
+             Get the body index map.
+             </summary>
+             <remarks>
+             Called when the user has received a body frame and wants to access the data contained in it.
+            
+             Body Index map is the body instance segmentation map. Each pixel maps to the corresponding pixel in the
+             depth image or the IR image.The value for each pixel represents which body the pixel belongs to. It can be either
+             background (<see cref="F:Microsoft.Azure.Kinect.BodyTracking.Frame.BodyIndexMapBackground"/>) or the index of a detected <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Body"/>.
+             </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.BodyTracking.Frame.Capture">
+            <summary>
+            Get the original capture that is used to calculate this frame.
+            </summary>
+            <remarks>Called when the user has received a body frame and wants to access the data contained in it.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.GetBody(System.UInt32)">
+            <summary>
+            Gets the helper reference structure that can be used only on stack to get body data.
+            </summary>
+            <param name="index">The index of the body of which the body id information is queried.</param>
+            <returns>Helper reference structure that can be used only on stack to get body data.</returns>
+            <remarks>Called when the user has received a body frame and wants to access the data contained in it.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.GetBodyId(System.UInt32)">
+            <summary>
+            Get the body id for a particular person index from this frame.
+            </summary>
+            <param name="index">The index of the body of which the body id information is queried.</param>
+            <returns>Returns the body id. All failures will return <see cref="F:Microsoft.Azure.Kinect.BodyTracking.Body.InvalidId"/>.</returns>
+            <remarks>Called when the user has received a body frame and wants to access the id of the body given a particular index.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.GetBodySkeleton(System.UInt32)">
+            <summary>
+            Get the joint information for a particular person index from this frame.
+            </summary>
+            <returns>If successful this contains the body skeleton information.</returns>
+            <remarks>Called when the user has received a body frame and wants to access the skeleton of the body given a particular index.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.Reference">
+            <summary>
+            Creates a duplicate reference to the same Frame.
+            </summary>
+            <returns>A new Frame object representing the same data.</returns>
+            <remarks>Creating a reference to the same frame does not copy the frame,
+            or the data stored in the frame, but creates a new managed object representing
+            the same frame data. Each object must be independently disposed. The lifetime of the
+            underlying frame data will be equal or greater than all of the referenced Frame objects.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Frame"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Frame.Dispose(System.Boolean)">
+            <summary>
+            Disposes the resources held by the frame.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Joint">
+            <summary>
+            Structure to define a single joint.
+            </summary>
+            <remarks>
+            The position and orientation together defines the coordinate system for the given joint. They are defined relative
+            to the sensor global coordinate system.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.Vector3Size">
+            <summary>
+            Size of <see cref="T:System.Numerics.Vector3"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.QuaternionSize">
+            <summary>
+            Size of <see cref="F:Microsoft.Azure.Kinect.BodyTracking.Joint.Quaternion"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.Size">
+            <summary>
+            Size of <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Joint"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.Position">
+            <summary>
+            The position of the joint specified in millimeters.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.Quaternion">
+            <summary>
+            The orientation of the joint specified in normalized quaternion.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Joint.ConfidenceLevel">
+            <summary>
+            The confidence level of the joint.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel">
+            <summary>
+            This enumeration specifies the joint confidence level.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel.None">
+            <summary>
+            The joint is out of range (too far from depth camera)
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel.Low">
+            <summary>
+            The joint is not observed (likely due to occlusion), predicted joint pose
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel.Medium">
+            <summary>
+            Medium confidence in joint pose. Current SDK will only provide joints up to this confidence level
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel.High">
+            <summary>
+            High confidence in joint pose. Placeholder for future SDK
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel.Count">
+            <summary>
+            The total number of confidence levels.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.JointId">
+            <summary>
+            Model fitting joint definition.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.Pelvis">
+            <summary>
+            Pelvis
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.SpineNavel">
+            <summary>
+            Spine navel
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.SpineChest">
+            <summary>
+            Spine chest
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.Neck">
+            <summary>
+            Neck
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ClavicleLeft">
+            <summary>
+            Left clavicle
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ShoulderLeft">
+            <summary>
+            Left shoulder
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ElbowLeft">
+            <summary>
+            Left elbow
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.WristLeft">
+            <summary>
+            Left wrist
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HandLeft">
+            <summary>
+            Left hand
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HandTipLeft">
+            <summary>
+            Left hand tip
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ThumbLeft">
+            <summary>
+            Left thumb
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ClavicleRight">
+            <summary>
+            Right clavicle
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ShoulderRight">
+            <summary>
+            Right shoulder
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ElbowRight">
+            <summary>
+            Right elbow
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.WristRight">
+            <summary>
+            Right wrist
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HandRight">
+            <summary>
+            Right hand
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HandTipRight">
+            <summary>
+            Right hand tip
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.ThumbRight">
+            <summary>
+            Right thumb
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HipLeft">
+            <summary>
+            Left hip
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.KneeLeft">
+            <summary>
+            Left knee
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.AnkleLeft">
+            <summary>
+            Left ankle
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.FootLeft">
+            <summary>
+            Left foot
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.HipRight">
+            <summary>
+            Right hip
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.KneeRight">
+            <summary>
+            Right knee
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.AnkleRight">
+            <summary>
+            Right ankle
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.FootRight">
+            <summary>
+            Right foot
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.Head">
+            <summary>
+            Head
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.Nose">
+            <summary>
+            Nose
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.EyeLeft">
+            <summary>
+            Left eye
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.EarLeft">
+            <summary>
+            Left ear
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.EyeRight">
+            <summary>
+            Right eye
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.EarRight">
+            <summary>
+            Right ear
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.JointId.Count">
+            <summary>
+            Number of different joints defined in this enumeration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.Vector3Size">
+            <summary>
+            Size of <see cref="T:System.Numerics.Vector3"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.QuaternionSize">
+            <summary>
+            Size of <see cref="T:System.Numerics.Quaternion"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.Size">
+            <summary>
+            Size of <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Native.Joint"/> structure.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.PositionX">
+            <summary>
+            The position of the joint specified in millimeters (X component)
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.PositionY">
+            <summary>
+            The position of the joint specified in millimeters (Y component)
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.PositionZ">
+            <summary>
+            The position of the joint specified in millimeters (Z component)
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.QuaternionW">
+            <summary>
+            The orientation of the joint specified in normalized quaternion (W component).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.QuaternionX">
+            <summary>
+            The orientation of the joint specified in normalized quaternion (X component).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.QuaternionY">
+            <summary>
+            The orientation of the joint specified in normalized quaternion (Y component).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.QuaternionZ">
+            <summary>
+            The orientation of the joint specified in normalized quaternion (Z component).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Native.Joint.ConfidenceLevel">
+            <summary>
+            The confidence level of the joint. <see cref="T:Microsoft.Azure.Kinect.BodyTracking.JointConfidenceLevel"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.SensorOrientation">
+            <summary>
+            Sensor mounting orientation types.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.SensorOrientation.Default">
+            <summary>
+            Mount the sensor at its default orientation
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.SensorOrientation.Clockwise90">
+            <summary>
+            Clockwisely rotate the sensor 90 degree
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.SensorOrientation.CounterClockwise90">
+            <summary>
+            Counter-clockwisely rotate the sensor 90 degrees
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.SensorOrientation.Flip180">
+            <summary>
+            Mount the sensor upside-down
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Skeleton">
+            <summary>
+            Structure to define joints for skeleton.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Skeleton.JointCount">
+            <summary>
+            Total number of joints.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.Skeleton.data">
+            <summary>
+            Memory buffer needed to marshal data from native.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Skeleton.GetJoint(Microsoft.Azure.Kinect.BodyTracking.JointId)">
+            <summary>
+            Gets joint of the body.
+            </summary>
+            <param name="joint">Specified the joint by type.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Skeleton.GetJoint(System.Int32)">
+            <summary>
+            Gets joint of the body.
+            </summary>
+            <param name="index">Specified the joint by index.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.Tracker">
+            <summary>
+            Represents Azure Kinect body tracking component.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Create(Microsoft.Azure.Kinect.Sensor.Calibration,Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration)">
+            <summary>
+            Create a body tracking component.
+            </summary>
+            <param name="calibration">The sensor calibration that will be used for capture processing.</param>
+            <param name="configuration">The configuration we want to run the tracker in. This can be initialized with <see cref="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.Default"/>.</param>
+            <returns>New body tracking component.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.SetTemporalSmooting(System.Single)">
+            <summary>
+            Control the temporal smoothing across frames.
+            </summary>
+            <param name="smoothingFactor">Set between 0 for no smoothing and 1 for full smoothing. Less smoothing will increase the responsiveness of the detected skeletons but will cause more positional and orientational jitters.</param>
+            <remarks>The default smoothness value is 0.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture,System.TimeSpan)">
+             <summary>
+             Add a Azure Kinect sensor capture to the tracker input queue to generate its body tracking result asynchronously.
+             </summary>
+             <param name="capture">Azure Kinect sensor capture returned by <see cref="M:Microsoft.Azure.Kinect.Sensor.Device.GetCapture"/>() from Azure Kinect Sensor SDK. It should contain the depth data for this function to work. Otherwise the function will return failure.</param>
+             <param name="timeout">Time the function should block waiting to add the sensor capture to the tracker process queue.</param>
+             <remarks>
+             Add a Azure Kinect sensor capture to the tracker input queue so that it can be processed asynchronously to generate the body tracking
+             result. The processed results will be added to an output queue maintained by this tracker instance. Call
+             <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)"/> to get the result and pop it from the output queue.
+             If the input queue or output queue is full, this function will block up until the timeout is reached.
+            
+             Upon successfully insert a sensor capture to the input queue this function will return success.
+            
+             This function will fail when either the tracker is shut down by <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Shutdown"/> API,
+             or an internal problem is encountered before adding to the input queue: such as low memory condition,
+             <see cref="T:Microsoft.Azure.Kinect.Sensor.Capture"/> not containing the depth data, or other unexpected issues.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture)">
+            <summary>
+            Add a k4a sensor capture to the tracker input queue to generate its body tracking result asynchronously.
+            </summary>
+            <param name="capture">Azure Kinect sensor capture returned by <see cref="M:Microsoft.Azure.Kinect.Sensor.Device.GetCapture"/>() from Azure Kinect Sensor SDK. It should contain the depth data for this function to work. Otherwise the function will return failure.</param>
+            <remarks>This is an infinite timeout function version of <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture,System.TimeSpan)"/>.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)">
+             <summary>
+             Gets the next available body frame.
+             </summary>
+             <param name="timeout">Time the function should block waiting for the body frame. 0 is a check of the queue without blocking.</param>
+             <param name="throwOnTimeout">If set to <c>false</c>, on timeout failure <c>null</c> will be returned instead of throwing exception.</param>
+             <returns>If successful this contains a handle to a body frame object.</returns>
+             <remarks>
+             Retrieves the next available body frame result and pop it from the output queue in this tracker instance. If a new body
+             frame is not currently available, this function will block up until the timeout is reached. The SDK will buffer at
+             least three body frames worth of data before stopping new capture being queued by <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture,System.TimeSpan)"/>.
+            
+             Upon successfully reads a body frame this function will return success.
+            
+             This function will fail when either the tracker is shut down by <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Shutdown"/> API
+             and the remaining tracker queue is empty, or an internal problem is encountered: such as low memory condition,
+             other unexpected issues.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.Boolean)">
+            <summary>
+            Gets the next available body frame.
+            </summary>
+            <param name="throwOnTimeout">If set to <c>false</c>, on timeout failure <c>null</c> will be returned instead of throwing exception.</param>
+            <returns>If successful this contains a handle to a body frame object.</returns>
+            <remarks>This is an infinite timeout function version of <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)"/>.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Shutdown">
+             <summary>
+             Shutdown the tracker so that no further capture can be added to the input queue.
+             </summary>
+             <remarks>
+             Once the tracker is shutdown, <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture,System.TimeSpan)"/> API will always immediately return failure.
+            
+             If there are remaining catpures in the tracker queue after the tracker is shutdown, <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)"/> can
+             still return successfully. Once the tracker queue is empty, the <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)"/> call will always immediately
+             return failure.
+            
+             This function may be called while another thread is blocking in <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.EnqueueCapture(Microsoft.Azure.Kinect.Sensor.Capture,System.TimeSpan)"/> or <see cref="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.PopResult(System.TimeSpan,System.Boolean)"/>.
+             Calling this function while another thread is in that function will result in that function returning a failure.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:Microsoft.Azure.Kinect.BodyTracking.Tracker"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.BodyTracking.Tracker.Dispose(System.Boolean)">
+            <summary>
+            Disposes the resources held by the tracker.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration">
+            <summary>
+            Configuration parameters for a Azure Kinect body tracker.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.SensorOrientation">
+            <summary>
+            The sensor mounting orientation type.
+            </summary>
+            <remarks>
+            Setting the correct orientation can help the body tracker to achieve more accurate body tracking results.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.ProcessingMode">
+            <summary>
+            Specify whether to use CPU only mode or GPU mode to run the tracker.
+            </summary>
+            <remarks>
+            The CPU only mode doesn't require the machine to have a GPU to run this SDK. But it will be much slower than the GPU mode.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.GpuDeviceId">
+            <summary>
+            Specify the GPU device ID to run the tracker.
+            </summary>
+            <remarks>
+            The setting is only effective if the <see cref="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.ProcessingMode"/> setting is set to <see cref="F:Microsoft.Azure.Kinect.BodyTracking.TrackerProcessingMode.Gpu"/>.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerConfiguration.Default">
+            <summary>
+            Default configuration setting for Azure Kinect body tracking component.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.BodyTracking.TrackerProcessingMode">
+            <summary>
+            Tracker processing mode types.
+            </summary>
+            <remarks>
+            The CPU only mode doesn't require the machine to have a GPU to run this SDK. But it will be much slower
+            than the GPU mode.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerProcessingMode.Gpu">
+            <summary>
+            SDK will use GPU mode to run the tracker.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.BodyTracking.TrackerProcessingMode.Cpu">
+            <summary>
+            SDK will use CPU only mode to run the tracker.
+            </summary>
+        </member>
+    </members>
+</doc>

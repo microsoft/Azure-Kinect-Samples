@@ -1,0 +1,15 @@
+sdk\linux_clang\amd64\release\lib\libdepthengine.so
+sdk\linux_clang\amd64\release\lib\libdepthengine.so.2.0
+sdk\linux_clang\amd64\release\lib\libk4a.so.1.3.0
+sdk\linux_clang\amd64\release\lib\libk4arecord.so.1.3.0
+sdk\netstandard2.0\release\Microsoft.Azure.Kinect.Sensor.dll
+sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll
+sdk\windows-desktop\amd64\release\bin\k4a.dll
+sdk\windows-desktop\amd64\release\bin\k4arecord.dll
+sdk\windows-desktop\x86\release\bin\depthengine_2_0.dll
+sdk\windows-desktop\x86\release\bin\k4a.dll
+sdk\windows-desktop\x86\release\bin\k4arecord.dll
+tools\AzureKinectFirmwareTool.exe
+tools\k4arecorder.exe
+tools\k4aviewer.exe
+tools\firmware\AzureKinectDK_Fw_1.6.102075014.bin

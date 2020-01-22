@@ -1,0 +1,12 @@
+sdk\windows-desktop\amd64\release\bin\k4abt.dll
+sdk\windows-desktop\amd64\release\bin\onnxruntime.dll
+sdk\windows-desktop\amd64\release\bin\dnn_model_2_0.onnx
+tools\cublas64_100.dll
+tools\cudart64_100.dll
+tools\cudnn64_7.dll
+tools\depthengine_2_0.dll
+tools\k4a.dll
+tools\k4abt.dll
+tools\onnxruntime.dll
+tools\vcomp140.dll
+tools\k4abt_simple_3d_viewer.exe

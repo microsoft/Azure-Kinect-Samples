@@ -1,0 +1,2204 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Azure.Kinect.Sensor</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Allocator">
+            <summary>
+            Manages buffer allocation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Allocator.Singleton">
+            <summary>
+            Gets the Allocator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Allocator.UseManagedAllocator">
+            <summary>
+            Gets or sets a value indicating whether to have the native library use the managed allocator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Allocator.SafeCopyNativeBuffers">
+            <summary>
+            Gets or sets a value indicating whether to make a safe copy of native buffers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Allocator.RegisterForDisposal(System.IDisposable)">
+             <summary>
+             Register the object for disposal when the CLR shuts down.
+             </summary>
+             <param name="disposable">Object to dispose before native hooks are disconnected.</param>
+             <remarks>
+             When the CLR shuts down, native callbacks in to the CLR result in an application crash. The allocator free method
+             is a native callback to the managed layer that is called whenever the hooked native API needs to free memory.
+            
+             To avoid this callback after the CLR shuts down, the native library must be completely cleaned up prior CLR shutdown.
+            
+             Any object that may hold references to the native library (and will therefore generate native to manged callbacks when it
+             gets cleaned up) should register with the RegisterForDisposal method to ensure it is cleaned up in the correct order.
+             during shutdown.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Allocator.UnregisterForDisposal(System.IDisposable)">
+            <summary>
+            Unregister the object for disposal.
+            </summary>
+            <param name="disposable">Object to unregister.</param>
+            <remarks>
+            This does not unhook the native allocator, but only unregisters the object for
+            disposal.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Allocator.GetManagedAllocatedMemory(System.IntPtr,System.Int64)">
+             <summary>
+             Get a Memory reference to the managed memory that was used by the hooked native
+             allocator.
+             </summary>
+             <param name="address">Native address of the memory.</param>
+             <param name="size">Size of the memory region.</param>
+             <returns>Reference to the memory, or an empty memory reference.</returns>
+             <remarks>
+             If the address originally came from a managed array that was provided to the native
+             API through the allocator hook, this function will return a Memory reference to the managed
+             memory. Since this is a reference to the managed memory and not the native pointer, it
+             is safe and not subject to use after free bugs.
+            
+             The address and size do not need to reference the exact pointer provided to the native layer
+             by the allocator, but can refer to any region in the allocated memory.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Allocator.GetBufferCache(System.IntPtr,System.Int32)">
+            <summary>
+            Get a managed array to cache the contents of a native buffer.
+            </summary>
+            <param name="nativeAddress">Native buffer to mirror.</param>
+            <param name="size">Size of the native memory.</param>
+            <returns>A managed array populated with the content of the native buffer.</returns>
+            <remarks>Multiple callers asking for the same address will get the same buffer.
+            When done with the buffer the caller must call <seealso cref="M:Microsoft.Azure.Kinect.Sensor.Allocator.ReturnBufferCache(System.IntPtr)"/>.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Allocator.ReturnBufferCache(System.IntPtr)">
+            <summary>
+            Return the buffer cache.
+            </summary>
+            <param name="nativeAddress">Address of the native buffer.</param>
+            <remarks>Must be called exactly once for each buffer provided by <see cref="M:Microsoft.Azure.Kinect.Sensor.Allocator.GetBufferCache(System.IntPtr,System.Int32)"/>.</remarks>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2">
+            <summary>
+            Helper to cast from one Memory type to another.
+            </summary>
+            <typeparam name="TFrom">Element type of the original Memory.</typeparam>
+            <typeparam name="TTo">Element type of the new Memory.</typeparam>
+            <remarks>
+            This type does not take ownership of the Memory, so Dispose does nothing.
+            The resultant Memory object derived from this type has the same useful lifetime as
+            the source Memory object.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2.#ctor(System.Memory{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2"/> class.
+            </summary>
+            <param name="memory">Memory object to cast.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2.GetSpan">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2.Pin(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2.Unpin">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryCast`2.Dispose(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager">
+            <summary>
+            Manages the native memory allocated by the Azure Kinect SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager.#ctor(Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager"/> class.
+            </summary>
+            <param name="image">Image with native memory.</param>
+            <remarks>
+            Constructs a new MemoryManager representing the native memory backing an Image.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager.GetSpan">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager.Pin(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager.Unpin">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectMemoryManager.Dispose(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.BGRA">
+            <summary>
+            Describes a pixel of color in terms of blue, green, red, and alpha channels.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure.
+            </summary>
+            <param name="blue">The blue channel value of the color.</param>
+            <param name="green">The green channel value of the color.</param>
+            <param name="red">The red channel value of the color.</param>
+            <param name="alpha">The alpha channel value of the color.</param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.BGRA.A">
+            <summary>
+            Gets or sets the BGRA alpha channel value of the color.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.BGRA.R">
+            <summary>
+            Gets or sets the BGRA red channel value of the color.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.BGRA.G">
+            <summary>
+            Gets or sets the BGRA green channel value of the color.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.BGRA.B">
+            <summary>
+            Gets or sets the BGRA blue channel value of the color.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.BGRA.Value">
+            <summary>
+            Gets or sets the combined BGRA value of the color.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.op_Equality(Microsoft.Azure.Kinect.Sensor.BGRA,Microsoft.Azure.Kinect.Sensor.BGRA)">
+            <summary>
+            Tests whether two <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structures are identical.
+            </summary>
+            <param name="bgra1">The first <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure to compare.</param>
+            <param name="bgra2">The second <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure to compare.</param>
+            <returns><c>true</c> if <paramref name="bgra1"/> and <paramref name="bgra2"/> are exactly identical; otherwise, <c>flase</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.op_Inequality(Microsoft.Azure.Kinect.Sensor.BGRA,Microsoft.Azure.Kinect.Sensor.BGRA)">
+            <summary>
+            Tests whether two <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structures are not identical.
+            </summary>
+            <param name="bgra1">The first <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure to compare.</param>
+            <param name="bgra2">The second <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure to compare.</param>
+            <returns><c>true</c> if <paramref name="bgra1"/> and <paramref name="bgra2"/> are note equal; otherwise, <c>flase</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.Equals(System.Object)">
+            <summary>
+            Tests whether the specified object is a <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure and is equivalent to this <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/>.
+            </summary>
+            <param name="obj">The object to compare to this <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure.</param>
+            <returns><c>true</c> if the specified object is a <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure and is identical to the current <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure; otherwise, <c>flase</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.Equals(Microsoft.Azure.Kinect.Sensor.BGRA)">
+            <summary>
+            Tests whether the specified <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure is equivalent to this <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/>.
+            </summary>
+            <param name="other">The <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure to compare to the current <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure.</param>
+            <returns><c>true</c> if the specified <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure is identical to the current <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure; otherwise, <c>flase</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.BGRA.GetHashCode">
+            <summary>
+            Gets a hash code for this <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure.
+            </summary>
+            <returns>A hash code for this <see cref="T:Microsoft.Azure.Kinect.Sensor.BGRA"/> structure.</returns>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Calibration">
+            <summary>
+            Device Calibration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Calibration.DepthCameraCalibration">
+            <summary>
+            Depth camera calibration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Calibration.ColorCameraCalibration">
+            <summary>
+            Color camera calibration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Calibration.DeviceExtrinsics">
+             <summary>
+             Extrinsic transformation parameters.
+             </summary>
+             <remarks>
+             The extrinsic parameters allow 3D coordinate conversions between depth camera, color camera, the IMU's gyroscope and accelerometer.
+            
+             To transform from a source to a target 3D coordinate system, use the parameters stored under DeviceExtrinsics[source][target].
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Calibration.DepthMode">
+            <summary>
+            Depth camera mode for which calibration was obtained.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Calibration.ColorResolution">
+            <summary>
+            Color camera resolution for which calibration was obtained.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.op_Equality(Microsoft.Azure.Kinect.Sensor.Calibration,Microsoft.Azure.Kinect.Sensor.Calibration)">
+            <summary>
+            Compares two Calibrations.
+            </summary>
+            <param name="left">First Calibration to compare.</param>
+            <param name="right">Second Calibration to compare.</param>
+            <returns>True if equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.op_Inequality(Microsoft.Azure.Kinect.Sensor.Calibration,Microsoft.Azure.Kinect.Sensor.Calibration)">
+            <summary>
+            Compares two Calibrations.
+            </summary>
+            <param name="left">First Calibration to compare.</param>
+            <param name="right">Second Calibration to compare.</param>
+            <returns>True if not equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.GetFromRaw(System.Byte[],Microsoft.Azure.Kinect.Sensor.DepthMode,Microsoft.Azure.Kinect.Sensor.ColorResolution)">
+            <summary>
+            Get the camera calibration for a device from a raw calibration blob.
+            </summary>
+            <param name="raw">Raw calibration blob obtained from a device or recording.</param>
+            <param name="depthMode">Mode in which depth camera is operated.</param>
+            <param name="colorResolution">Resolution in which the color camera is operated.</param>
+            <returns>Calibration object.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.TransformTo2D(System.Numerics.Vector2,System.Single,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+            <summary>
+            Transform a 2D pixel coordinate with an associated depth value of the source camera into a 2D pixel coordinate of the target camera.
+            </summary>
+            <param name="sourcePoint2D">The 2D pixel <paramref name="sourceCamera"/> coordinates.</param>
+            <param name="sourceDepth">The depth of <paramref name="sourcePoint2D"/> in millimeters.</param>
+            <param name="sourceCamera">The current camera.</param>
+            <param name="targetCamera">The target camera.</param>
+            <returns>The 2D pixel in <paramref name="targetCamera"/> coordinates, or null if the source point is not valid in the target coordinate system.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.TransformTo3D(System.Numerics.Vector2,System.Single,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+            <summary>
+            Transform a 2D pixel coordinate with an associated depth value of the source camera into a 3D point of the target coordinate system.
+            </summary>
+            <param name="sourcePoint2D">The 2D pixel in <paramref name="sourceCamera"/> coordinates.</param>
+            <param name="sourceDepth">The depth of <paramref name="sourceCamera"/> in millimeters.</param>
+            <param name="sourceCamera">The current camera.</param>
+            <param name="targetCamera">The target camera.</param>
+            <returns>The 3D coordinate of the input pixel in the coordinate system of <paramref name="targetCamera"/> in millimeters or null if the input point is not valid in that coordinate system.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.TransformTo2D(System.Numerics.Vector3,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+            <summary>
+            Transform a 3D point of a source coordinate system into a 2D pixel coordinate of the target camera.
+            </summary>
+            <param name="sourcePoint3D">The 3D coordinate in millimeters representing a point in <paramref name="sourceCamera"/> coordinate system.</param>
+            <param name="sourceCamera">The current camera.</param>
+            <param name="targetCamera">The target camera.</param>
+            <returns>The 2D pixel coordinate in <paramref name="targetCamera"/> coordinates or null if the point is not valid in that coordinate system.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.TransformTo3D(System.Numerics.Vector3,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+            <summary>
+            Transform a 3D point of a source coordinate system into a 3D point of the target coordinate system.
+            </summary>
+            <param name="sourcePoint3D">The 3D coordinates in millimeters representing a point in <paramref name="sourceCamera"/>.</param>
+            <param name="sourceCamera">The current camera.</param>
+            <param name="targetCamera">The target camera.</param>
+            <returns>A point in 3D coordiantes of <paramref name="targetCamera"/> stored in millimeters.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.CreateTransformation">
+            <summary>
+            Creates a Transformation object from this calibration.
+            </summary>
+            <returns>A new Transformation object.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.Equals(Microsoft.Azure.Kinect.Sensor.Calibration)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Calibration.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType">
+            <summary>
+            Specifies a type of calibration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Unknown">
+            <summary>
+            Calibration type is unknown.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Depth">
+            <summary>
+            Depth sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Color">
+            <summary>
+            Color sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Gyro">
+            <summary>
+            Gyroscope sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Accel">
+            <summary>
+            Accelerometer sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType.Num">
+            <summary>
+            Number of types excluding unknown type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.CalibrationModelType">
+            <summary>
+            The model used to interpret the calibration parameters. Azure Kinect devices are calibrated with Brown Conrady.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationModelType.Unknown">
+            <summary>
+            Calibration model is unknown.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationModelType.Theta">
+            <summary>
+            Deprecated (not supported). Calibration model is Theta (arctan).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationModelType.Polynomial3K">
+            <summary>
+            Deprecated (not supported). Calibration model is Polynomial 3K.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationModelType.Rational6KT">
+            <summary>
+            Deprecated (only supported early internal devices). Calibration model is Rational 6KT.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CalibrationModelType.BrownConrady">
+            <summary>
+            Calibration model is Brown Conrady.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.CameraCalibration">
+            <summary>
+            Camera calibration contains intrinsic and extrinsic calibration information for a camera.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CameraCalibration.Extrinsics">
+            <summary>
+            Extrinsic calibration data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CameraCalibration.Intrinsics">
+            <summary>
+            Intrinsic calibration data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CameraCalibration.ResolutionWidth">
+            <summary>
+            Resolution width of the camera sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CameraCalibration.ResolutionHeight">
+            <summary>
+            Resolution height of the camera sensor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.CameraCalibration.MetricRadius">
+            <summary>
+            Maximum FOV of the camera.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.CameraCalibration.op_Equality(Microsoft.Azure.Kinect.Sensor.CameraCalibration,Microsoft.Azure.Kinect.Sensor.CameraCalibration)">
+            <summary>
+            Compare two CameraCalibrations for equality.
+            </summary>
+            <param name="left">First CameraCalibration to compare.</param>
+            <param name="right">Second CameraCalibration to compare.</param>
+            <returns>True if equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.CameraCalibration.op_Inequality(Microsoft.Azure.Kinect.Sensor.CameraCalibration,Microsoft.Azure.Kinect.Sensor.CameraCalibration)">
+            <summary>
+            Compare two CameraCalibrations for inequality.
+            </summary>
+            <param name="left">First CameraCalibration to compare.</param>
+            <param name="right">Second CameraCalibration to compare.</param>
+            <returns>True if not equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.CameraCalibration.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.CameraCalibration.Equals(Microsoft.Azure.Kinect.Sensor.CameraCalibration)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.CameraCalibration.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Capture">
+            <summary>
+            A set of images captured in sync.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Capture"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.#ctor(Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_capture_t)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Capture"/> class.
+            </summary>
+            <param name="handle">Native handle of the Capture.</param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Capture.Color">
+             <summary>
+             Gets or sets the color image of this capture.
+             </summary>
+             <remarks>
+             Images assigned to this capture are owned by the Capture. When the Capture is disposed, the
+             Color Image will be disposed.
+            
+             By setting the Color image on a Capture, the Capture takes ownership and the Capture will
+             dispose the Image when the Capture is disposed.
+            
+             To get an instance of an Image that lives longer than the capture, call Image.Reference().
+             </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Capture.Depth">
+             <summary>
+             Gets or sets the depth image of this capture.
+             </summary>
+             <remarks>
+             Images assigned to this capture are owned by the Capture. When the Capture is disposed, the
+             Depth Image will be disposed.
+            
+             By setting the Depth image on a Capture, the Capture takes ownership and the Capture will
+             dispose the Image when the Capture is disposed.
+            
+             To get an instance of an Image that lives longer than the capture, call Image.Reference().
+             </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Capture.IR">
+             <summary>
+             Gets or sets the IR image of this capture.
+             </summary>
+             <remarks>
+             Images assigned to this capture are owned by the Capture. When the Capture is disposed, the
+             IR Image will be disposed.
+            
+             By setting the IR image on a Capture, the Capture takes ownership and the Capture will
+             dispose the Image when the Capture is disposed.
+            
+             To get an instance of an Image that lives longer than the capture, call Image.Reference().
+             </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Capture.Temperature">
+            <summary>
+            Gets or sets the device temperature at the time of the capture.
+            </summary>
+            <remarks>
+            Temperature is represented in degrees Celsius.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.Reference">
+            <summary>
+            Creates a duplicate reference to the same Capture.
+            </summary>
+            <returns>A new Capture object representing the same data.</returns>
+            <remarks>Creating a reference to the same capture does not copy the capture,
+            or the image data stored in the capture, but creates a new managed object representing
+            the same capture data. Each object must be independently disposed. The lifetime of the
+            underlying capture data will be equal or greater than all of the referenced Capture objects.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.DangerousGetHandle">
+            <summary>
+            Gets the native handle.
+            </summary>
+            <returns>The native handle that is wrapped by this capture.</returns>
+            <remarks>The function is dangerous because there is no guarantee that the
+            handle will not be disposed once it is retrieved. This should only be called
+            by code that can ensure that the Capture object will not be disposed on another
+            thread.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.NativeEquals(Microsoft.Azure.Kinect.Sensor.Capture)">
+            <summary>
+            Checks two captures to determine if they represent the same native capture object.
+            </summary>
+            <param name="other">Another Capture to compare against.</param>
+            <returns>true if the Captures represent the same native k4a_capture_t.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.Dispose(System.Boolean)">
+            <summary>
+            Handle the disposing of the object.
+            </summary>
+            <param name="disposing">true when called by Dispose(), false when called by the finalizer.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.UpdateImageWrapperAndDisposePrevious(System.Func{Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_capture_t,Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_image_t},Microsoft.Azure.Kinect.Sensor.Image@)">
+            <summary>
+            Retrieves a native image handle from the native API.
+            </summary>
+            <param name="nativeMethod">Native method to retrieve the image.</param>
+            <param name="cachedImage">A cached instance of the Image that we return to callers. (Callers may dispose this image, although they shouldn't).</param>
+            <remarks>
+            If this is the first time calling the property, we construct a new wrapper.
+            If the handle is for an Image we have already constructed a wrapper for, we return the existing wrapper.
+            If the handle is for a different Image, we construct a new wrapper and dispose the old one.
+            If existing wrapper has been disposed, we throw an exception.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Capture.SetImageWrapperAndDisposePrevious(System.Action{Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_capture_t,Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_image_t},Microsoft.Azure.Kinect.Sensor.Image@,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Sets the image wrapper provided to a property.
+            </summary>
+            <param name="nativeMethod">Native set method.</param>
+            <param name="cachedImage">Reference to the cached image wrapper used by this class.</param>
+            <param name="value">Value to assign the image wrapper to.</param>
+            <remarks>
+            This function takes ownership of the wrapper and stores it in the class. If there was
+            a previous wrapper owned by the class, this function will dispose it.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.ColorControlCommand">
+            <summary>
+            Color sensor control commands.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.ExposureTimeAbsolute">
+             <summary>
+             Exposure time setting.
+             </summary>
+             <remarks>
+             May be set to Auto or Manual.
+            
+             Exposure time is measured in microseconds.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Brightness">
+             <summary>
+             Brightness setting.
+             </summary>
+             <remarks>
+             May only be set to Manual.
+            
+             The valid range is 0 to 255. The default value is 128.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Contrast">
+            <summary>
+            Contrast setting.
+            </summary>
+            <remarks>
+            May only be set to Manual.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Saturation">
+            <summary>
+            Saturation setting.
+            </summary>
+            <remarks>
+            May only be set to Manual.</remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Sharpness">
+            <summary>
+            Sharpness setting.
+            </summary>
+            <remarks>
+            May only be set to Manual.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Whitebalance">
+             <summary>
+             White balance setting.
+             </summary>
+             <remarks>
+             May be set to Auto or Manual.
+            
+             The unit is degrees Kelvin. The setting must be set to a value evenly divisible by 10 degrees.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.BacklightCompensation">
+             <summary>
+             Back-light compensation setting.
+             </summary>
+             <remarks>
+             May only be set to Manual.
+            
+             Value of 0 means back-light compensation is disabled.
+             Value of 1 means back-light compensation is enabled.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.Gain">
+            <summary>
+            Gain setting.
+            </summary>
+            <remarks>
+            May only be set to Manual.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlCommand.PowerlineFrequency">
+             <summary>
+             Power-line frequency setting.
+             </summary>
+             <remarks>
+             May only be set to Manual.
+            
+             Value of 1 sets the power-line compensation to 50 Hz.
+             Value of 2 sets the power-line compensation to 60 Hz.
+             </remarks>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.ColorControlMode">
+            <summary>
+            Color sensor control mode.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlMode.Auto">
+            <summary>
+            Set the associated <see cref="T:Microsoft.Azure.Kinect.Sensor.ColorControlCommand"/> to Auto.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorControlMode.Manual">
+            <summary>
+            Set the associated <see cref="T:Microsoft.Azure.Kinect.Sensor.ColorControlCommand"/> to Manual.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.ColorResolution">
+            <summary>
+            Color sensor resolutions.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.Off">
+            <summary>
+            Color camera will be turned off with this setting.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R720p">
+            <summary>
+            1280 * 720 16:9
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R1080p">
+            <summary>
+            1920 * 1080 16:9
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R1440p">
+            <summary>
+            2560 * 1440 16:9
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R1536p">
+            <summary>
+            2048 * 1536 4:3
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R2160p">
+            <summary>
+            3840 * 2160 16:9
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ColorResolution.R3072p">
+            <summary>
+            4096 * 3072 4:3
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.DepthMode">
+            <summary>
+            Depth sensor capture modes.
+            </summary>
+            <remarks>
+            See the hardware specification for additional details on the field of view, and supported frame rates for each mode.
+            NFOV and WFOV denote Narrow and Wide Field Of View configurations.
+            Binned modes reduce the captured camera resolution by combining adjacent sensor pixels into a bin.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.Off">
+            <summary>
+            Depth sensor will be turned off with this setting.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.NFOV_2x2Binned">
+            <summary>
+            Depth and Passive IR are captured at 320x288.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.NFOV_Unbinned">
+            <summary>
+            Depth and Passive IR are captured at 640x576.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.WFOV_2x2Binned">
+            <summary>
+            Depth and Passive IR are captured at 512x512.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.WFOV_Unbinned">
+            <summary>
+            Depth and Passive IR are captured at 1024x1024.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.DepthMode.PassiveIR">
+            <summary>
+            Passive IR only is captured at 1024x1024.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Device">
+            <summary>
+            Represents an Azure Kinect device.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.SerialNum">
+            <summary>
+            Gets the devices serial number.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.CurrentDepthMode">
+            <summary>
+            Gets the depth mode the device is currently set to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.CurrentColorResolution">
+            <summary>
+            Gets the color resolution the device is currently set to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.SyncInJackConnected">
+            <summary>
+            Gets a value indicating whether gets the Sync In jack is connected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.SyncOutJackConnected">
+            <summary>
+            Gets a value indicating whether gets the Sync Out jack is connected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Device.Version">
+            <summary>
+            Gets the hardware version of the device.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetInstalledCount">
+            <summary>
+            Gets the number of currently connected devices.
+            </summary>
+            <returns>The number of connected devices.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.Open(System.Int32)">
+            <summary>
+            Opens an Azure Kinect device.
+            </summary>
+            <param name="index">Index of the device to open if there are multiple connected.</param>
+            <returns>A Device object representing that device.</returns>
+            <remarks>The device will remain opened for exclusive access until the Device object is disposed.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetCalibration(Microsoft.Azure.Kinect.Sensor.DepthMode,Microsoft.Azure.Kinect.Sensor.ColorResolution)">
+            <summary>
+            Gets the calibration of the device.
+            </summary>
+            <param name="depthMode">Depth mode for the calibration.</param>
+            <param name="colorResolution">Color camera resolution for the calibration.</param>
+            <returns>Calibration object.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetCalibration">
+            <summary>
+            Gets the calibration of the device for the current operating mode.
+            </summary>
+            <returns>Calibration object.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetRawCalibration">
+            <summary>
+            Gets the device raw calibration data.
+            </summary>
+            <returns>The raw data can be stored off-line for future use.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetCapture(System.TimeSpan)">
+            <summary>
+            Reads a sensor capture.
+            </summary>
+            <param name="timeout">Time to wait for a capture.</param>
+            <returns>A Capture object holding image data.</returns>
+            <remarks>
+            Gets the next capture in the streamed sequence of captures from the camera.
+            If a new capture is not currently available, this function will block until the timeout is reached.
+            The SDK will buffer at least two captures worth of data before dropping the oldest capture.
+            Callers needing to capture all data need to ensure they read the data as fast as the data is being produced on average.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetCapture">
+            <summary>
+            Reads a sensor capture.
+            </summary>
+            <returns>A Capture object holding image data.</returns>
+            <remarks>
+            Gets the next capture in the streamed sequence of captures from the camera.
+            If a new capture is not currently available, this function will block until the timeout is reached.
+            The SDK will buffer at least two captures worth of data before dropping the oldest capture.
+            Callers needing to capture all data need to ensure they read the data as fast as the data is being produced on average.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetImuSample(System.TimeSpan)">
+            <summary>
+            Reads an IMU sample from the device.
+            </summary>
+            <param name="timeout">Time to wait for an IMU sample.</param>
+            <returns>The next unread IMU sample from the device.</returns>
+            <remarks>Gets the next sample in the streamed sequence of IMU samples from the device.
+            If a new sample is not currently available, this function will block until the timeout is reached.
+            The API will buffer at least two camera capture intervals worth of samples before dropping the oldest sample. Callers needing to capture all data need to ensure they read the data as fast as the data is being produced on average.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetImuSample">
+            <summary>
+            Reads an IMU sample from the device.
+            </summary>
+            <returns>The next unread IMU sample from the device.</returns>
+            <remarks>Gets the next sample in the streamed sequence of IMU samples from the device.
+            If a new sample is not currently available, this function will block until one is available.
+            The API will buffer at least two camera capture intervals worth of samples before dropping the oldest sample. Callers needing to capture all data need to ensure they read the data as fast as the data is being produced on average.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetColorControl(Microsoft.Azure.Kinect.Sensor.ColorControlCommand)">
+            <summary>
+            Get the Azure Kinect color sensor control value.
+            </summary>
+            <param name="command">Color sensor control command.</param>
+            <returns>The value of the color control option.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.GetColorControl(Microsoft.Azure.Kinect.Sensor.ColorControlCommand,Microsoft.Azure.Kinect.Sensor.ColorControlMode@)">
+            <summary>
+            Get the Azure Kinect color sensor control value.
+            </summary>
+            <param name="command">Color sensor control command.</param>
+            <param name="mode">The mode of the color control option.</param>
+            <returns>The value of the color control option.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.SetColorControl(Microsoft.Azure.Kinect.Sensor.ColorControlCommand,Microsoft.Azure.Kinect.Sensor.ColorControlMode,System.Int32)">
+            <summary>
+            Sets the Azure Kinect color sensor control value.
+            </summary>
+            <param name="command">Color sensor control command.</param>
+            <param name="mode">The mode of the color control option.</param>
+            <param name="value">The value of the color control option.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.StartCameras(Microsoft.Azure.Kinect.Sensor.DeviceConfiguration)">
+            <summary>
+            Starts color and depth camera capture.
+            </summary>
+            <param name="configuration">The configuration we want to run the device in.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.StopCameras">
+            <summary>
+            Stops the color and depth camera capture.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.StartImu">
+            <summary>
+            Starts the IMU sample stream.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.StopImu">
+            <summary>
+            Stops the IMU sample stream.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Device.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>True</c> to release both managed and unmanaged resources; <c>False</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration">
+            <summary>
+            Represents the configuration to run an Azure Kinect device in.
+            </summary>
+            <remarks>
+            Default initialization is the same as K4A_DEVICE_CONFIG_INIT_DISABLE_ALL.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.ColorFormat">
+            <summary>
+            Gets or sets the image format to capture with the color camera.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.ColorResolution">
+            <summary>
+            Gets or sets the image resolution to capture with the color camera.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.DepthMode">
+            <summary>
+            Gets or sets the capture mode for the depth camera.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.CameraFPS">
+            <summary>
+            Gets or sets the desired frame rate for the color and depth cameras.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.SynchronizedImagesOnly">
+            <summary>
+            Gets or sets a value indicating whether to only return synchronized depth and color images.
+            </summary>
+            <remarks>
+            If this is false, when color or depth images are dropped, the other corresponding image will be dropped too.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.DepthDelayOffColor">
+            <summary>
+            Gets or sets the desired delay between the capture of the color image and the capture of the depth image.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.WiredSyncMode">
+            <summary>
+            Gets or sets the external synchronization mode.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.SuboridinateDelayOffMaster">
+            <summary>
+            Gets or sets the external synchronization timing.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.DisableStreamingIndicator">
+            <summary>
+            Gets or sets a value indicating whether the automatic streaming indicator light is disabled.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.DeviceConfiguration.GetNativeConfiguration">
+            <summary>
+            Get the equivalent native configuration structure.
+            </summary>
+            <returns>A k4a_device_configuration_t.</returns>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException">
+            <summary>
+            Represents errors that occur when interacting with the Azure Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> class with a
+            specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> class with a
+            specified error message and a reference to the inner exception that is the cause of
+            this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> class with
+            serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.#ctor(System.String,System.Collections.Generic.ICollection{Microsoft.Azure.Kinect.Sensor.LogMessage})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> class with a
+            specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="logMessages">
+            The log messages that happened during the function call that generated this error.
+            </param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.AzureKinectException.LogMessages">
+            <summary>
+            Gets the log messages that happened during the function call that generated this
+            error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.ThrowIfNotSuccess``1(System.Func{``0})">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> if the result of the function is not
+            a success.
+            </summary>
+            <param name="function">The native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.ThrowIfNotSuccess``1(Microsoft.Azure.Kinect.Sensor.LoggingTracer,``0)">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectException"/> if the result of the function is not
+            a success.
+            </summary>
+            <param name="tracer">The tracer is that is capturing logging messages.</param>
+            <param name="result">The result native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.IsSuccess``1(``0)">
+            <summary>
+            Determines if the result is a success result.
+            </summary>
+            <typeparam name="T">The type of result.</typeparam>
+            <param name="result">The result to check if it is a success.</param>
+            <returns><c>True</c> if the result is a success;otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.IsSuccess(Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_result_t)">
+            <summary>
+            Determines if the <see cref="T:Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_result_t"/> is a success.
+            </summary>
+            <param name="result">The result to check if it is a success.</param>
+            <returns><c>True</c> if the result is a success;otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.IsSuccess(Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_wait_result_t)">
+            <summary>
+            Determines if the <see cref="T:Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_wait_result_t"/> is a success.
+            </summary>
+            <param name="result">The result to check if it is a success.</param>
+            <returns><c>True</c> if the result is a success;otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectException.IsSuccess(Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_buffer_result_t)">
+            <summary>
+            Determines if the <see cref="T:Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_buffer_result_t"/> is a success.
+            </summary>
+            <param name="result">The result to check if it is a success.</param>
+            <returns><c>True</c> if the result is a success;otherwise <c>false</c>.</returns>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException">
+            <summary>
+            Represents errors that occur when opening a device with the Azure Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> class
+            with a specified error message and a reference to the inner exception that is the
+            cause of this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> class
+            with serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.#ctor(System.String,System.Collections.Generic.ICollection{Microsoft.Azure.Kinect.Sensor.LogMessage})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="logMessages">
+            The log messages that happened during the function call that generated this error.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.ThrowIfNotSuccess``1(System.Func{``0})">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> if the result of the function
+            is not a success.
+            </summary>
+            <param name="function">The native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException.ThrowIfNotSuccess``1(Microsoft.Azure.Kinect.Sensor.LoggingTracer,``0)">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectOpenDeviceException"/> if the result of the function
+            is not a success.
+            </summary>
+            <param name="tracer">The tracer is that is capturing logging messages.</param>
+            <param name="result">The result native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException">
+            <summary>
+            Represents errors that occur when attempting to start the cameras on a device with the
+            Azure Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> class
+            with a specified error message and a reference to the inner exception that is the
+            cause of this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> class
+            with serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.#ctor(System.String,System.Collections.Generic.ICollection{Microsoft.Azure.Kinect.Sensor.LogMessage})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="logMessages">
+            The log messages that happened during the function call that generated this error.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.ThrowIfNotSuccess``1(System.Func{``0})">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> if the result of the function
+            is not a success.
+            </summary>
+            <param name="function">The native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException.ThrowIfNotSuccess``1(Microsoft.Azure.Kinect.Sensor.LoggingTracer,``0)">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartCamerasException"/> if the result of the function
+            is not a success.
+            </summary>
+            <param name="tracer">The tracer is that is capturing logging messages.</param>
+            <param name="result">The result native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException">
+            <summary>
+            Represents errors that occur when attempting to start the IMU on a device with the Azure
+            Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> class with a
+            specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> class with a
+            specified error message and a reference to the inner exception that is the cause of
+            this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception.
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception, or a null reference
+            (Nothing in Visual Basic) if no inner exception is specified.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> class with
+            serialized data.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the
+            exception being thrown.</param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>System.Runtime.Serialization.StreamingContext that
+            contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.#ctor(System.String,System.Collections.Generic.ICollection{Microsoft.Azure.Kinect.Sensor.LogMessage})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> class
+            with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="logMessages">
+            The log messages that happened during the function call that generated this error.
+            </param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.ThrowIfNotSuccess``1(System.Func{``0})">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> if the result of the function is not
+            a success.
+            </summary>
+            <param name="function">The native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException.ThrowIfNotSuccess``1(Microsoft.Azure.Kinect.Sensor.LoggingTracer,``0)">
+            <summary>
+            Throws an <see cref="T:Microsoft.Azure.Kinect.Sensor.AzureKinectStartImuException"/> if the result of the function
+            is not a success.
+            </summary>
+            <param name="tracer">The tracer is that is capturing logging messages.</param>
+            <param name="result">The result native function to call.</param>
+            <typeparam name="T">The type of result to expect from the function call.</typeparam>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Extrinsics">
+            <summary>
+            Extrinsic calibration data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Extrinsics.Rotation">
+            <summary>
+            Gets 3x3 Rotation matrix stored in row major order.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Extrinsics.Translation">
+            <summary>
+            Gets translation vector, x, y, z (in millimeters).
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Extrinsics.op_Equality(Microsoft.Azure.Kinect.Sensor.Extrinsics,Microsoft.Azure.Kinect.Sensor.Extrinsics)">
+            <summary>
+            Compares two <see cref="T:Microsoft.Azure.Kinect.Sensor.Extrinsics"/> for equality.
+            </summary>
+            <param name="left">First extrinsic to compare.</param>
+            <param name="right">Second extrinsic to compare.</param>
+            <returns>True if equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Extrinsics.op_Inequality(Microsoft.Azure.Kinect.Sensor.Extrinsics,Microsoft.Azure.Kinect.Sensor.Extrinsics)">
+            <summary>
+            Compares two <see cref="T:Microsoft.Azure.Kinect.Sensor.Extrinsics"/> for inequality.
+            </summary>
+            <param name="left">First extrinsic to compare.</param>
+            <param name="right">Second extrinsic to compare.</param>
+            <returns>True if not equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Extrinsics.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Extrinsics.Equals(Microsoft.Azure.Kinect.Sensor.Extrinsics)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Extrinsics.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.FirmwareBuild">
+            <summary>
+            Firmware build type.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FirmwareBuild.Release">
+            <summary>
+            Production firmware.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FirmwareBuild.Debug">
+            <summary>
+            Preproduction firmware.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.FirmwareSignature">
+            <summary>
+            Firmware signature type.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FirmwareSignature.Msft">
+            <summary>
+            Microsoft signed firmware.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FirmwareSignature.Test">
+            <summary>
+            Test signed firmware.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FirmwareSignature.NotSigned">
+            <summary>
+            Unsigned firmware.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.FPS">
+            <summary>
+            Color and depth sensor frame rate.
+            </summary>
+            <remarks>
+            This enumeration is used to select the desired frame rate to operate the cameras.
+            The actual frame rate may vary slightly due to dropped data, synchronization variation
+            between devices, clock accuracy, or if the camera exposure priority mode causes
+            reduced frame rate.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FPS.FPS5">
+            <summary>
+            5 Frames per second.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FPS.FPS15">
+            <summary>
+            15 Frames per second.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.FPS.FPS30">
+            <summary>
+            30 Frames per second.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.HardwareVersion">
+            <summary>
+            The hardware version information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.RGB">
+            <summary>
+            Gets or sets the color camera firmware version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.Depth">
+            <summary>
+            Gets or sets the depth camera firmware version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.Audio">
+            <summary>
+            Gets or sets the audio device firmware version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.DepthSensor">
+            <summary>
+            Gets or sets the depth sensor firmware version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.FirmwareBuild">
+            <summary>
+            Gets or sets the build type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.HardwareVersion.FirmwareSignature">
+            <summary>
+            Gets or sets the firmware signature.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Image">
+            <summary>
+            An Azure Kinect Image referencing its buffer and meta-data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.#ctor(Microsoft.Azure.Kinect.Sensor.ImageFormat,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Image"/> class.
+            </summary>
+            <param name="format">The pixel format of the image. Must be a format with a constant pixel size.</param>
+            <param name="widthPixels">Width of the image in pixels.</param>
+            <param name="heightPixels">Height of the image in pixels.</param>
+            <param name="strideBytes">Stride of the image in bytes. Must be as large as the width times the size of a pixel.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.#ctor(Microsoft.Azure.Kinect.Sensor.ImageFormat,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Image"/> class.
+            </summary>
+            <param name="format">The pixel format of the image. Must be a format with a constant pixel size.</param>
+            <param name="widthPixels">Width of the image in pixels.</param>
+            <param name="heightPixels">Height of the image in pixels.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.#ctor(Microsoft.Azure.Kinect.Sensor.NativeMethods.k4a_image_t)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Image"/> class.
+            </summary>
+            <param name="handle">Handle to initialize the image from.</param>
+            <remarks>The handle will be owned by the new image.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Image"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.Memory">
+            <summary>
+            Gets the Memory containing the image data.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.Exposure">
+            <summary>
+            Gets or sets the image exposure time.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.Format">
+            <summary>
+            Gets the image pixel format.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.HeightPixels">
+            <summary>
+            Gets the image height in pixels.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.WidthPixels">
+            <summary>
+            Gets the image width in pixels.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.StrideBytes">
+            <summary>
+            Gets the image stride in bytes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.Size">
+            <summary>
+            Gets the image buffer size in bytes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.DeviceTimestamp">
+            <summary>
+            Gets or sets the image time-stamp in the device's clock.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.SystemTimestampNsec">
+            <summary>
+            Gets or sets the image timestamp in nanoseconds.
+            </summary>
+            <remarks>
+            The base of the timestamp clock is the same as Stopwatch.GetTimestamp(). Units need to be
+            converted between nanoseconds and the Stopwatch frequency to make comparisons.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.ISOSpeed">
+            <summary>
+            Gets or sets the ISO speed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Image.WhiteBalance">
+            <summary>
+            Gets or sets the white balance.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.GetPixels``1">
+            <summary>
+            Gets the pixels of the image.
+            </summary>
+            <typeparam name="TPixel">The type of the pixel.</typeparam>
+            <remarks>If the image pixels are not in contiguous memory, this method will throw an exception.</remarks>
+            <returns>The contiguous memory of the image pixels.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.GetPixels``1(System.Int32)">
+            <summary>
+            Gets the pixels of the image.
+            </summary>
+            <typeparam name="TPixel">The type of the pixel.</typeparam>
+            <param name="row">The row of pixels to get.</param>
+            <returns>The contiguous memory of the image pixel row.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.GetPixel``1(System.Int32,System.Int32)">
+            <summary>
+            Gets a pixel value in the image.
+            </summary>
+            <typeparam name="TPixel">The type of the pixel.</typeparam>
+            <param name="row">The image row.</param>
+            <param name="col">The image column.</param>
+            <returns>The pixel value at the row and column.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.SetPixel``1(System.Int32,System.Int32,``0)">
+            <summary>
+            Sets a pixel value in the image.
+            </summary>
+            <typeparam name="TPixel">The type of the pixel.</typeparam>
+            <param name="row">The image row.</param>
+            <param name="col">The image column.</param>
+            <param name="pixel">The value of the pixel.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.Reference">
+            <summary>
+            Creates a duplicate reference to the same Image.
+            </summary>
+            <returns>A new Image object representing the same data.</returns>
+            <remarks>Creating a reference to the same image does not copy the image, but
+            creates two managed objects representing the same image data. Each object
+            must be independently disposed. The lifetime of the underlying image data
+            will be equal or greater than all of the referenced image objects.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.GetUnsafeBuffer">
+             <summary>
+             Gets a native pointer to the underlying memory.
+             </summary>
+             <remarks>
+             This property may only be accessed by unsafe code.
+            
+             This returns an unsafe pointer to the image's memory. It is important that the
+             caller ensures the Image is not Disposed or garbage collected while this pointer is
+             in use, since it may become invalid when the Image is disposed or finalized.
+            
+             If this method needs to be used in a context where the caller cannot guarantee that the
+             Image will be disposed by another thread, the caller can call <see cref="M:Microsoft.Azure.Kinect.Sensor.Image.Reference"/>
+             to create a duplicate reference to the Image which can be disposed separately.
+            
+             For safe buffer access <see cref="P:Microsoft.Azure.Kinect.Sensor.Image.Memory"/>.
+             </remarks>
+             <returns>A pointer to the native buffer.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.FlushMemory">
+            <summary>
+            Flush the managed cache of native memory to the native buffer.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.InvalidateMemory">
+            <summary>
+            Invalidate the managed cache of native memory by reading from the native buffer.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.DangerousGetHandle">
+            <summary>
+            Gets the native handle.
+            </summary>
+            <returns>The native handle that is wrapped by this image.</returns>
+            <remarks>The function is dangerous because there is no guarantee that the
+            handle will not be disposed once it is retrieved. This should only be called
+            by code that can ensure that the Image object will not be disposed on another
+            thread.</remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.NativeEquals(Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Checks two Images to determine if they represent the same native image object.
+            </summary>
+            <param name="other">Another Image to compare against.</param>
+            <returns>true if the Images represent the same native k4a_image_t.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Image.Dispose(System.Boolean)">
+            <summary>
+            Disposes the resources held by the image.
+            </summary>
+            <param name="disposing"><c>True</c> to release both managed and unmanaged resources; <c>False</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.ImageFormat">
+            <summary>
+            Image format.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.ColorMJPG">
+             <summary>
+             Color image type MJPG.
+             </summary>
+             <remarks>
+             The buffer for each image is encoded as a JPEG and can be decoded by a JPEG decoder.
+            
+             Because the image is compressed, the Stride property of the Image is not applicable.
+            
+             Each MJPG encoded image in a stream may be of differing size depending on the compression efficiency.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.ColorNV12">
+             <summary>
+             Color image type NV12.
+             </summary>
+             <remarks>
+             NV12 images separate the luminance and chroma data such that all the luminance is at the beginning
+             of the buffer, and the chroma lines follow immediately after.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start location
+             of each line of the image in memory. Chroma has half as many lines of height and half the width in
+             pixels of the luminance. Each chroma line has the same width in bytes as a luminance line.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.ColorYUY2">
+             <summary>
+             Color image type YUY2.
+             </summary>
+             <remarks>
+             YUY2 stores chroma and luminance data in interleaved pixels.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start location
+             of each line of the image in memory.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.ColorBGRA32">
+             <summary>
+             Color image type BGRA32.
+             </summary>
+             <remarks>
+             Each pixel of BGRA32 data is four bytes. The first three bytes represent Blue, Green, and Red data.
+             The fourth byte is the alpha channel and is unused in the Azure Kinect APIs.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start location
+             of each line of the image in memory.
+            
+             The Azure Kinect device does not natively capture in this format. Requesting images of this format
+             requires additional computation in the API.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.Depth16">
+             <summary>
+             Depth image type DEPTH16.
+             </summary>
+             <remarks>
+             Each pixel of DEPTH16 data is two bytes of little-endian unsigned depth data. The unit of the data
+             is in millimeters from the origin of the camera.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start location
+             of each line of the image in memory.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.IR16">
+             <summary>
+             Image type IR16.
+             </summary>
+             <remarks>
+             Each pixel of IR16 data is two bytes of little-endian unsigned depth data. The value of the data
+             represents brightness.
+            
+             This format represents infrared light and is captured by the depth camera. Stride indicates the
+             length of each line in bytes and should be used to determine the start location of each line of
+             the image in memory.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.Custom8">
+             <summary>
+             Single channel image type CUSTOM8.
+             </summary>
+             <remarks>
+             Each pixel of CUSTOM8 is a single channel one byte of unsigned data.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start
+             location of each line of the image in memory.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.Custom16">
+             <summary>
+             Single channel image type CUSTOM16.
+             </summary>
+             <remarks>
+             Each pixel of CUSTOM16 is a single channel two bytes of little-endian unsigned data.
+            
+             Stride indicates the length of each line in bytes and should be used to determine the start
+             location of each line of the image in memory.
+             </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.ImageFormat.Custom">
+             <summary>
+             Custom image format.
+             </summary>
+             <remarks>
+             Used in conjunction with user created images or images packing non-standard data.
+            
+             See the originator of the custom formatted image for information on how to interpret the data.
+             </remarks>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.ImuSample">
+            <summary>
+            IMU sample.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.ImuSample.Temperature">
+            <summary>
+            Gets or sets temperature reading of this sample (Celsius).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.ImuSample.AccelerometerSample">
+            <summary>
+            Gets or sets accelerometer reading of this sample (meters per second squared).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.ImuSample.AccelerometerTimestamp">
+            <summary>
+            Gets or sets time-stamp of the accelerometer.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.ImuSample.GyroSample">
+            <summary>
+            Gets or sets gyroscope sample in radians per second.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.ImuSample.GyroTimestamp">
+            <summary>
+            Gets or sets time-stamp of the gyroscope.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Intrinsics">
+            <summary>
+            Camera sensor intrinsic calibration data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Intrinsics.Type">
+            <summary>
+            Type of calibration model used.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Intrinsics.ParameterCount">
+            <summary>
+            Number of valid entries in parameters.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.Intrinsics.Parameters">
+            <summary>
+            Calibration parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Intrinsics.op_Equality(Microsoft.Azure.Kinect.Sensor.Intrinsics,Microsoft.Azure.Kinect.Sensor.Intrinsics)">
+            <summary>
+            Compare two <see cref="T:Microsoft.Azure.Kinect.Sensor.Intrinsics"/> for equality.
+            </summary>
+            <param name="left">First intrinsic to compare.</param>
+            <param name="right">Second intrinsic to compare.</param>
+            <returns>True if equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Intrinsics.op_Inequality(Microsoft.Azure.Kinect.Sensor.Intrinsics,Microsoft.Azure.Kinect.Sensor.Intrinsics)">
+            <summary>
+            Compare two <see cref="T:Microsoft.Azure.Kinect.Sensor.Intrinsics"/> for inequality.
+            </summary>
+            <param name="left">First intrinsic to compare.</param>
+            <param name="right">Second intrinsic to compare.</param>
+            <returns>True if not equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Intrinsics.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Intrinsics.Equals(Microsoft.Azure.Kinect.Sensor.Intrinsics)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Intrinsics.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.LargeArrayPool">
+             <summary>
+             An array pool implementation for large arrays.
+             </summary>
+             <remarks>
+             This ArrayPool allocates and re-uses large arrays to reduce the overhead of
+             zeroing out the buffers and allocating from the managed heap.
+            
+             Unused arrays are held by weak references and may be garbage collected.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LargeArrayPool.Rent(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LargeArrayPool.Return(System.Byte[],System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Logger">
+            <summary>
+            The Azure Kinect logging system. Enables access to the debug messages from the Azure Kinect device.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Azure.Kinect.Sensor.Logger.LogMessage">
+            <summary>
+            Occurs when the Azure Kinect Sensor SDK delivers a debug message.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Logger.Initialize">
+            <summary>
+            Initializes the <see cref="T:Microsoft.Azure.Kinect.Sensor.Logger"/> class to begin receiving messages from the Azure Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Logger.Reset">
+            <summary>
+            Resets the logger to an uninitialized state. This is used in the Unit Tests to ensure that the
+            initialization is run during the unit tests.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.LogLevel">
+            <summary>
+            Verbosity levels of debug messaging.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Critical">
+            <summary>
+            The most severe level of debug messaging.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Error">
+            <summary>
+            The second most severe level of debug messaging.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Warning">
+            <summary>
+            The third most severe level of debug messaging.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Information">
+            <summary>
+            The second least severe level of debug messaging.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Trace">
+            <summary>
+            The lest severe level of debug messaging. This is the most verbose messaging possible.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.LogLevel.Off">
+            <summary>
+            No logging is performed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.LogMessage">
+            <summary>
+            A debug log message that is part of an exception.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LogMessage.#ctor(System.DateTime,Microsoft.Azure.Kinect.Sensor.LogLevel,System.String,System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.LogMessage"/> class.
+            </summary>
+            <param name="time">The time at which the log message was received.</param>
+            <param name="logLevel">The level of the log message that was created.</param>
+            <param name="fileName">The file name of the source file that generated the message.</param>
+            <param name="line">The line number of the source file that generated the message.</param>
+            <param name="message">The messaged generated by the Azure Kinect SDK.</param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.Time">
+            <summary>
+            Gets the time at which the log message was received.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.LogLevel">
+            <summary>
+            Gets the level of the message that was created.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.FileName">
+            <summary>
+            Gets the file name of the source file that generated the message.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.Line">
+            <summary>
+            Gets the line number of the source file that generated the message.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.Message">
+            <summary>
+            Gets the messaged generated by the Azure Kinect SDK.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LogMessage.FormatedMessage">
+            <summary>
+            Gets the full formated exception log message with all of the details.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LogMessage.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.LoggingTracer">
+            <summary>
+            Represents a tracer for capturing thread specific logging messages for tracing native calls
+            into the Azure Kinect Sensor SDK.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LoggingTracer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.LoggingTracer"/> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.LoggingTracer.LogMessages">
+            <summary>
+            Gets all of the messages that have occurred on this thread since the tracing began.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LoggingTracer.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.LoggingTracer.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>True</c> to release both managed and unmanaged resources; <c>False</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute">
+            <summary>
+            Attribute indicating the native equivalent.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute"/> class with the specified name.
+            </summary>
+            <param name="referenceName">The name of the native function, handle, enumeration, callback, or structure entity that is being referenced.</param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Native.NativeReferenceAttribute.ReferenceName">
+            <summary>
+            Gets the name of the native function, handle, enumeration, callback, or structure entity that is being referenced.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Short3">
+            <summary>
+            A value representing a vector of 3 shorts.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.#ctor(System.Int16,System.Int16,System.Int16)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Short3"/> structure.
+            </summary>
+            <param name="x">X value of the vector.</param>
+            <param name="y">Y value of the vector.</param>
+            <param name="z">Z value of the vector.</param>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Short3.X">
+            <summary>
+            Gets or sets the X component of the vector.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Short3.Y">
+            <summary>
+            Gets or sets the Y component of the vector.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Azure.Kinect.Sensor.Short3.Z">
+            <summary>
+            Gets or sets the Z component of the vector.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.op_Equality(Microsoft.Azure.Kinect.Sensor.Short3,Microsoft.Azure.Kinect.Sensor.Short3)">
+            <summary>
+            Compares two Short3 values for equality.
+            </summary>
+            <param name="left">The first Short3 to compare.</param>
+            <param name="right">The second Shrot3 to compare.</param>
+            <returns>True if the values are equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.op_Inequality(Microsoft.Azure.Kinect.Sensor.Short3,Microsoft.Azure.Kinect.Sensor.Short3)">
+            <summary>
+            Compares two Short3 values for inequality.
+            </summary>
+            <param name="left">The first Short3 to compare.</param>
+            <param name="right">The second Shrot3 to compare.</param>
+            <returns>True if the values are not equal.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Short3.Equals(Microsoft.Azure.Kinect.Sensor.Short3)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.Transformation">
+            <summary>
+            Class that allows the calibrated transformation of Azure Kinect Images.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.#ctor(Microsoft.Azure.Kinect.Sensor.Calibration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Azure.Kinect.Sensor.Transformation"/> class.
+            </summary>
+            <param name="calibration">Calibration to use for transformation operations.</param>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToColorCamera(Microsoft.Azure.Kinect.Sensor.Capture)">
+            <summary>
+            Transforms an Image from the depth camera perspective to the color camera perspective.
+            </summary>
+            <param name="capture">Capture with the depth image.</param>
+            <returns>A depth image transformed in to the color camera perspective.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToColorCamera(Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the depth camera perspective to the color camera perspective.
+            </summary>
+            <param name="depth">The depth image to transform.</param>
+            <returns>A depth image transformed in to the color camera perspective.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToColorCamera(Microsoft.Azure.Kinect.Sensor.Capture,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the depth camera perspective to the color camera perspective.
+            </summary>
+            <param name="capture">Capture with the depth image.</param>
+            <param name="transformed">An Image to hold the output.</param>
+            <remarks>
+            The <paramref name="transformed"/> Image must be of the resolution of the color camera, and
+            of the pixel format of the depth image.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToColorCamera(Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the depth camera perspective to the color camera perspective.
+            </summary>
+            <param name="depth">Depth image to transform.</param>
+            <param name="transformed">An Image to hold the output.</param>
+            <remarks>
+            The <paramref name="transformed"/> Image must be of the resolution of the color camera, and
+            of the pixel format of the depth image.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.ColorImageToDepthCamera(Microsoft.Azure.Kinect.Sensor.Capture)">
+            <summary>
+            Transforms an Image from the color camera perspective to the depth camera perspective.
+            </summary>
+            <param name="capture">Capture containing depth and color images.</param>
+            <returns>A color image in the perspective of the depth camera.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.ColorImageToDepthCamera(Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the color camera perspective to the depth camera perspective.
+            </summary>
+            <param name="depth">Depth map of the space the color image is being transformed in to.</param>
+            <param name="color">Color image to transform in to the depth space.</param>
+            <returns>A color image in the perspective of the depth camera.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.ColorImageToDepthCamera(Microsoft.Azure.Kinect.Sensor.Capture,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the color camera perspective to the depth camera perspective.
+            </summary>
+            <param name="capture">Capture containing depth and color images.</param>
+            <param name="transformed">An Image to hold the output.</param>
+            <remarks>
+            The <paramref name="transformed"/> Image must be of the resolution of the depth camera, and
+            of the pixel format of the color image.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.ColorImageToDepthCamera(Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.Image)">
+            <summary>
+            Transforms an Image from the color camera perspective to the depth camera perspective.
+            </summary>
+            <param name="depth">Depth map of the space the color image is being transformed in to.</param>
+            <param name="color">Color image to transform in to the depth space.</param>
+            <param name="transformed">An Image to hold the output.</param>
+            <remarks>
+            The <paramref name="transformed"/> Image must be of the resolution of the depth camera, and
+            of the pixel format of the color image.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToPointCloud(Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+             <summary>
+             Creates a point cloud from a depth image.
+             </summary>
+             <param name="depth">The depth map to generate the point cloud from.</param>
+             <param name="camera">The perspective the depth map is from.</param>
+             <remarks>
+             If the depth map is from the original depth perspective, <paramref name="camera"/> should be Depth. If it has
+             been transformed to the color camera perspective, <paramref name="camera"/> should be Color.
+            
+             The returned image will be of format Custom. Each pixel will be an XYZ set of 16 bit values,
+             therefore its stride must is 2(bytes) * 3(x,y,z) * width of the <paramref name="depth"/> image in pixels.
+             </remarks>
+             <returns>A point cloud image.</returns>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.DepthImageToPointCloud(Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.Image,Microsoft.Azure.Kinect.Sensor.CalibrationDeviceType)">
+             <summary>
+             Creates a point cloud from a depth image.
+             </summary>
+             <param name="depth">The depth map to generate the point cloud from.</param>
+             <param name="pointCloud">The image to store the output point cloud.</param>
+             <param name="camera">The perspective the depth map is from.</param>
+             <remarks>
+             If the depth map is from the original depth perspective, <paramref name="camera"/> should be Depth. If it has
+             been transformed to the color camera perspective, <paramref name="camera"/> should be Color.
+            
+             The <paramref name="pointCloud"/> image must be of format Custom. Each pixel will be an XYZ set of 16 bit values,
+             therefore its stride must be 2(bytes) * 3(x,y,z) * width of the <paramref name="depth"/> image in pixels.
+             </remarks>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Azure.Kinect.Sensor.Transformation.Dispose(System.Boolean)">
+            <summary>
+            Implements the dispose operation.
+            </summary>
+            <param name="disposing">True if called from Dispose.</param>
+        </member>
+        <member name="T:Microsoft.Azure.Kinect.Sensor.WiredSyncMode">
+            <summary>
+            Synchronization mode when connecting two or more devices together.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.WiredSyncMode.Standalone">
+            <summary>
+            Neither 'Sync In' or 'Sync Out' connections are used.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.WiredSyncMode.Master">
+            <summary>
+            The 'Sync Out' jack is enabled and synchronization data it driven out the connected wire.
+            </summary>
+            <remarks>
+            While in master mode the color camera must be enabled as part of the multi device sync
+            signaling logic. Even if the color image is not needed, the color camera must be running.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Azure.Kinect.Sensor.WiredSyncMode.Subordinate">
+            <summary>
+            The 'Sync In' jack is used for synchronization and 'Sync Out' is driven for the next device in the chain.
+            </summary>
+            <remarks>
+            'Sync Out' is a mirror of 'Sync In' for this mode.
+            </remarks>
+        </member>
+    </members>
+</doc>
