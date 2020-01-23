@@ -30,6 +30,7 @@ dnn_model_2_0.onnx
 
 2) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
 
+![alt text](./UnitySampleGettingStarted.png)
 
 
 Press play.
