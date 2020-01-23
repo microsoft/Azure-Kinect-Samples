@@ -4,24 +4,22 @@ using UnityEngine;
 
 public class ConfigLoader : MonoBehaviour
 {
-    private static ConfigLoader _instance = null;
-
-    public static ConfigLoader Instance { get { return _instance; } }
+    public static ConfigLoader Instance { get; private set; }
 
     private void Awake()
     {
-        if (_instance == null)
+        if (Instance == null)
         {
-            _instance = this;
+            Instance = this;
         }
 
         LoadDemoSceneSetup();
     }
 
     // Name of scene config file.
-    private string gameDataFileName = "config.json";
+    private const string gameDataFileName = "config.json";
 
-    public Configs configs { get; set; } = new Configs();
+    public Configs Configs { get; private set; } = new Configs();
 
     private void LoadDemoSceneSetup()
     {
@@ -34,7 +32,7 @@ public class ConfigLoader : MonoBehaviour
             string dataAsJson = File.ReadAllText(filePath);
 
             // Pass the json to JsonUtility, and tell it to create a Configs object from it.
-            configs = JsonUtility.FromJson<Configs>(dataAsJson);
+            Configs = JsonUtility.FromJson<Configs>(dataAsJson);
 
             UnityEngine.Debug.Log("Successfully loaded config file.");
         }

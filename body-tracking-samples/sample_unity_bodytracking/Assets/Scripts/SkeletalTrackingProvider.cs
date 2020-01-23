@@ -23,8 +23,6 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
 
             // Buffer allocations.
             BackgroundData currentFrameData = new BackgroundData();
-            //using (Device device2 = Device.Open())
-            // {
             // Open device.
             using (Device device = Device.Open(id))
             {
@@ -79,7 +77,6 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
                                     initialTimestamp = depthImage.DeviceTimestamp;
                                 }
                                 currentFrameData.TimestampInMs = (float)(depthImage.DeviceTimestamp - initialTimestamp).TotalMilliseconds;
-                                //UnityEngine.Debug.Log("New depth image received.");
                                 currentFrameData.DepthImageWidth = depthImage.WidthPixels;
                                 currentFrameData.DepthImageHeight = depthImage.HeightPixels;
 
@@ -92,7 +89,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
 
                                 for (int it = currentFrameData.DepthImageWidth * currentFrameData.DepthImageHeight - 1; it > 0; it--)
                                 {
-                                    byte b = (byte)(depthFrame[it] / (ConfigLoader.Instance.configs.SkeletalTracking.MaximumDisplayedDepthInMillimeters) * 255);
+                                    byte b = (byte)(depthFrame[it] / (ConfigLoader.Instance.Configs.SkeletalTracking.MaximumDisplayedDepthInMillimeters) * 255);
                                     currentFrameData.DepthImage[byteCounter++] = b;
                                     currentFrameData.DepthImage[byteCounter++] = b;
                                     currentFrameData.DepthImage[byteCounter++] = b;

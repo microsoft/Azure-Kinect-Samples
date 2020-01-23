@@ -1,6 +1,36 @@
 Directions for getting started:
 
-1)open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
+1) First add these libraries to the Assets/Plugins folder:
+
+cublas64_100.dll
+cudart64_100.dll
+depthengine_2_0.dll
+k4a.dll
+k4abt.dll
+k4arecord.dll
+Microsoft.Azure.Kinect.BodyTracking.dll
+Microsoft.Azure.Kinect.Sensor.dll
+onnxruntime.dll
+System.Buffers.dll
+System.Numerics.Vectors.dll
+System.Memory.dll
+System.Runtime.CompilerServices.Unsafe.dll
+vcomp140.dll
+Microsoft.Azure.Kinect.BodyTracking.deps.json
+Microsoft.Azure.Kinect.BodyTracking.xml
+
+
+Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
+
+cudnn64_7.dll
+onnxruntime.dll
+dnn_model_2_0.onnx
+
+
+
+2) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
+
+
 
 Press play.
 
