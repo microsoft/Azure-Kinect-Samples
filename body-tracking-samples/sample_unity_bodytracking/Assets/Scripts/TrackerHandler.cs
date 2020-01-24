@@ -5,55 +5,56 @@ using Microsoft.Azure.Kinect.BodyTracking;
 
 public class TrackerHandler : MonoBehaviour
 {
-    Dictionary<JointId, int> parentJointMap;
+    Dictionary<JointId, JointId> parentJointMap;
     public bool drawSkeletons = true;
 
     // Start is called before the first frame update
     void Awake()
     {
-        parentJointMap = new Dictionary<JointId, int>();
-        parentJointMap[JointId.Pelvis] = -1;
-        parentJointMap[JointId.SpineNavel] = 0;
-        parentJointMap[JointId.SpineChest] = 1;
-        parentJointMap[JointId.Neck] = 2;
-        parentJointMap[JointId.ClavicleLeft] = 2;
-        parentJointMap[JointId.ShoulderLeft] = 4;
-        parentJointMap[JointId.ElbowLeft] = 5;
-        parentJointMap[JointId.WristLeft] = 6;
-        parentJointMap[JointId.HandLeft] = 7;
-        parentJointMap[JointId.HandTipLeft] = 8;
-        parentJointMap[JointId.ThumbLeft] = 8;
-        parentJointMap[JointId.ClavicleRight] = 2;
-        parentJointMap[JointId.ShoulderRight] = 11;
-        parentJointMap[JointId.ElbowRight] = 12;
-        parentJointMap[JointId.WristRight] = 13;
-        parentJointMap[JointId.HandRight] = 14;
-        parentJointMap[JointId.HandTipRight] = 15;
-        parentJointMap[JointId.ThumbRight] = 15;
-        parentJointMap[JointId.HipLeft] = 1;
-        parentJointMap[JointId.KneeLeft] = 18;
-        parentJointMap[JointId.AnkleLeft] = 19;
-        parentJointMap[JointId.FootLeft] = 20;
-        parentJointMap[JointId.HipRight] = 1;
-        parentJointMap[JointId.KneeRight] = 22;
-        parentJointMap[JointId.AnkleRight] = 23;
-        parentJointMap[JointId.FootRight] = 24;
-        parentJointMap[JointId.Head] = 0;
-        parentJointMap[JointId.Nose] = -1;
-        parentJointMap[JointId.EyeLeft] = -1;
-        parentJointMap[JointId.EarLeft] = -1;
-        parentJointMap[JointId.EyeRight] = -1;
-        parentJointMap[JointId.EarRight] = -1;
+        parentJointMap = new Dictionary<JointId, JointId>();
+
+        // pelvis has no parent so set to count
+        parentJointMap[JointId.Pelvis] = JointId.Count;
+        parentJointMap[JointId.SpineNavel] = JointId.Pelvis;
+        parentJointMap[JointId.SpineChest] = JointId.SpineNavel;
+        parentJointMap[JointId.Neck] = JointId.SpineChest;
+        parentJointMap[JointId.ClavicleLeft] = JointId.SpineChest;
+        parentJointMap[JointId.ShoulderLeft] = JointId.ClavicleLeft;
+        parentJointMap[JointId.ElbowLeft] = JointId.ShoulderLeft;
+        parentJointMap[JointId.WristLeft] = JointId.ElbowLeft;
+        parentJointMap[JointId.HandLeft] = JointId.WristLeft;
+        parentJointMap[JointId.HandTipLeft] = JointId.HandLeft;
+        parentJointMap[JointId.ThumbLeft] = JointId.HandLeft;
+        parentJointMap[JointId.ClavicleRight] = JointId.SpineChest;
+        parentJointMap[JointId.ShoulderRight] = JointId.ClavicleRight;
+        parentJointMap[JointId.ElbowRight] = JointId.ShoulderRight;
+        parentJointMap[JointId.WristRight] = JointId.ElbowRight;
+        parentJointMap[JointId.HandRight] = JointId.WristRight;
+        parentJointMap[JointId.HandTipRight] = JointId.HandRight;
+        parentJointMap[JointId.ThumbRight] = JointId.HandRight;
+        parentJointMap[JointId.HipLeft] = JointId.SpineNavel;
+        parentJointMap[JointId.KneeLeft] = JointId.HipLeft;
+        parentJointMap[JointId.AnkleLeft] = JointId.KneeLeft;
+        parentJointMap[JointId.FootLeft] = JointId.AnkleLeft;
+        parentJointMap[JointId.HipRight] = JointId.SpineNavel;
+        parentJointMap[JointId.KneeRight] = JointId.HipRight;
+        parentJointMap[JointId.AnkleRight] = JointId.KneeRight;
+        parentJointMap[JointId.FootRight] = JointId.AnkleRight;
+        parentJointMap[JointId.Head] = JointId.Pelvis;
+        parentJointMap[JointId.Nose] = JointId.Head;
+        parentJointMap[JointId.EyeLeft] = JointId.Head;
+        parentJointMap[JointId.EarLeft] = JointId.Head;
+        parentJointMap[JointId.EyeRight] = JointId.Head;
+        parentJointMap[JointId.EarRight] = JointId.Head;
     }
 
     public void updateTracker(BackgroundData trackerFrameData)
     {
         //this is an array in case you want to get the n closest bodies
-        int[] closestBodies = new int[1] { 0 };
-        findClosestTrackedBody(trackerFrameData, closestBodies);
+        int closestBody = findClosestTrackedBody(trackerFrameData);
 
         // render the closest body
-        Body skeleton = trackerFrameData.Bodies[closestBodies[0]];
+        Body skeleton = trackerFrameData.Bodies[closestBody];
         renderSkeleton(skeleton, 0);
     }
 
@@ -71,20 +72,22 @@ public class TrackerHandler : MonoBehaviour
         return retIndex;
     }
 
-    private void findClosestTrackedBody(BackgroundData trackerFrameData, int[] bodies)
+    private int findClosestTrackedBody(BackgroundData trackerFrameData)
     {
+        int closestBody = -1;
         const float MAX_DISTANCE = 5000.0f;
-        float[] minDistanceFromKinect = { MAX_DISTANCE };
+        float minDistanceFromKinect = MAX_DISTANCE;
         for (int i = 0; i < (int)trackerFrameData.NumOfBodies; i++)
         {
             var pelvisPosition = trackerFrameData.Bodies[i].JointPositions3D[(int)JointId.Pelvis];
             Vector3 pelvisPos = new Vector3((float)pelvisPosition.X, (float)pelvisPosition.Y, (float)pelvisPosition.Z);
-            if (pelvisPos.magnitude < minDistanceFromKinect[0])
+            if (pelvisPos.magnitude < minDistanceFromKinect)
             {
-                bodies[0] = i;
-                minDistanceFromKinect[0] = pelvisPos.magnitude;
+                closestBody = i;
+                minDistanceFromKinect = pelvisPos.magnitude;
             }
         }
+        return closestBody;
     }
 
     public void turnOnOffSkeletons()
@@ -110,9 +113,9 @@ public class TrackerHandler : MonoBehaviour
             transform.GetChild(skeletonNumber).GetChild(jointNum).localRotation = jointRot;
 
             const int boneChildNum = 0;
-            if (parentJointMap[(JointId)jointNum] != -1)
+            if (parentJointMap[(JointId)jointNum] != JointId.Head && parentJointMap[(JointId)jointNum] != JointId.Count)
             {
-                Vector3 parentTrackerSpacePosition = new Vector3(skeleton.JointPositions3D[parentJointMap[(JointId)jointNum]].X, -skeleton.JointPositions3D[parentJointMap[(JointId)jointNum]].Y, skeleton.JointPositions3D[parentJointMap[(JointId)jointNum]].Z);
+                Vector3 parentTrackerSpacePosition = new Vector3(skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].X, -skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Y, skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Z);
                 Vector3 boneDirectionTrackerSpace = jointPos - parentTrackerSpacePosition;
                 Vector3 boneDirectionWorldSpace = transform.rotation * boneDirectionTrackerSpace;
                 Vector3 boneDirectionLocalSpace = Quaternion.Inverse(transform.GetChild(skeletonNumber).GetChild(jointNum).rotation) * Vector3.Normalize(boneDirectionWorldSpace);
