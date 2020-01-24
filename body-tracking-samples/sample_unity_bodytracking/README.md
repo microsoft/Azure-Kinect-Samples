@@ -2,31 +2,82 @@
 
 ### Directions for getting started:
 
-#### 1) First add these libraries to the Assets/Plugins folder:
+
+#### 1) First get the latest nuget packages of libraries:
+
+Open the sample_unity_bodytracking project in Unity.
+Open the Visual Studio Solution associated with this project.
+Select Tools->NuGet Package Manager-> Package Manager Console
+
+On the command line of the console at type the following command:
+
+Install-Package Microsoft.Azure.Kinect.BodyTracking -Version 1.0.0
+
+The body tracking libraries will be put in the Packages folder under sample_unity_bodytracking
+
+
+#### 2) Next add these libraries to the Assets/Plugins folder:
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/netstandard2.0
+
+- Microsoft.Azure.Kinect.BodyTracking.deps.json
+- Microsoft.Azure.Kinect.BodyTracking.xml
+- Microsoft.Azure.Kinect.BodyTracking.dll
+- Microsoft.Azure.Kinect.BodyTracking.pdb
+
+From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/netstandard2.0
+
+- Microsoft.Azure.Kinect.Sensor.deps.json
+- Microsoft.Azure.Kinect.Sensor.xml
+- Microsoft.Azure.Kinect.Sensor.dll
+- Microsoft.Azure.Kinect.Sensor.pdb
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
 
 - cublas64_100.dll
 - cudart64_100.dll
+- vcomp140.dll
+
+From Packages/System.Buffers.4.4.0/lib/netstandard2.0
+
+- System.Buffers.dll
+
+From Packages/System.Memory.4.5.3/lib/netstandard2.0
+
+- System.Memory.dll
+
+From Packages/System.Reflection.Emit.Lightweight.4.6.0/lib/netstandard2.0
+
+- System.Reflection.Emit.Lightweight.dll
+
+From Packages/System.Runtime.CompilerServices.Unsafe.4.5.2/lib/netstandard2.0
+
+- System.Runtime.CompilerServices.Unsafe.dll
+
+From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/native/amd64/release
+
 - depthengine_2_0.dll
 - k4a.dll
-- k4abt.dll
 - k4arecord.dll
-- Microsoft.Azure.Kinect.BodyTracking.dll
-- Microsoft.Azure.Kinect.Sensor.dll
-- onnxruntime.dll
-- System.Buffers.dll
-- System.Numerics.Vectors.dll
-- System.Memory.dll
-- System.Runtime.CompilerServices.Unsafe.dll
-- vcomp140.dll
-- Microsoft.Azure.Kinect.BodyTracking.deps.json
-- Microsoft.Azure.Kinect.BodyTracking.xml
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
+
+- k4abt.dll
 
 
 
-#### 2)Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
+#### 2) Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1/lib/native/amd64/release
 
 - cudnn64_7.dll
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
+
 - onnxruntime.dll
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/content
+
 - dnn_model_2_0.onnx
 
 
