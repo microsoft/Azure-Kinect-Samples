@@ -18,6 +18,9 @@ The body tracking libraries will be put in the Packages folder under sample_unit
 
 #### 2) Next add these libraries to the Assets/Plugins folder:
 
+You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
+
+
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/netstandard2.0
 
 - Microsoft.Azure.Kinect.BodyTracking.deps.json
