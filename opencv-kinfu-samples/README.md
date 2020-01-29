@@ -4,7 +4,11 @@
 
 The Azure Kinect - OpenCV KinectFusion sample shows how to use the Azure Kinect SDK with the KinectFusion from opencv_contrib's rgbd module (https://github.com/opencv/opencv_contrib/tree/master/modules/rgbd). This sample demonstrates how to feed calibration and undistorted depth images from Azure Kinect to the OpenCV's KinectFusion module. We render live KinectFusion results and generate fused point cloud as ply when user exits application.
 
-The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The following steps are tested on Windows with OpenCV 4.1.0 (user should configure the right path of OpenCV dependencies):
+The sample requires user having OpenCV/OpenCV_Contrib/VTK installed.
+
+## For Windows
+
+The following steps are tested on Windows with OpenCV 4.1.0 (user should configure the right path of OpenCV dependencies):
 - Download and install opencv-4.1.0 from https://opencv.org/releases/ (e.g. on windows, download the opencv-4.1.0-vc14_vc15.exe, and extract contents), then, copy opencv\build\include\* to the opencv-kinfu-samples\extern\opencv-4.1.0\include\* (please create extern directory and subdirectories accordingly).
 - Download opencv_contrib-4.1.0 source from https://github.com/opencv/opencv_contrib/releases and extract contents, then copy opencv_contrib-4.1.0\modules\rgbd\include\* to extern\opencv_contrib-4.1.0\modules\rgbd\include\*, and copy opencv_contrib-4.1.0\modules\viz\include\* to extern\opencv_contrib-4.1\modules\viz\include\*.
 - Download VTK-8.2.0 from https://vtk.org/download/ and build the source accordingly.
@@ -51,3 +55,31 @@ The sample requires user having OpenCV/OpenCV_Contrib/VTK installed. The followi
 Example:
 
     Usage: kinfu_example.exe
+
+## For Linux
+
+### Setting up
+
+The following steps are tested on Ubuntu Linux (18.04) with OpenCV 4.1.0
+
+- Download VTK-8.2.0 from https://vtk.org/download/ and build the source accordingly.
+- Clone opencv and opencv_contrib (from https://github.com/opencv/opencv and https://github.com/opencv/opencv_contrib respectively)
+- Checkout both repositories to 4.1.0 (If you are downloading the zip from releases, make sure you download the same version of the two repositories)
+- Set `OPENCV_EXTRA_MODULES_PATH` to `your-path/opencv_contrib/modules/`, enable `WITH_VTK`, and set `VTK_DIR` to your VTK's cmake directory (which includes the `VTKConfig.cmake` file), enable `OPENCV_ENABLE_NONFREE` (we used cmake-gui to set these and generate opencv makefile, where you can also make sure if `BUILD_opencv_viz` and `BUILD_opencv_rgbd` are checked)
+- Once the makefile is generated using cmake-gui, go to the generated folder and perform:
+    ```
+    $ make -j$(nproc)
+    $ sudo make install
+    ```
+
+### Using opencv-kinfu
+
+- Uncomment the HAVE_OPENCV pound define in the main.cpp
+- From the folder containing the CMakeLists.txt file,
+    ```
+    $ mkdir build
+    $ cd  build
+    $ cmake ..
+    $ make
+    $ ./kinfu-example
+    ```
