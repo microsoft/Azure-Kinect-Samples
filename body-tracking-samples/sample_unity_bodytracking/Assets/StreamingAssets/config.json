@@ -1,0 +1,63 @@
+{
+    "CenterOfMassJointId": 0,
+    "LoggingToZion": false,
+    "DrawOnlyMainSkeleton": true,
+    "IsFpsDisplayActive": false,
+    "DemoSceneConfig": {
+        "DistanceFromCamera": 2.5,
+        "CameraHeight": 1.15,
+        "MonitoringSquareWidth": 1,
+        "MonitoringSquareHeight": 1,
+        "ShoesSize": 0.2,
+        "DrawMonitoringArea": true,
+        "NumberSmoothingFrames": 5
+    },
+    "JumpValidity": {
+        "InitialAndEndStability": {
+            "StableTimeInMs": 200,
+            "InitialAllowedMovementDeviationInMeters": 0.05
+        },
+        "MovementDisplacement": {
+            "HorizontalThresholdInMeters": 0.15,
+            "VerticalThresholdInMeters": 0.05
+        },
+        "HandsDisplacement": {
+            "FrameCountThreshold": 5,
+            "DistanceThresholdInMeters": 0.3,
+            "AllowedStandardDeviationInMeters": 0.03
+        },
+        "AngleDisplacement": {
+            "KneeAngleThresholdInDeg": 150,
+            "KneeAngleAllowedDeviation": 30,
+            "TorsoAngleThresholdInDeg": 170,
+            "TorsongleAllowedDeviation": 30
+        },
+        "Height": {
+            "MaximalPossibleValueInMeters": 0.6
+        }
+    },
+    "BodyFiltering": {
+        "DistanceThresholdInMeters": 0.7,
+        "CircleCenterXInMeters": 0,
+        "CircleCenterZIntMeters": 2.5,
+        "RejectPiruetteInRagDollVisualization": true,
+        "ShowFlippedPiruetteInRagDoll": true
+    },
+    "SkeletalTracking": {
+        "MaximumDisplayedDepthInMillimeters": 5000
+    },
+    "DebugOpt": {
+        "LogLevel": 2,
+        "MaxMessages": 10
+    },
+    "Plotting": {
+        "IsMovingAverageOn": false,
+        "MovingAverageWindowWidth": 5
+    },
+    "RawDataCollection": {
+      "Logging": false,
+      "LoggingFileNamePrefix": "log",
+      "ReadFromFile": false,
+      "FileName": "log_2_22_2019_2_20_11_PM"
+    }
+}
