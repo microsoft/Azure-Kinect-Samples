@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include <iostream>
-#include <vector>
 
 #include <k4a/k4a.h>
 #include <k4abt.h>
