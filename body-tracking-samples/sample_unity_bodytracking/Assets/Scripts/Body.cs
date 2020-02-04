@@ -2,7 +2,7 @@
 using Microsoft.Azure.Kinect.Sensor;
 using System;
 using System.Numerics;
-//using UnityEngine;
+using UnityEngine;
 using System.Runtime.Serialization;
 
 // Class with relevant information about body
@@ -10,11 +10,11 @@ using System.Runtime.Serialization;
 [Serializable]
 public struct Body : ISerializable
 {
-    public Vector3[] JointPositions3D;
+    public System.Numerics.Vector3[] JointPositions3D;
 
-    public Vector2[] JointPositions2D;
+    public System.Numerics.Vector2[] JointPositions2D;
 
-    public Quaternion[] JointRotations;
+    public System.Numerics.Quaternion[] JointRotations;
 
     public JointConfidenceLevel[] JointPrecisions;
 
@@ -24,9 +24,9 @@ public struct Body : ISerializable
 
     public Body(int maxJointsLength)
     {
-        JointPositions3D = new Vector3[maxJointsLength];
-        JointPositions2D = new Vector2[maxJointsLength];
-        JointRotations = new Quaternion[maxJointsLength];
+        JointPositions3D = new System.Numerics.Vector3[maxJointsLength];
+        JointPositions2D = new System.Numerics.Vector2[maxJointsLength];
+        JointRotations = new System.Numerics.Quaternion[maxJointsLength];
         JointPrecisions = new JointConfidenceLevel[maxJointsLength];
 
         Length = 0;
@@ -85,7 +85,7 @@ public struct Body : ISerializable
         float[] JointPositions3D_X = (float[])info.GetValue("JointPositions3D_X", typeof(float[]));
         float[] JointPositions3D_Y = (float[])info.GetValue("JointPositions3D_Y", typeof(float[]));
         float[] JointPositions3D_Z = (float[])info.GetValue("JointPositions3D_Z", typeof(float[]));
-        JointPositions3D = new Vector3[JointPositions3D_X.Length];
+        JointPositions3D = new System.Numerics.Vector3[JointPositions3D_X.Length];
         for (int i = 0; i < JointPositions3D_X.Length; i++)
         {
             JointPositions3D[i].X = JointPositions3D_X[i];
@@ -95,7 +95,7 @@ public struct Body : ISerializable
 
         float[] JointPositions2D_X = (float[])info.GetValue("JointPositions2D_X", typeof(float[]));
         float[] JointPositions2D_Y = (float[])info.GetValue("JointPositions2D_Y", typeof(float[]));
-        JointPositions2D = new Vector2[JointPositions2D_X.Length];
+        JointPositions2D = new System.Numerics.Vector2[JointPositions2D_X.Length];
         for (int i = 0; i < JointPositions2D_X.Length; i++)
         {
             JointPositions2D[i].X = JointPositions2D_X[i];
@@ -106,7 +106,7 @@ public struct Body : ISerializable
         float[] JointRotations_Y = (float[])info.GetValue("JointRotations_Y", typeof(float[]));
         float[] JointRotations_Z = (float[])info.GetValue("JointRotations_Z", typeof(float[]));
         float[] JointRotations_W = (float[])info.GetValue("JointRotations_W", typeof(float[]));
-        JointRotations = new Quaternion[JointRotations_X.Length];
+        JointRotations = new System.Numerics.Quaternion[JointRotations_X.Length];
         for (int i = 0; i < JointRotations_X.Length; i++)
         {
             JointRotations[i].X = JointRotations_X[i];
