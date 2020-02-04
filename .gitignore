@@ -344,13 +344,17 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-body-tracking-samples/sample_unity_bodytracking/[Ll]ibrary/
+[Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
-body-tracking-samples/sample_unity_bodytracking/Assets/AssetStoreTools*
-body-tracking-samples/sample_unity_bodytracking/Library/shadercompiler-UnityShaderCompiler.exe0.log
+Assets/AssetStoreTools*
+Logs/
+body-tracking-samples/sample_unity_bodytracking/Assets/Plugins
+body-tracking-samples/sample_unity_bodytracking/*.dll
+body-tracking-samples/sample_unity_bodytracking/*onnx
+
 
 
 
