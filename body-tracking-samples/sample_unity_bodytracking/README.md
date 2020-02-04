@@ -7,6 +7,11 @@
 
 Open the sample_unity_bodytracking project in Unity.
 Open the Visual Studio Solution associated with this project.
+If there is no Visual Studio Solution yet you can make one by opening the Unity Editor
+and selecting one of the csharp files in the project and opening it for editing.
+You may also need to set the preferences->External Tools to Visual Studio
+
+In Visual Studio:
 Select Tools->NuGet Package Manager-> Package Manager Console
 
 On the command line of the console at type the following command:
