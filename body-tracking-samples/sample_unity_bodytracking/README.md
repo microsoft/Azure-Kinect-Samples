@@ -42,8 +42,6 @@ From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/netstandard2.0
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
 
-- cublas64_100.dll
-- cudart64_100.dll
 - vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
@@ -87,6 +85,11 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/content
 
 - dnn_model_2_0.onnx
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
+
+- cublas64_100.dll
+- cudart64_100.dll
 
 
 #### 3) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
