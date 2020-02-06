@@ -7,6 +7,11 @@
 
 Open the sample_unity_bodytracking project in Unity.
 Open the Visual Studio Solution associated with this project.
+If there is no Visual Studio Solution yet you can make one by opening the Unity Editor
+and selecting one of the csharp files in the project and opening it for editing.
+You may also need to set the preferences->External Tools to Visual Studio
+
+In Visual Studio:
 Select Tools->NuGet Package Manager-> Package Manager Console
 
 On the command line of the console at type the following command:
@@ -37,8 +42,6 @@ From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/netstandard2.0
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
 
-- cublas64_100.dll
-- cudart64_100.dll
 - vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
@@ -82,6 +85,11 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/content
 
 - dnn_model_2_0.onnx
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
+
+- cublas64_100.dll
+- cudart64_100.dll
 
 
 #### 3) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene

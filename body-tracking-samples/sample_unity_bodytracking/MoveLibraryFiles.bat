@@ -7,8 +7,8 @@ copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.A
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.pdb Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.deps.json Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.xml Assets\Plugins
-copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cublas64_100.dll Assets\Plugins
-copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cudart64_100.dll Assets\Plugins
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cublas64_100.dll .\
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cudart64_100.dll .\
 copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\vcomp140.dll Assets\Plugins
 copy packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll Assets\Plugins
 copy packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll Assets\Plugins
