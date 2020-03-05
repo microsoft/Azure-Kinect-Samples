@@ -1,5 +1,7 @@
 # TouchDesigner Example
 
+![Touch Designer Screenshot](./td-screenshot.jpg)
+
 This is an example of consuming live point cloud frames for in TouchDesigner. The example consists of a sample project that demonstrates using a custom c++ TOP plugin to consume the merged MQTT data stream as well as the TOP source code.
 
 
