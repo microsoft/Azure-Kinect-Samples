@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>THREE.js Azure Kinect Streaming Example</title>
+        <style>
+            
+            body,
+            html{
+                background: black;
+                padding: 0px;
+                margin: 0px;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+            #viewport {
+                width: 100%;
+                height: 100%;
+            }            
+            
+            #stats{
+                font-family: monospace;
+                padding: 10px;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                color: white;
+                background-color: rgba(0,0,0,0.6)
+            }
+
+        </style>
+    </head>
+<body>
+
+    <div id="stats">Waiting for data..</div>
+    
+    <canvas id="viewport"></canvas>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="three.min.js"></script>
+    <script src="viewer.js"></script>
+
+</body>
+
+</html>

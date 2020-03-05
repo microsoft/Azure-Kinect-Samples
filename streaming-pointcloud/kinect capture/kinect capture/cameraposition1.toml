@@ -1,0 +1,5 @@
+[Camera]
+translation = [0, 0, 0]
+rotation = [0, 0, 0]
+min = [-2000, 0, -1500]
+max = [2000, 2000, 2000]
