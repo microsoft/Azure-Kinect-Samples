@@ -5,6 +5,8 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+!*.meta
+
 # Visual Studio cache directory
 .vs/
 
@@ -34,5 +36,3 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-
-experiments/interactive-spheres/Logs/
