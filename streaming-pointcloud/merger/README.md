@@ -65,11 +65,14 @@ Connection settings for the MQTT client are stored in the `[MqttInfo]` section.
 To compile this application from source, you will need the following:
 
 + Visual Studio 2019 with MSVC v142 or greater
-+ [Microsoft Azure Kinect SDK](https://docs.microsoft.com/en-us/azure/kinect-dk/sensor-sdk-download)
 
 + Install the following packages via [Vcpkg](https://github.com/microsoft/vcpkg) 
   + mosquitto:x64-windows
   + boost:x64-windows
+
++ If you experience problems compiling the projects related to the Kinect SDK or libraries, it may be that you need to   manually add the Microsoft Azure Kinect Sensor package. You can do this from within Visual Studio via the Nuget Package   Manager.
+  + In Visual Studio, open the `Tools` menu and select `NuGet Package Manager > Manage NuGet Packages for Solution...`
+  + Search for `Microsoft.Azure.Kinect.Sensor` and install it.
 
 + [TomlParser](https://github.com/ToruNiina/TOMLParser) Library
   + Download or clone the repository and copy the contents to ```packages/```

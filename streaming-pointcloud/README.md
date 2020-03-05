@@ -2,6 +2,8 @@
 
 This example project consists of a set of applications to align multiple Azure Kinect cameras, capture depth data (point cloud frames), merge the frames from multiple cameras together, and forward them on to be consumed and rendered by third party applications like Touch Designer, Unity, or even via webGL.
 
+![Webgl Screenshot](./docs/visualizer-screenshot.jpg)
+
 ## Overview of Components
 
 This project made up of from three separate executables which communicate via the MQTT protocol.

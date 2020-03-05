@@ -1,5 +1,7 @@
 # Unity Visualizer
 
+![Unity Screenshot](./unity-screenshot.jpg)
+
 This is an example of consuming live point cloud frames for use with Unity. This example will receive point cloud frames and will update a VFX Graph.
 
 ## Prerequisites

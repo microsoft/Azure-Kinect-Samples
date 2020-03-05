@@ -9,7 +9,7 @@ const app = express();
 
 app.use('/', express.static(__dirname + "/public"));
 
-const server = app.listen(config.http_server.port, "localhost", function() {
+const server = app.listen(config.http_server.port, "0.0.0.0", function() {
     console.log("HTTP server running on port: ", server.address().port);
 });
 

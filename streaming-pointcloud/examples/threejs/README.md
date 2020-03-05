@@ -1,5 +1,7 @@
 # THREE.js Visualizer
 
+![Webgl Screenshot](./webgl-screenshot.jpg)
+
 This is an example of consuming live point cloud frames for use with THREE.js. When run in a web browser, this example will receive point cloud frames and will update a THREE.BufferGeometry to be rendered via the THREE.PointsMaterial and THREE.Points object.
 
 In order to receive frames in the browser, an intermediary server is needed to translate the MQTT messages into websocket messages. If you use an MQTT broker with built-in websocket support you will not need to translate between MQTT and websockets.

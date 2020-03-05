@@ -106,7 +106,12 @@ function InitializeScene() {
 function resizeViewport() { 
     let height = window.innerHeight;
     let width = window.innerWidth;
+
+    let aspectRatio = width / height;
+    
     renderer.setSize(width,height);
+    camera.aspect = aspectRatio;
+    camera.updateProjectionMatrix();
 }
 
 
