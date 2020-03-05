@@ -596,18 +596,17 @@ VisualEffectResource:
       PARTICLE_PER_STRIP_COUNT);\r\n\t\tInitStripAttributes(particleIndex, attributes,
       stripData);\r\n\t\t// TODO Change seed to be sure we're deterministic on random
       with strip\r\n#endif\r\n        \r\n        {\n            SetAttribute_2EBDF112(
-      /*inout */attributes.size, (float)1.11000001);\n        }\n        {\n           
-      SetAttribute_9631F7C0( /*inout */attributes.age, (float)0);\n        }\n       
-      {\n            SetAttribute_EC596BAC( /*inout */attributes.lifetime, (float)1);\n       
-      }\n        {\n            AttributeFromMap_6F6C36D5( /*inout */attributes.position,
-      attributes.particleId, GetVFXSampler(attributeMap_d, samplerattributeMap_d),
-      (uint)0, float3(0, 0, 0), float3(1, 1, 1));\n        }\n        {\n           
-      AttributeFromMap_9AACC55( /*inout */attributes.color, attributes.particleId,
-      GetVFXSampler(attributeMap_e, samplerattributeMap_e), (uint)0, float3(0, 0,
-      0), float3(1, 1, 1));\n        }\n        \n\r\n\t\t\r\n#if VFX_USE_ALIVE_CURRENT\r\n       
-      if (attributes.alive)\r\n#endif       \r\n        {\r\n#if USE_DEAD_LIST\r\n\t       
-      uint deadIndex = deadListIn.DecrementCounter();\r\n            uint index =
-      deadListIn[deadIndex];\r\n#else\r\n            uint index = particleIndex;\r\n#endif\r\n           
+      /*inout */attributes.size, (float)1);\n        }\n        {\n            SetAttribute_9631F7C0(
+      /*inout */attributes.age, (float)0);\n        }\n        {\n            SetAttribute_EC596BAC(
+      /*inout */attributes.lifetime, (float)1);\n        }\n        {\n           
+      AttributeFromMap_6F6C36D5( /*inout */attributes.position, attributes.particleId,
+      GetVFXSampler(attributeMap_d, samplerattributeMap_d), (uint)0, float3(0, 0,
+      0), float3(1, 1, 1));\n        }\n        {\n            AttributeFromMap_9AACC55(
+      /*inout */attributes.color, attributes.particleId, GetVFXSampler(attributeMap_e,
+      samplerattributeMap_e), (uint)0, float3(0, 0, 0), float3(1, 1, 1));\n       
+      }\n        \n\r\n\t\t\r\n#if VFX_USE_ALIVE_CURRENT\r\n        if (attributes.alive)\r\n#endif      
+      \r\n        {\r\n#if USE_DEAD_LIST\r\n\t        uint deadIndex = deadListIn.DecrementCounter();\r\n           
+      uint index = deadListIn[deadIndex];\r\n#else\r\n            uint index = particleIndex;\r\n#endif\r\n           
       attributeBuffer.Store((index * 0x4 + 0x3) << 2,asuint(attributes.size));\n           
       attributeBuffer.Store((index * 0x1 + 0x1E8500) << 2,asuint(attributes.age));\n           
       attributeBuffer.Store((index * 0x1 + 0x262640) << 2,asuint(attributes.lifetime));\n           
@@ -672,7 +671,7 @@ VisualEffectResource:
       HAS_STRIPS\r\n            const StripData stripData = GetStripDataFromParticleIndex(index,
       PARTICLE_PER_STRIP_COUNT);\r\n            InitStripAttributes(index, attributes,
       stripData);\r\n#endif\r\n\t\t\t\r\n\t\t\t{\n\t\t\t    SetAttribute_3278B22F(
-      /*inout */attributes.size, (float)0.0900000036);\n\t\t\t}\n\t\t\t{\n\t\t\t   
+      /*inout */attributes.size, (float)0.0399999991);\n\t\t\t}\n\t\t\t{\n\t\t\t   
       AttributeFromMap_6F6C36D5( /*inout */attributes.position, attributes.particleId,
       GetVFXSampler(attributeMap_b, samplerattributeMap_b), (uint)0, float3(0, 0,
       0), float3(1, 1, 1));\n\t\t\t}\n\t\t\t{\n\t\t\t    AttributeFromMap_9AACC55(
@@ -708,7 +707,7 @@ VisualEffectResource:
       HAS_STRIPS\r\n        const StripData stripData = GetStripDataFromParticleIndex(index,
       PARTICLE_PER_STRIP_COUNT);\r\n        InitStripAttributes(index, attributes,
       stripData);\r\n#endif\r\n\t\t\r\n\t\t{\n\t\t    SetAttribute_3278B22F( /*inout
-      */attributes.size, (float)0.0900000036);\n\t\t}\n\t\t{\n\t\t    AttributeFromMap_6F6C36D5(
+      */attributes.size, (float)0.0399999991);\n\t\t}\n\t\t{\n\t\t    AttributeFromMap_6F6C36D5(
       /*inout */attributes.position, attributes.particleId, GetVFXSampler(attributeMap_b,
       samplerattributeMap_b), (uint)0, float3(0, 0, 0), float3(1, 1, 1));\n\t\t}\n\t\t{\n\t\t   
       AttributeFromMap_9AACC55( /*inout */attributes.color, attributes.particleId,
@@ -1110,45 +1109,39 @@ VisualEffectResource:
         data[0]: -1
         data[1]: -1
         data[2]: -1
-        data[3]: 1
+        data[3]: 6
       - op: 1
         valueIndex: 12
         data[0]: -1
         data[1]: -1
         data[2]: -1
-        data[3]: 6
+        data[3]: 3
       - op: 1
-        valueIndex: 13
+        valueIndex: 15
         data[0]: -1
         data[1]: -1
         data[2]: -1
         data[3]: 3
       - op: 1
-        valueIndex: 16
-        data[0]: -1
-        data[1]: -1
-        data[2]: -1
-        data[3]: 3
-      - op: 1
-        valueIndex: 19
+        valueIndex: 18
         data[0]: -1
         data[1]: -1
         data[2]: -1
         data[3]: 1
       - op: 6
-        valueIndex: 20
+        valueIndex: 19
         data[0]: -1
         data[1]: -1
         data[2]: -1
         data[3]: -1
       - op: 1
-        valueIndex: 21
+        valueIndex: 20
         data[0]: -1
         data[1]: -1
         data[2]: -1
         data[3]: 7
       - op: 9
-        valueIndex: 22
+        valueIndex: 21
         data[0]: -1
         data[1]: -1
         data[2]: -1
@@ -1162,13 +1155,11 @@ VisualEffectResource:
         - m_ExpressionIndex: 2
           m_Value: 25000
         - m_ExpressionIndex: 5
-          m_Value: 1.11
+          m_Value: 1
         - m_ExpressionIndex: 6
           m_Value: 0
-        - m_ExpressionIndex: 7
-          m_Value: 1
-        - m_ExpressionIndex: 11
-          m_Value: 0.09
+        - m_ExpressionIndex: 10
+          m_Value: 0.04
       m_Vector2f:
         m_Array: []
       m_Vector3f:
@@ -1177,15 +1168,15 @@ VisualEffectResource:
           m_Value: {x: 0, y: 1, z: 0}
         - m_ExpressionIndex: 1
           m_Value: {x: 50, y: 50, z: 50}
-        - m_ExpressionIndex: 9
+        - m_ExpressionIndex: 8
           m_Value: {x: 0, y: 0, z: 0}
-        - m_ExpressionIndex: 10
+        - m_ExpressionIndex: 9
           m_Value: {x: 1, y: 1, z: 1}
       m_Vector4f:
         m_Array: []
       m_Uint:
         m_Array:
-        - m_ExpressionIndex: 8
+        - m_ExpressionIndex: 7
           m_Value: 0
       m_Int:
         m_Array: []
@@ -1201,7 +1192,7 @@ VisualEffectResource:
           m_Value: {fileID: 2800000, guid: 276d9e395ae18fe40a9b4988549f2349, type: 3}
         - m_ExpressionIndex: 4
           m_Value: {fileID: 2800000, guid: 276d9e395ae18fe40a9b4988549f2349, type: 3}
-        - m_ExpressionIndex: 13
+        - m_ExpressionIndex: 12
           m_Value: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
       m_Bool:
         m_Array: []
@@ -1417,7 +1408,7 @@ VisualEffectResource:
       temporaryBuffers: []
       values:
       - nameId: deltaTime_d
-        index: 12
+        index: 11
       - nameId: attributeMap_b
         index: 3
       - nameId: attributeMap_c
@@ -1436,7 +1427,7 @@ VisualEffectResource:
       temporaryBuffers: []
       values:
       - nameId: deltaTime_a
-        index: 12
+        index: 11
       params: []
       processor: {fileID: 0}
       shaderSourceIndex: 3
@@ -1453,7 +1444,7 @@ VisualEffectResource:
       temporaryBuffers: []
       values:
       - nameId: localToWorld
-        index: 14
+        index: 13
       params: []
       processor: {fileID: 0}
       shaderSourceIndex: 4
@@ -1468,7 +1459,7 @@ VisualEffectResource:
       temporaryBuffers: []
       values:
       - nameId: mainTexture
-        index: 13
+        index: 12
       params:
       - nameId: sortPriority
         index: 0
@@ -1959,7 +1950,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 1.11
+      m_SerializableObject: 1
     m_Space: 2147483647
   m_Property:
     name: Size
@@ -3028,7 +3019,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.09
+      m_SerializableObject: 0.04
     m_Space: 2147483647
   m_Property:
     name: Size
