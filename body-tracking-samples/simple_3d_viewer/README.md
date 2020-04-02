@@ -13,7 +13,7 @@ USAGE: simple_3d_viewer.exe SensorMode[NFOV_UNBINNED, WFOV_BINNED](optional) Run
   * WFOV_BINNED             - Wide Field of View Binned Mode [Resolution: 512x512; FOI: 120 degree x 120 degree]
 * RuntimeMode:
   * CPU - Use the CPU only mode. It runs on machines without a GPU but it will be much slower
-  * OFFLINE - Play a specified file. Does not require Kinect device
+  * OFFLINE - Play a specified file. Does not require Kinect device. Can use with CPU mode
 
 ```
 e.g.   simple_3d_viewer.exe WFOV_BINNED CPU
