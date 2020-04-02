@@ -387,6 +387,7 @@ int main(int argc, char** argv)
     else {
         // Print app usage if user entered incorrect arguments.
         PrintUsage();
+        return -1;
     }
 
     return 0;
