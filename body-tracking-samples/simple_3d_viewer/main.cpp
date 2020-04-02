@@ -50,6 +50,7 @@ bool s_isRunning = true;
 Visualization::Layout3d s_layoutMode = Visualization::Layout3d::OnlyMainView;
 bool s_visualizeJointFrame = false;
 
+
 int64_t ProcessKey(void* /*context*/, int key)
 {
     // https://www.glfw.org/docs/latest/group__keys.html
@@ -106,20 +107,108 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
         else if (inputArg == std::string("OFFLINE"))
         {
             inputSettings.Offline = true;
+            if (i < argc - 1) {
+                // Take the next argument after OFFLINE as file name
+                inputSettings.FileName = argv[i + 1];
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-     
         else
         {
-            inputSettings.FileName = inputArg;
+            return false;
         }
-     
     }
     return true;
 
 }
 
+void VisualizeResult(k4abt_frame_t bodyFrame, Window3dWrapper& window3d, int depthWidth, int depthHeight) {
 
-void playFile(InputSettings inputSettings) {
+
+    // Obtain original capture that generates the body tracking result
+    k4a_capture_t originalCapture = k4abt_frame_get_capture(bodyFrame);
+    k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
+
+    std::vector<Color> pointCloudColors(depthWidth * depthHeight, { 1.f, 1.f, 1.f, 1.f });
+
+    // Read body index map and assign colors
+    k4a_image_t bodyIndexMap = k4abt_frame_get_body_index_map(bodyFrame);
+    const uint8_t* bodyIndexMapBuffer = k4a_image_get_buffer(bodyIndexMap);
+    for (int i = 0; i < depthWidth * depthHeight; i++)
+    {
+        uint8_t bodyIndex = bodyIndexMapBuffer[i];
+        if (bodyIndex != K4ABT_BODY_INDEX_MAP_BACKGROUND)
+        {
+            uint32_t bodyId = k4abt_frame_get_body_id(bodyFrame, bodyIndex);
+            pointCloudColors[i] = g_bodyColors[bodyId % g_bodyColors.size()];
+        }
+    }
+    k4a_image_release(bodyIndexMap);
+
+    // Visualize point cloud
+    window3d.UpdatePointClouds(depthImage, pointCloudColors);
+
+    // Visualize the skeleton data
+    window3d.CleanJointsAndBones();
+    uint32_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
+    for (uint32_t i = 0; i < numBodies; i++)
+    {
+        k4abt_body_t body;
+        VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
+        body.id = k4abt_frame_get_body_id(bodyFrame, i);
+
+        // Assign the correct color based on the body id
+        Color color = g_bodyColors[body.id % g_bodyColors.size()];
+        color.a = 0.4f;
+        Color lowConfidenceColor = color;
+        lowConfidenceColor.a = 0.1f;
+
+        // Visualize joints
+        for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
+        {
+            if (body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+            {
+                const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
+                const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
+
+                window3d.AddJoint(
+                    jointPosition,
+                    jointOrientation,
+                    body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM ? color : lowConfidenceColor);
+            }
+        }
+
+        // Visualize bones
+        for (size_t boneIdx = 0; boneIdx < g_boneList.size(); boneIdx++)
+        {
+            k4abt_joint_id_t joint1 = g_boneList[boneIdx].first;
+            k4abt_joint_id_t joint2 = g_boneList[boneIdx].second;
+
+            if (body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW &&
+                body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
+            {
+                bool confidentBone = body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM &&
+                    body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM;
+                const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
+                const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
+
+                window3d.AddBone(joint1Position, joint2Position, confidentBone ? color : lowConfidenceColor);
+            }
+        }
+    }
+
+    k4a_capture_release(originalCapture);
+    k4a_image_release(depthImage);
+    k4abt_frame_release(bodyFrame);
+}
+
+void PlayFile(InputSettings inputSettings) {
+    // Initialize the 3d window controller
+    Window3dWrapper window3d;
+
     //create the tracker and playback handle
     k4a_calibration_t sensor_calibration;
     k4abt_tracker_t tracker = NULL;
@@ -128,7 +217,7 @@ void playFile(InputSettings inputSettings) {
     const char* file = inputSettings.FileName.c_str();
     if (k4a_playback_open(file, &playback_handle) != K4A_RESULT_SUCCEEDED)
     {
-        printf("Failed to open recording\n");
+        printf("Failed to open recording: %s\n", file);
         return;
     }
 
@@ -154,9 +243,6 @@ void playFile(InputSettings inputSettings) {
     int depthWidth = sensor_calibration.depth_camera_calibration.resolution_width;
     int depthHeight = sensor_calibration.depth_camera_calibration.resolution_height;
 
-    // Initialize the 3d window controller
-    Window3dWrapper window3d;
-
     window3d.Create("3D Visualization", sensor_calibration);
     window3d.SetCloseCallback(CloseCallback);
     window3d.SetKeyCallback(ProcessKey);
@@ -176,71 +262,8 @@ void playFile(InputSettings inputSettings) {
             {
                 size_t num_bodies = k4abt_frame_get_num_bodies(bodyFrame);
                 printf("%zu bodies are detected\n", num_bodies);
-
                 /************* Successfully get a body tracking result, process the result here ***************/
-
-                // Obtain original capture that generates the body tracking result
-                k4a_capture_t originalCapture = k4abt_frame_get_capture(bodyFrame);
-                k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
-
-                std::vector<Color> pointCloudColors(depthWidth * depthHeight, { 1.f, 1.f, 1.f, 1.f });
-
-                // Read body index map and assign colors
-                k4a_image_t bodyIndexMap = k4abt_frame_get_body_index_map(bodyFrame);
-                const uint8_t* bodyIndexMapBuffer = k4a_image_get_buffer(bodyIndexMap);
-                for (int i = 0; i < depthWidth * depthHeight; i++)
-                {
-                    uint8_t bodyIndex = bodyIndexMapBuffer[i];
-                    if (bodyIndex != K4ABT_BODY_INDEX_MAP_BACKGROUND)
-                    {
-                        uint32_t bodyId = k4abt_frame_get_body_id(bodyFrame, bodyIndex);
-                        pointCloudColors[i] = g_bodyColors[bodyId % g_bodyColors.size()];
-                    }
-                }
-                k4a_image_release(bodyIndexMap);
-
-                // Visualize point cloud
-                window3d.UpdatePointClouds(depthImage, pointCloudColors);
-
-                // Visualize the skeleton data
-                window3d.CleanJointsAndBones();
-                size_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-                for (size_t i = 0; i < numBodies; i++)
-                {
-                    k4abt_body_t body;
-                    VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
-                    body.id = k4abt_frame_get_body_id(bodyFrame, i);
-
-                    // Assign the correct color based on the body id
-                    Color color = g_bodyColors[body.id % g_bodyColors.size()];
-                    color.a = 0.4f;
-
-                    // Visualize joints
-                    for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
-                    {
-                        const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
-                        const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
-
-                        window3d.AddJoint(jointPosition, jointOrientation, color);
-                    }
-
-                    // Visualize bones
-                    for (size_t boneIdx = 0; boneIdx < g_boneList.size(); boneIdx++)
-                    {
-                        k4abt_joint_id_t joint1 = g_boneList[boneIdx].first;
-                        k4abt_joint_id_t joint2 = g_boneList[boneIdx].second;
-
-                        const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
-                        const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
-
-                        window3d.AddBone(joint1Position, joint2Position, color);
-                    }
-                }
-
-
-                k4a_image_release(depthImage);
-                k4a_capture_release(capture); // Release the sensor capture 
-                k4abt_frame_release(bodyFrame); //Release the body frame 
+                VisualizeResult(bodyFrame, window3d, depthWidth, depthHeight); 
             }
             else
             {
@@ -264,7 +287,6 @@ void playFile(InputSettings inputSettings) {
     window3d.Delete();
     printf("Finished body tracking processing!\n");
     k4a_playback_close(playback_handle);
-
 
 }
 
@@ -328,82 +350,8 @@ void PlayFromDevice(InputSettings inputSettings) {
         if (popFrameResult == K4A_WAIT_RESULT_SUCCEEDED)
         {
             /************* Successfully get a body tracking result, process the result here ***************/
-
-            // Obtain original capture that generates the body tracking result
-            k4a_capture_t originalCapture = k4abt_frame_get_capture(bodyFrame);
-            k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
-
-            std::vector<Color> pointCloudColors(depthWidth * depthHeight, { 1.f, 1.f, 1.f, 1.f });
-
-            // Read body index map and assign colors
-            k4a_image_t bodyIndexMap = k4abt_frame_get_body_index_map(bodyFrame);
-            const uint8_t* bodyIndexMapBuffer = k4a_image_get_buffer(bodyIndexMap);
-            for (int i = 0; i < depthWidth * depthHeight; i++)
-            {
-                uint8_t bodyIndex = bodyIndexMapBuffer[i];
-                if (bodyIndex != K4ABT_BODY_INDEX_MAP_BACKGROUND)
-                {
-                    uint32_t bodyId = k4abt_frame_get_body_id(bodyFrame, bodyIndex);
-                    pointCloudColors[i] = g_bodyColors[bodyId % g_bodyColors.size()];
-                }
-            }
-            k4a_image_release(bodyIndexMap);
-
-            // Visualize point cloud
-            window3d.UpdatePointClouds(depthImage, pointCloudColors);
-
-            // Visualize the skeleton data
-            window3d.CleanJointsAndBones();
-            uint32_t numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-            for (uint32_t i = 0; i < numBodies; i++)
-            {
-                k4abt_body_t body;
-                VERIFY(k4abt_frame_get_body_skeleton(bodyFrame, i, &body.skeleton), "Get skeleton from body frame failed!");
-                body.id = k4abt_frame_get_body_id(bodyFrame, i);
-
-                // Assign the correct color based on the body id
-                Color color = g_bodyColors[body.id % g_bodyColors.size()];
-                color.a = 0.4f;
-                Color lowConfidenceColor = color;
-                lowConfidenceColor.a = 0.1f;
-
-                // Visualize joints
-                for (int joint = 0; joint < static_cast<int>(K4ABT_JOINT_COUNT); joint++)
-                {
-                    if (body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
-                    {
-                        const k4a_float3_t& jointPosition = body.skeleton.joints[joint].position;
-                        const k4a_quaternion_t& jointOrientation = body.skeleton.joints[joint].orientation;
-
-                        window3d.AddJoint(
-                            jointPosition,
-                            jointOrientation,
-                            body.skeleton.joints[joint].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM ? color : lowConfidenceColor);
-                    }
-                }
-
-                // Visualize bones
-                for (size_t boneIdx = 0; boneIdx < g_boneList.size(); boneIdx++)
-                {
-                    k4abt_joint_id_t joint1 = g_boneList[boneIdx].first;
-                    k4abt_joint_id_t joint2 = g_boneList[boneIdx].second;
-
-                    if (body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW &&
-                        body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_LOW)
-                    {
-                        bool confidentBone = body.skeleton.joints[joint1].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM &&
-                            body.skeleton.joints[joint2].confidence_level >= K4ABT_JOINT_CONFIDENCE_MEDIUM;
-                        const k4a_float3_t& joint1Position = body.skeleton.joints[joint1].position;
-                        const k4a_float3_t& joint2Position = body.skeleton.joints[joint2].position;
-
-                        window3d.AddBone(joint1Position, joint2Position, confidentBone ? color : lowConfidenceColor);
-                    }
-                }
-            }
-
-            k4a_capture_release(originalCapture);
-            k4a_image_release(depthImage);
-            k4abt_frame_release(bodyFrame);
+            VisualizeResult(bodyFrame, window3d, depthWidth, depthHeight);
+           
         }
 
         window3d.SetLayout3d(s_layoutMode);
@@ -426,19 +374,20 @@ void PlayFromDevice(InputSettings inputSettings) {
 int main(int argc, char** argv)
 {
     InputSettings inputSettings;
-    PrintUsage();
-    ParseInputSettingsFromArg(argc, argv, inputSettings);
-    
-    PrintAppUsage();
-
-    // Either play the offline file or play from the device
-    if (inputSettings.Offline == true) {
-        playFile(inputSettings);
+   
+    if (ParseInputSettingsFromArg(argc, argv, inputSettings)) {
+        // Either play the offline file or play from the device
+        if (inputSettings.Offline == true) {     
+            PlayFile(inputSettings);
+        }
+        else {
+            PlayFromDevice(inputSettings);
+        }
     }
     else {
-        PlayFromDevice(inputSettings);
+        // Print app usage if user entered incorrect arguments.
+        PrintUsage();
     }
-   
 
     return 0;
 }
