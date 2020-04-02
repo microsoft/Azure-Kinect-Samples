@@ -127,7 +127,6 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
 
 void VisualizeResult(k4abt_frame_t bodyFrame, Window3dWrapper& window3d, int depthWidth, int depthHeight) {
 
-
     // Obtain original capture that generates the body tracking result
     k4a_capture_t originalCapture = k4abt_frame_get_capture(bodyFrame);
     k4a_image_t depthImage = k4a_capture_get_depth_image(originalCapture);
@@ -202,7 +201,7 @@ void VisualizeResult(k4abt_frame_t bodyFrame, Window3dWrapper& window3d, int dep
 
     k4a_capture_release(originalCapture);
     k4a_image_release(depthImage);
-    k4abt_frame_release(bodyFrame);
+
 }
 
 void PlayFile(InputSettings inputSettings) {
@@ -227,7 +226,7 @@ void PlayFile(InputSettings inputSettings) {
         printf("Failed to get calibration\n");
         return;
     }
-    ;
+    
 
     k4a_capture_t capture = NULL;
     k4a_stream_result_t result = K4A_STREAM_RESULT_SUCCEEDED;
@@ -264,12 +263,15 @@ void PlayFile(InputSettings inputSettings) {
                 printf("%zu bodies are detected\n", num_bodies);
                 /************* Successfully get a body tracking result, process the result here ***************/
                 VisualizeResult(bodyFrame, window3d, depthWidth, depthHeight); 
+                //Release the bodyFrame
+                k4abt_frame_release(bodyFrame);
             }
             else
             {
                 printf("Pop body frame result failed!\n");
                 break;
             }
+           
         }
 
         window3d.SetLayout3d(s_layoutMode);
@@ -351,9 +353,10 @@ void PlayFromDevice(InputSettings inputSettings) {
         {
             /************* Successfully get a body tracking result, process the result here ***************/
             VisualizeResult(bodyFrame, window3d, depthWidth, depthHeight);
-           
+            //Release the bodyFrame
+            k4abt_frame_release(bodyFrame);
         }
-
+       
         window3d.SetLayout3d(s_layoutMode);
         window3d.SetJointFrameVisualization(s_visualizeJointFrame);
         window3d.Render();
