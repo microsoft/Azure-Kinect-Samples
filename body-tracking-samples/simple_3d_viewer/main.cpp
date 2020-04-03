@@ -110,7 +110,7 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
             if (i < argc - 1) {
                 // Take the next argument after OFFLINE as file name
                 inputSettings.FileName = argv[i + 1];
-                return true;
+                i++;
             }
             else {
                 return false;
@@ -118,6 +118,7 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
         }
         else
         {
+            printf("Error command not understood: %s\n", inputArg.c_str());
             return false;
         }
     }
@@ -249,10 +250,22 @@ void PlayFile(InputSettings inputSettings) {
     while (result == K4A_STREAM_RESULT_SUCCEEDED)
     {
         result = k4a_playback_get_next_capture(playback_handle, &capture);
+        // check to make sure we have a depth image
+        // if we are not at the end of the file
+        if (result != K4A_STREAM_RESULT_EOF) {
+            k4a_image_t depth_image = k4a_capture_get_depth_image(capture);
+            if (depth_image == NULL) {
+                //If no depth image, print a warning and skip to next frame
+                printf("Warning: No depth image, skipping frame\n");
+                continue;
+            }
+            // Release the Depth image
+            k4a_image_release(depth_image);
+        }
         if (result == K4A_STREAM_RESULT_SUCCEEDED)
         {
             
-            //enque capture and pop results - asynchronous
+            //enque capture and pop results - synchronous
             k4a_wait_result_t queue_capture_result = k4abt_tracker_enqueue_capture(tracker, capture, K4A_WAIT_INFINITE);
 
             // Release the sensor capture once it is no longer needed.
