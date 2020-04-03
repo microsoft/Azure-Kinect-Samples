@@ -255,6 +255,9 @@ void PlayFile(InputSettings inputSettings) {
             //enque capture and pop results - asynchronous
             k4a_wait_result_t queue_capture_result = k4abt_tracker_enqueue_capture(tracker, capture, K4A_WAIT_INFINITE);
 
+            // Release the sensor capture once it is no longer needed.
+            k4a_capture_release(capture);
+
             k4abt_frame_t bodyFrame = NULL;
             k4a_wait_result_t pop_frame_result = k4abt_tracker_pop_result(tracker, &bodyFrame, K4A_WAIT_INFINITE);
             if (pop_frame_result == K4A_WAIT_RESULT_SUCCEEDED)
