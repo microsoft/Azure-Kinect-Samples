@@ -257,6 +257,7 @@ void PlayFile(InputSettings inputSettings) {
             if (depth_image == NULL) {
                 //If no depth image, print a warning and skip to next frame
                 printf("Warning: No depth image, skipping frame\n");
+                k4a_capture_release(capture);
                 continue;
             }
             // Release the Depth image
