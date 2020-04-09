@@ -96,11 +96,12 @@ static const char* const glslPointCloudVertexShader = GLSL_STRING(
 // ************** Point Cloud Fragment Shader **************
 static const char* const glslPointCloudFragmentShader = GLSL_STRING(
 
+    out vec4 fragColor;
     in vec4 fragmentColor;
 
     void main()
     {
-        gl_FragColor = fragmentColor;
+        fragColor = fragmentColor;
     }
 
 );  // GLSL_STRING

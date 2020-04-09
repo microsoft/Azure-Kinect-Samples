@@ -35,6 +35,7 @@ static const char* const glslMonoObjectVertexShader = GLSL_STRING(
 // ************** Mono Object Fragment Shader **************
 static const char* const glslMonoObjectFragmentShader = GLSL_STRING(
 
+    out vec4 fragColor;
     varying vec4 fragmentColor;
     varying vec3 fragmentPosition;
     varying vec3 fragmentNormal;
@@ -48,7 +49,7 @@ static const char* const glslMonoObjectFragmentShader = GLSL_STRING(
         vec3 lightDir = normalize(lightPosition - fragmentPosition);
         float diffuse = abs(dot(norm, lightDir));
 
-        gl_FragColor = vec4(fragmentColor.rgb * diffuse, fragmentColor.a);
+        fragColor = vec4(fragmentColor.rgb * diffuse, fragmentColor.a);
     }
 
 );  // GLSL_STRING
