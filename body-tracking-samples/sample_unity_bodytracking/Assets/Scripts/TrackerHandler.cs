@@ -161,7 +161,7 @@ public class TrackerHandler : MonoBehaviour
             Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);
             Vector3 offsetPosition = transform.rotation * jointPos;
             Vector3 positionInTrackerRootSpace = transform.position + offsetPosition;
-            Quaternion jointRot = Y_180_FLIP * new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y, 
+            Quaternion jointRot = Y_180_FLIP * new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y,
                 skeleton.JointRotations[jointNum].Z, skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(basisJointMap[(JointId)jointNum]);
             absoluteJointRotations[jointNum] = jointRot;
             // these are absolute body space because each joint has the body root for a parent in the scene graph
@@ -189,7 +189,6 @@ public class TrackerHandler : MonoBehaviour
 
     public Quaternion GetRelativeJointRotation(JointId jointId)
     {
-        
         JointId parent = parentJointMap[jointId];
         Quaternion parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
         if (parent == JointId.Count)
