@@ -8,6 +8,7 @@ public class TrackerHandler : MonoBehaviour
     Dictionary<JointId, Quaternion> basisJointMap;
     Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
     public bool drawSkeletons = true;
+    Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
     // Start is called before the first frame update
     void Awake()
@@ -160,15 +161,12 @@ public class TrackerHandler : MonoBehaviour
             Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);
             Vector3 offsetPosition = transform.rotation * jointPos;
             Vector3 positionInTrackerRootSpace = transform.position + offsetPosition;
-            Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
-            Quaternion jointRot = new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y, 
+            Quaternion jointRot = Y_180_FLIP * new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y, 
                 skeleton.JointRotations[jointNum].Z, skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(basisJointMap[(JointId)jointNum]);
-
-            //Quaternion jointRot = new Quaternion(skeleton.JointRotations[jointNum].X, -skeleton.JointRotations[jointNum].Y, skeleton.JointRotations[jointNum].Z, -skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(Quaternion.Euler(0, -90, 90));
-            absoluteJointRotations[jointNum] = Y_180_FLIP * jointRot;
+            absoluteJointRotations[jointNum] = jointRot;
             // these are absolute body space because each joint has the body root for a parent in the scene graph
             transform.GetChild(skeletonNumber).GetChild(jointNum).localPosition = jointPos;
-            transform.GetChild(skeletonNumber).GetChild(jointNum).localRotation = Y_180_FLIP * jointRot;
+            transform.GetChild(skeletonNumber).GetChild(jointNum).localRotation = jointRot;
 
             const int boneChildNum = 0;
             if (parentJointMap[(JointId)jointNum] != JointId.Head && parentJointMap[(JointId)jointNum] != JointId.Count)
@@ -191,14 +189,14 @@ public class TrackerHandler : MonoBehaviour
 
     public Quaternion GetRelativeJointRotation(JointId jointId)
     {
-        Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+        
         JointId parent = parentJointMap[jointId];
-        Quaternion parentJointRotationBodySpace = Y_180_FLIP;
-        Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
-        if (parent != JointId.Count)
+        Quaternion parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
+        if (parent == JointId.Count)
         {
-            parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
+            parentJointRotationBodySpace = Y_180_FLIP;
         }
+        Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
         Quaternion relativeRotation =  Quaternion.Inverse(parentJointRotationBodySpace) * jointRotationBodySpace;
 
         return relativeRotation;

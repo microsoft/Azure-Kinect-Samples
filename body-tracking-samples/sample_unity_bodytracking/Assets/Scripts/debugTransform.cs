@@ -5,10 +5,8 @@ using UnityEngine;
 public class debugTransform : MonoBehaviour
 {
     public GameObject tracker;
-    public bool spine;
-    public bool arm;
-    public bool leg;
-
+    public int jointNum;
+    public GameObject Joint;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,18 +18,7 @@ public class debugTransform : MonoBehaviour
     {
         //Debug.Log("rot" + tracker.GetComponent<TrackerHandler>().GetRelativeJointRotation(Microsoft.Azure.Kinect.BodyTracking.JointId.ShoulderRight));
         //Quaternion Z_180_FLIP = new Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
-        if (spine)
-        {
-            transform.localRotation = tracker.GetComponent<TrackerHandler>().GetRelativeJointRotation(Microsoft.Azure.Kinect.BodyTracking.JointId.Pelvis);
-        }
-        else if (arm)
-        {
-            transform.localRotation = tracker.GetComponent<TrackerHandler>().GetRelativeJointRotation(Microsoft.Azure.Kinect.BodyTracking.JointId.ShoulderRight);
-        }
-        else
-        {
-            transform.localRotation = tracker.GetComponent<TrackerHandler>().GetRelativeJointRotation(Microsoft.Azure.Kinect.BodyTracking.JointId.HipRight);
-        }
-        
+        transform.localRotation = tracker.GetComponent<TrackerHandler>().GetRelativeJointRotation((Microsoft.Azure.Kinect.BodyTracking.JointId)jointNum);
+        //transform.rotation = Joint.transform.rotation;
     }
 }
