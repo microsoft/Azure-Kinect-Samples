@@ -7,8 +7,8 @@ copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.A
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.pdb Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.deps.json Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.xml Assets\Plugins
-copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cublas64_100.dll .\
-copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cudart64_100.dll .\
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cublas64_100.dll Assets\Plugins
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cudart64_100.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\vcomp140.dll Assets\Plugins
 copy packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll Assets\Plugins
 copy packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll Assets\Plugins
@@ -17,7 +17,8 @@ copy packages\System.Reflection.Emit.Lightweight.4.6.0\lib\netstandard2.0\System
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\native\amd64\release\depthengine_2_0.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\native\amd64\release\k4a.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.3.0\lib\native\amd64\release\k4arecord.dll Assets\Plugins
+copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release\onnxruntime.dll Assets\Plugins
+copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release\k4abt.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\lib\native\amd64\release\cudnn64_7.dll .\
 copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release\onnxruntime.dll .\
-copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release\k4abt.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\content\dnn_model_2_0.onnx .\
