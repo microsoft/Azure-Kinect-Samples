@@ -80,6 +80,11 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1/lib/n
 
 - cudnn64_7.dll
 
+From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
+
+- cublas64_100.dll
+- cudart64_100.dll
+
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
 
 - onnxruntime.dll

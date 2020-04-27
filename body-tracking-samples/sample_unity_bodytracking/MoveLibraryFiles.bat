@@ -22,3 +22,5 @@ copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release
 copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1\lib\native\amd64\release\cudnn64_7.dll .\
 copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\lib\native\amd64\release\onnxruntime.dll .\
 copy packages\Microsoft.Azure.Kinect.BodyTracking.1.0.1\content\dnn_model_2_0.onnx .\
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cublas64_100.dll .\
+copy packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1\lib\native\amd64\release\cudart64_100.dll .\
