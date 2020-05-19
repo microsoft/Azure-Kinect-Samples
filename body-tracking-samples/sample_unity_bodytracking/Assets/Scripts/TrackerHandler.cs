@@ -4,9 +4,9 @@ using Microsoft.Azure.Kinect.BodyTracking;
 
 public class TrackerHandler : MonoBehaviour
 {
-    Dictionary<JointId, JointId> parentJointMap;
+    public Dictionary<JointId, JointId> parentJointMap;
     Dictionary<JointId, Quaternion> basisJointMap;
-    Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
+    public Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
     public bool drawSkeletons = true;
     Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -190,10 +190,14 @@ public class TrackerHandler : MonoBehaviour
     public Quaternion GetRelativeJointRotation(JointId jointId)
     {
         JointId parent = parentJointMap[jointId];
-        Quaternion parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
+        Quaternion parentJointRotationBodySpace = Quaternion.identity;
         if (parent == JointId.Count)
         {
             parentJointRotationBodySpace = Y_180_FLIP;
+        }
+        else
+        {
+            parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
         }
         Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
         Quaternion relativeRotation =  Quaternion.Inverse(parentJointRotationBodySpace) * jointRotationBodySpace;
