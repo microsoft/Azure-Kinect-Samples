@@ -95,7 +95,8 @@ public class PuppetAvatar : MonoBehaviour
                 finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * KinectDevice.absoluteJointRotations[j] * absOffset;
                 if (j == 0)
                 {
-                    finalJoint.position = new Vector3(RootPosition.transform.localPosition.x, RootPosition.transform.localPosition.y + OffsetY, RootPosition.transform.localPosition.z - OffsetZ);
+                    // character root plus translation reading from the kinect, plus the offset from the script public variables
+                    finalJoint.position = CharacterRootTransform.position + new Vector3(RootPosition.transform.localPosition.x, RootPosition.transform.localPosition.y + OffsetY, RootPosition.transform.localPosition.z - OffsetZ);
                 }
             }
         }
