@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.Azure.Kinect.BodyTracking;
+using System.Text;
 
 public class PuppetAvatar : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class PuppetAvatar : MonoBehaviour
     Dictionary<JointId, Quaternion> absoluteOffsetMap;
     Animator PuppetAnimator;
     public GameObject RootPosition;
-    public GameObject CharacterRoot;
+    public Transform CharacterRootTransform;
     public float OffsetY;
     public float OffsetZ;
     private static HumanBodyBones MapKinectJoint(JointId joint)
@@ -44,7 +45,7 @@ public class PuppetAvatar : MonoBehaviour
     private void Start()
     {
         PuppetAnimator = GetComponent<Animator>();
-        Transform _rootJointTransform = findRoot();
+        Transform _rootJointTransform = CharacterRootTransform;
 
         absoluteOffsetMap = new Dictionary<JointId, Quaternion>();
         for (int i = 0; i < (int)JointId.Count; i++)
@@ -64,27 +65,15 @@ public class PuppetAvatar : MonoBehaviour
             }
         }
     }
-    
-    Transform findRoot()
-    {
-        Transform ret = PuppetAnimator.GetBoneTransform(HumanBodyBones.Hips);
-        if (ret.parent != null)
-        {
-            while (ret.parent.parent != null)
-            {
-                ret = ret.parent;
-            }
-        }
-        return ret;
-    }
 
     private static SkeletonBone GetSkeletonBone(Animator animator, string boneName)
     {
         int count = 0;
+        StringBuilder cloneName = new StringBuilder(boneName);
+        cloneName.Append("(Clone)");
         foreach (SkeletonBone sb in animator.avatar.humanDescription.skeleton)
         {
-            //Debug.Log($"human skeleton joint name {sb.name}");
-            if (sb.name == boneName)
+            if (sb.name == boneName || sb.name == cloneName.ToString())
             {
                 return animator.avatar.humanDescription.skeleton[count];
             }
@@ -106,7 +95,7 @@ public class PuppetAvatar : MonoBehaviour
                 finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * KinectDevice.absoluteJointRotations[j] * absOffset;
                 if (j == 0)
                 {
-                    finalJoint.localPosition = new Vector3(RootPosition.transform.localPosition.x, RootPosition.transform.localPosition.y + OffsetY, RootPosition.transform.localPosition.z - OffsetZ);
+                    finalJoint.position = new Vector3(RootPosition.transform.localPosition.x, RootPosition.transform.localPosition.y + OffsetY, RootPosition.transform.localPosition.z - OffsetZ);
                 }
             }
         }
