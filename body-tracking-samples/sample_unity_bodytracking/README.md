@@ -107,3 +107,12 @@ Press play.
 2) go to the prefab folder and drop in the Kinect4AzureTracker prefab
 3) now drag the gameobject for the Kinect4AzureTracker onto the Tracker slot in the main object in the inspector.
 
+### Finally if you Build a Standalone Executable 
+####Then you will need to put these files in the same directory with the .exe:
+
+- onnxruntime.dll
+- dnn_model_2_0.onnx
+- cudnn64_7.dll
+- cudart64_100.dll
+- cublas64_100.dll
+
