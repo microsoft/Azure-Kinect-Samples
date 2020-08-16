@@ -26,8 +26,8 @@ namespace Csharp_3d_viewer
                     {
                         for (int u = 0; u < calibration.DepthCameraCalibration.ResolutionWidth; ++u, k += 3)
                         {
-                            // Divide by 1e6 to store points position per each 1 millimeter of z-distance.
-                            var point = new Vector3(pointCloudBuffer[k], pointCloudBuffer[k + 1], pointCloudBuffer[k + 2]) / 1000000;
+                            // Divide by 1e3 to store points position per each 1 millimeter of z-distance.
+                            var point = new Vector3(pointCloudBuffer[k], pointCloudBuffer[k + 1], pointCloudBuffer[k + 2]) / 1000;
                             pointCloudCache[v, u] = point;
                         }
                     }
