@@ -6,6 +6,7 @@
 #include <array>
 #include <unordered_map>
 #include <k4abttypes.h>
+#include <string>
 
 // Define the bone list based on the documentation
 const std::array<std::pair<k4abt_joint_id_t, k4abt_joint_id_t>, 31> g_boneList =
