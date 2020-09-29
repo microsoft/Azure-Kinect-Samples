@@ -14,6 +14,5 @@ target_link_libraries(simple_3d_viewer PRIVATE
     k4abt
     k4arecord
     window_controller_3d::window_controller_3d
-    glfw::glfw
     )
 
