@@ -180,6 +180,8 @@ bool process_mkv_offline(const char* input_path, const char* output_path)
 
     k4a_playback_close(playback_handle);
 
+    k4abt_tracker_destroy(tracker);
+
     return success;
 }
 
