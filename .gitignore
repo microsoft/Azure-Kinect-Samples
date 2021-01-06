@@ -78,6 +78,9 @@ StyleCopReport.xml
 *.meta
 # except the unity sample project
 !**/Assets/*.meta
+!**/Assets/**/*.cs.meta
+!**/Assets/Prefab/**/*.meta
+!**/Assets/Model/**/*.meta
 *.obj
 *.iobj
 *.pch
