@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 public abstract class BackgroundDataProvider
@@ -9,18 +10,18 @@ public abstract class BackgroundDataProvider
     object m_lockObj = new object();
     public bool IsRunning { get; set; } = false;
 
-    public void StartClientThread(int id)
+    public void StartClientThread(int id, CancellationToken token)
     {
         m_runBackgroundThread = true;
-        Task.Run(() => RunBackgroundThreadAsync(id));
+        Task.Run(() => RunBackgroundThreadAsync(id, token),token);
     }
 
-    protected abstract void RunBackgroundThreadAsync(int id);
+    protected abstract void RunBackgroundThreadAsync(int id, CancellationToken token);
 
     public void StopClientThread()
     {
         UnityEngine.Debug.Log("Stopping BackgroundDataProvider thread.");
-        m_runBackgroundThread = false;
+        //m_runBackgroundThread = false;
     }
 
     public void SetCurrentFrameData(ref BackgroundData currentFrameData)

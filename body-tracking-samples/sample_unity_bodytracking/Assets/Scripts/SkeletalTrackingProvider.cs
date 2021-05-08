@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Azure.Kinect.Sensor;
 using Microsoft.Azure.Kinect.BodyTracking;
 using UnityEngine;
+using System.Threading;
 
 public class SkeletalTrackingProvider : BackgroundDataProvider
 {
@@ -15,7 +16,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
 
     public Stream RawDataLoggingFile = null;
 
-    protected override void RunBackgroundThreadAsync(int id)
+    protected override void RunBackgroundThreadAsync(int id, CancellationToken token)
     {
         try
         {
@@ -41,7 +42,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
                 using (Tracker tracker = Tracker.Create(deviceCalibration, new TrackerConfiguration() { ProcessingMode = TrackerProcessingMode.Gpu, SensorOrientation = SensorOrientation.Default }))
                 {
                     UnityEngine.Debug.Log("Body tracker created.");
-                    while (m_runBackgroundThread)
+                    while (!token.IsCancellationRequested)
                     {
                         using (Capture sensorCapture = device.GetCapture())
                         {
@@ -106,6 +107,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
 
                         }
                     }
+                    Debug.Log("dispose of tracker now!!!!!");
                     tracker.Dispose();
                 }
                 device.Dispose();
@@ -117,7 +119,10 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
         }
         catch (Exception e)
         {
-            UnityEngine.Debug.LogError(e.Message);
+            Debug.Log("catching exception for background thread");
+            UnityEngine.Debug.Log($"error msg1 {e.Message}");
+            UnityEngine.Debug.Log($"error msg2 {e.InnerException.Message}");
+            token.ThrowIfCancellationRequested();
         }
     }
 }
