@@ -30,6 +30,7 @@ namespace Csharp_3d_viewer
 
         private const string FragmentShaderText = @"
             #version 430
+            out vec4 fragColor;
             varying vec4 fragmentColor;
             varying vec3 fragmentPosition;
             varying vec3 fragmentNormal;
@@ -45,7 +46,7 @@ namespace Csharp_3d_viewer
                 lightDir = normalize(lightDir);
                 float diffuse = abs(dot(norm, lightDir)) / dist2;
 
-                gl_FragColor = vec4(fragmentColor.rgb * diffuse, fragmentColor.a);
+                fragColor = vec4(fragmentColor.rgb * diffuse, fragmentColor.a);
             }
         ";
 

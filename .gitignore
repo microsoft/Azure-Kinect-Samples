@@ -378,3 +378,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
+/body-tracking-samples/simple_3d_viewer/include

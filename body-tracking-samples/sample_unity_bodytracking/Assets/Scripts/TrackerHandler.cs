@@ -2,11 +2,13 @@
 using UnityEngine;
 using Microsoft.Azure.Kinect.BodyTracking;
 
-
 public class TrackerHandler : MonoBehaviour
 {
-    Dictionary<JointId, JointId> parentJointMap;
+    public Dictionary<JointId, JointId> parentJointMap;
+    Dictionary<JointId, Quaternion> basisJointMap;
+    public Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
     public bool drawSkeletons = true;
+    Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
     // Start is called before the first frame update
     void Awake()
@@ -46,6 +48,57 @@ public class TrackerHandler : MonoBehaviour
         parentJointMap[JointId.EarLeft] = JointId.Head;
         parentJointMap[JointId.EyeRight] = JointId.Head;
         parentJointMap[JointId.EarRight] = JointId.Head;
+
+        Vector3 zpositive = Vector3.forward;
+        Vector3 xpositive = Vector3.right;
+        Vector3 ypositive = Vector3.up;
+        // spine and left hip are the same
+        Quaternion leftHipBasis = Quaternion.LookRotation(xpositive, -zpositive);
+        Quaternion spineHipBasis = Quaternion.LookRotation(xpositive, -zpositive);
+        Quaternion rightHipBasis = Quaternion.LookRotation(xpositive, zpositive);
+        // arms and thumbs share the same basis
+        Quaternion leftArmBasis = Quaternion.LookRotation(ypositive, -zpositive);
+        Quaternion rightArmBasis = Quaternion.LookRotation(-ypositive, zpositive);
+        Quaternion leftHandBasis = Quaternion.LookRotation(-zpositive, -ypositive);
+        Quaternion rightHandBasis = Quaternion.identity;
+        Quaternion leftFootBasis = Quaternion.LookRotation(xpositive, ypositive);
+        Quaternion rightFootBasis = Quaternion.LookRotation(xpositive, -ypositive);
+
+        basisJointMap = new Dictionary<JointId, Quaternion>();
+
+        // pelvis has no parent so set to count
+        basisJointMap[JointId.Pelvis] = spineHipBasis;
+        basisJointMap[JointId.SpineNavel] = spineHipBasis;
+        basisJointMap[JointId.SpineChest] = spineHipBasis;
+        basisJointMap[JointId.Neck] = spineHipBasis;
+        basisJointMap[JointId.ClavicleLeft] = leftArmBasis;
+        basisJointMap[JointId.ShoulderLeft] = leftArmBasis;
+        basisJointMap[JointId.ElbowLeft] = leftArmBasis;
+        basisJointMap[JointId.WristLeft] = leftHandBasis;
+        basisJointMap[JointId.HandLeft] = leftHandBasis;
+        basisJointMap[JointId.HandTipLeft] = leftHandBasis;
+        basisJointMap[JointId.ThumbLeft] = leftArmBasis;
+        basisJointMap[JointId.ClavicleRight] = rightArmBasis;
+        basisJointMap[JointId.ShoulderRight] = rightArmBasis;
+        basisJointMap[JointId.ElbowRight] = rightArmBasis;
+        basisJointMap[JointId.WristRight] = rightHandBasis;
+        basisJointMap[JointId.HandRight] = rightHandBasis;
+        basisJointMap[JointId.HandTipRight] = rightHandBasis;
+        basisJointMap[JointId.ThumbRight] = rightArmBasis;
+        basisJointMap[JointId.HipLeft] = leftHipBasis;
+        basisJointMap[JointId.KneeLeft] = leftHipBasis;
+        basisJointMap[JointId.AnkleLeft] = leftHipBasis;
+        basisJointMap[JointId.FootLeft] = leftFootBasis;
+        basisJointMap[JointId.HipRight] = rightHipBasis;
+        basisJointMap[JointId.KneeRight] = rightHipBasis;
+        basisJointMap[JointId.AnkleRight] = rightHipBasis;
+        basisJointMap[JointId.FootRight] = rightFootBasis;
+        basisJointMap[JointId.Head] = spineHipBasis;
+        basisJointMap[JointId.Nose] = spineHipBasis;
+        basisJointMap[JointId.EyeLeft] = spineHipBasis;
+        basisJointMap[JointId.EarLeft] = spineHipBasis;
+        basisJointMap[JointId.EyeRight] = spineHipBasis;
+        basisJointMap[JointId.EarRight] = spineHipBasis;
     }
 
     public void updateTracker(BackgroundData trackerFrameData)
@@ -108,14 +161,18 @@ public class TrackerHandler : MonoBehaviour
             Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);
             Vector3 offsetPosition = transform.rotation * jointPos;
             Vector3 positionInTrackerRootSpace = transform.position + offsetPosition;
-            Quaternion jointRot = new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y, skeleton.JointRotations[jointNum].Z, skeleton.JointRotations[jointNum].W);
+            Quaternion jointRot = Y_180_FLIP * new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y,
+                skeleton.JointRotations[jointNum].Z, skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(basisJointMap[(JointId)jointNum]);
+            absoluteJointRotations[jointNum] = jointRot;
+            // these are absolute body space because each joint has the body root for a parent in the scene graph
             transform.GetChild(skeletonNumber).GetChild(jointNum).localPosition = jointPos;
             transform.GetChild(skeletonNumber).GetChild(jointNum).localRotation = jointRot;
 
             const int boneChildNum = 0;
             if (parentJointMap[(JointId)jointNum] != JointId.Head && parentJointMap[(JointId)jointNum] != JointId.Count)
             {
-                Vector3 parentTrackerSpacePosition = new Vector3(skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].X, -skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Y, skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Z);
+                Vector3 parentTrackerSpacePosition = new Vector3(skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].X,
+                    -skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Y, skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Z);
                 Vector3 boneDirectionTrackerSpace = jointPos - parentTrackerSpacePosition;
                 Vector3 boneDirectionWorldSpace = transform.rotation * boneDirectionTrackerSpace;
                 Vector3 boneDirectionLocalSpace = Quaternion.Inverse(transform.GetChild(skeletonNumber).GetChild(jointNum).rotation) * Vector3.Normalize(boneDirectionWorldSpace);
@@ -128,6 +185,24 @@ public class TrackerHandler : MonoBehaviour
                 transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).gameObject.SetActive(false);
             }
         }
+    }
+
+    public Quaternion GetRelativeJointRotation(JointId jointId)
+    {
+        JointId parent = parentJointMap[jointId];
+        Quaternion parentJointRotationBodySpace = Quaternion.identity;
+        if (parent == JointId.Count)
+        {
+            parentJointRotationBodySpace = Y_180_FLIP;
+        }
+        else
+        {
+            parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
+        }
+        Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
+        Quaternion relativeRotation =  Quaternion.Inverse(parentJointRotationBodySpace) * jointRotationBodySpace;
+
+        return relativeRotation;
     }
 
 }

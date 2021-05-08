@@ -33,7 +33,7 @@ public class main : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
         // Stop background threads.
         if (m_backgroundDataProvider != null)

@@ -16,7 +16,7 @@ Select Tools->NuGet Package Manager-> Package Manager Console
 
 On the command line of the console at type the following command:
 
-Install-Package Microsoft.Azure.Kinect.BodyTracking -Version 1.0.0
+Install-Package Microsoft.Azure.Kinect.BodyTracking -Version 1.0.1
 
 The body tracking libraries will be put in the Packages folder under sample_unity_bodytracking
 
@@ -26,7 +26,7 @@ The body tracking libraries will be put in the Packages folder under sample_unit
 You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
 
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/netstandard2.0
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/netstandard2.0
 
 - Microsoft.Azure.Kinect.BodyTracking.deps.json
 - Microsoft.Azure.Kinect.BodyTracking.xml
@@ -41,7 +41,8 @@ From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/netstandard2.0
 - Microsoft.Azure.Kinect.Sensor.pdb
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
-
+- cublas64_100.dll
+- cudart64_100.dll
 - vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
@@ -66,9 +67,10 @@ From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/native/amd64/release
 - k4a.dll
 - k4arecord.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
 
 - k4abt.dll
+- onnxruntime.dll
 
 
 
@@ -78,18 +80,18 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1/lib/n
 
 - cudnn64_7.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/lib/native/amd64/release
-
-- onnxruntime.dll
-
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.0/content
-
-- dnn_model_2_0.onnx
-
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
 
 - cublas64_100.dll
 - cudart64_100.dll
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
+
+- onnxruntime.dll
+
+From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/content
+
+- dnn_model_2_0.onnx
 
 
 #### 3) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
