@@ -12,6 +12,11 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
     bool readFirstFrame = false;
     TimeSpan initialTimestamp;
 
+    public SkeletalTrackingProvider(int id): base(id)
+    {
+        Debug.Log("in the skeleton provider constructor");
+    }
+
     System.Runtime.Serialization.Formatters.Binary.BinaryFormatter binaryFormatter { get; set; } = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
 
     public Stream RawDataLoggingFile = null;

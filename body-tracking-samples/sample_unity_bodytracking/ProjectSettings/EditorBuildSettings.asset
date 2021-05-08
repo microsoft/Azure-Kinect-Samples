@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/PuppetMaster.unity
+    guid: f8f83b2fa35c63b4498c68984d7b4251
   m_configObjects: {}

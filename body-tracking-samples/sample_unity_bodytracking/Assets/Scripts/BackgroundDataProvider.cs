@@ -2,18 +2,42 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-public abstract class BackgroundDataProvider
+public abstract class BackgroundDataProvider:IDisposable
 {
-    protected volatile bool m_runBackgroundThread;
     private BackgroundData m_frameBackgroundData = new BackgroundData();
     private bool m_latest = false;
     object m_lockObj = new object();
     public bool IsRunning { get; set; } = false;
+    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationToken _token;
 
-    public void StartClientThread(int id, CancellationToken token)
+    public void StartClientThread(int id)
     {
-        m_runBackgroundThread = true;
-        Task.Run(() => RunBackgroundThreadAsync(id, token),token);
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting += OnEditorClose;
+#endif
+        _cancellationTokenSource = new CancellationTokenSource();
+        _token = _cancellationTokenSource.Token;
+        Task.Run(() => RunBackgroundThreadAsync(id, _token));
+    }
+
+    public BackgroundDataProvider(int id)
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting += OnEditorClose;
+#endif
+        _cancellationTokenSource = new CancellationTokenSource();
+        _token = _cancellationTokenSource.Token;
+        Task.Run(() => RunBackgroundThreadAsync(id, _token));
+    }
+
+    private void OnEditorClose()
+    {
+        //if (_cancellationTokenSource != null)
+        //{
+        //    _cancellationTokenSource.Cancel();
+        //}
+        Dispose();
     }
 
     protected abstract void RunBackgroundThreadAsync(int id, CancellationToken token);
@@ -21,7 +45,14 @@ public abstract class BackgroundDataProvider
     public void StopClientThread()
     {
         UnityEngine.Debug.Log("Stopping BackgroundDataProvider thread.");
-        //m_runBackgroundThread = false;
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource = null;
+        }
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting -= OnEditorClose;
+#endif
     }
 
     public void SetCurrentFrameData(ref BackgroundData currentFrameData)
@@ -46,5 +77,12 @@ public abstract class BackgroundDataProvider
             m_latest = false;
             return result;
         }
+    }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = null;
     }
 }

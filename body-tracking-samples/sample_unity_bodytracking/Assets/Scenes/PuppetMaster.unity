@@ -254,6 +254,11 @@ PrefabInstance:
       propertyPath: RootPosition
       value: 
       objectReference: {fileID: 1661018070}
+    - target: {fileID: 2827812544191477966, guid: a2aac2bb36d2d6d419b09589c2700bc8,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: a05a103e7f4790d48a0c5424d1311440, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2aac2bb36d2d6d419b09589c2700bc8, type: 3}
 --- !u!1 &566169799 stripped
@@ -422,6 +427,11 @@ PrefabInstance:
       propertyPath: RootPosition
       value: 
       objectReference: {fileID: 1661018070}
+    - target: {fileID: 6917378017658129621, guid: 4f08c0830dd2b7445b04e9deb828ac3e,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: a05a103e7f4790d48a0c5424d1311440, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f08c0830dd2b7445b04e9deb828ac3e, type: 3}
 --- !u!1 &1040333861
