@@ -26,23 +26,29 @@ The body tracking libraries will be put in the Packages folder under sample_unit
 You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
 
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/netstandard2.0
+From Wherever You Installed Azure Kinect Body Tracking SDK\sdk\netstandard2.0\release
 
 - Microsoft.Azure.Kinect.BodyTracking.deps.json
 - Microsoft.Azure.Kinect.BodyTracking.xml
 - Microsoft.Azure.Kinect.BodyTracking.dll
 - Microsoft.Azure.Kinect.BodyTracking.pdb
 
-From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/netstandard2.0
+From Packages/Microsoft.Azure.Kinect.Sensor.1.4.1/lib/netstandard2.0
 
 - Microsoft.Azure.Kinect.Sensor.deps.json
 - Microsoft.Azure.Kinect.Sensor.xml
 - Microsoft.Azure.Kinect.Sensor.dll
 - Microsoft.Azure.Kinect.Sensor.pdb
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
-- cublas64_100.dll
-- cudart64_100.dll
+From Azure Kinect Body Tracking SDK\tools
+
+- cudnn64_8.dll
+- cudnn64_cnn_infer64_8.dll
+- cudnn64_ops_infer64_8.dll
+- cudart64_110.dll
+- cublas64_11.dll
+- cublasLt64_11.dll
+- cufft64_10.dll
 - vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
@@ -61,16 +67,18 @@ From Packages/System.Runtime.CompilerServices.Unsafe.4.5.2/lib/netstandard2.0
 
 - System.Runtime.CompilerServices.Unsafe.dll
 
-From Packages/Microsoft.Azure.Kinect.Sensor.1.3.0/lib/native/amd64/release
+From Packages/Microsoft.Azure.Kinect.Sensor.1.4.1/lib/native/amd64/release
 
 - depthengine_2_0.dll
 - k4a.dll
 - k4arecord.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
+From Azure Kinect Body Tracking SDK\sdk\windows-desktop\amd64\release\bin
 
 - k4abt.dll
 - onnxruntime.dll
+- onnxruntime_providers_shared.dll
+- onnxruntime_providers_tensorrt.dll
 
 
 
@@ -78,20 +86,27 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1/lib/native/amd64/release
 
-- cudnn64_7.dll
+- cudnn64_8.dll
+- cudnn64_cnn_infer64_8.dll
+- cudnn64_ops_infer64_8.dll
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
 
-- cublas64_100.dll
-- cudart64_100.dll
+- cudart64_110.dll
+- cublas64_11.dll
+- cublasLt64_11.dll
+- cufft64_10.dll
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
 
 - onnxruntime.dll
+- onnxruntime_providers_shared.dll
+- onnxruntime_providers_tensorrt.dll
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/content
 
-- dnn_model_2_0.onnx
+- dnn_model_2_0_op11.onnx
+- dnn_model_2_0_lite_op11.onnx
 
 
 #### 3) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
@@ -107,12 +122,23 @@ Press play.
 2) go to the prefab folder and drop in the Kinect4AzureTracker prefab
 3) now drag the gameobject for the Kinect4AzureTracker onto the Tracker slot in the main object in the inspector.
 
+
+
 ### Finally if you Build a Standalone Executable 
 ####Then you will need to put these files in the same directory with the .exe:
 
 - onnxruntime.dll
-- dnn_model_2_0.onnx
-- cudnn64_7.dll
-- cudart64_100.dll
-- cublas64_100.dll
+- onnxruntime_providers_shared.dll
+- onnxruntime_providers_tensorrt.dll
+- dnn_model_2_0_op11.onnx
+- dnn_model_2_0_lite_op11.onnx
+- cudnn64_8.dll
+- cudnn64_cnn_infer64_8.dll
+- cudnn64_ops_infer64_8.dll
+- cudart64_110.dll
+- cublas64_11.dll
+- cublasLt64_11.dll
+- cufft64_10.dll
+- directml.dll
+- vcomp140.dll
 
