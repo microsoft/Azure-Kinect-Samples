@@ -124,9 +124,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
         }
         catch (Exception e)
         {
-            Debug.Log("catching exception for background thread");
-            UnityEngine.Debug.Log($"error msg1 {e.Message}");
-            UnityEngine.Debug.Log($"error msg2 {e.InnerException.Message}");
+            Debug.Log($"catching exception for background thread {e.Message}");
             token.ThrowIfCancellationRequested();
         }
     }

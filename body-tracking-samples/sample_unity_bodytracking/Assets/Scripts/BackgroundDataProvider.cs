@@ -11,16 +11,6 @@ public abstract class BackgroundDataProvider:IDisposable
     private CancellationTokenSource _cancellationTokenSource;
     private CancellationToken _token;
 
-    public void StartClientThread(int id)
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.quitting += OnEditorClose;
-#endif
-        _cancellationTokenSource = new CancellationTokenSource();
-        _token = _cancellationTokenSource.Token;
-        Task.Run(() => RunBackgroundThreadAsync(id, _token));
-    }
-
     public BackgroundDataProvider(int id)
     {
 #if UNITY_EDITOR
@@ -33,27 +23,10 @@ public abstract class BackgroundDataProvider:IDisposable
 
     private void OnEditorClose()
     {
-        //if (_cancellationTokenSource != null)
-        //{
-        //    _cancellationTokenSource.Cancel();
-        //}
         Dispose();
     }
 
     protected abstract void RunBackgroundThreadAsync(int id, CancellationToken token);
-
-    public void StopClientThread()
-    {
-        UnityEngine.Debug.Log("Stopping BackgroundDataProvider thread.");
-        if (_cancellationTokenSource != null)
-        {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource = null;
-        }
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.quitting -= OnEditorClose;
-#endif
-    }
 
     public void SetCurrentFrameData(ref BackgroundData currentFrameData)
     {
@@ -81,6 +54,9 @@ public abstract class BackgroundDataProvider:IDisposable
 
     public void Dispose()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting += OnEditorClose;
+#endif
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = null;
