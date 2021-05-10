@@ -16,12 +16,17 @@ Select Tools->NuGet Package Manager-> Package Manager Console
 
 On the command line of the console at type the following command:
 
-Install-Package Microsoft.Azure.Kinect.BodyTracking -Version 1.0.1
+Update-Package -reinstall
 
-The body tracking libraries will be put in the Packages folder under sample_unity_bodytracking
+The latest libraries will be put in the Packages folder under sample_unity_bodytracking
 
 
-#### 2) Next add these libraries to the Assets/Plugins folder:
+#### 2) Next download the latest Body Tracking Package
+
+Go to: https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-download and follow the directions to install the sdk for version  1.1.0
+
+
+#### 3) Next add these libraries to the Assets/Plugins folder:
 
 You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
 
@@ -42,13 +47,9 @@ From Packages/Microsoft.Azure.Kinect.Sensor.1.4.1/lib/netstandard2.0
 
 From Azure Kinect Body Tracking SDK\tools
 
-- cudnn64_8.dll
-- cudnn64_cnn_infer64_8.dll
-- cudnn64_ops_infer64_8.dll
 - cudart64_110.dll
 - cublas64_11.dll
 - cublasLt64_11.dll
-- cufft64_10.dll
 - vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
@@ -77,39 +78,32 @@ From Azure Kinect Body Tracking SDK\sdk\windows-desktop\amd64\release\bin
 
 - k4abt.dll
 - onnxruntime.dll
-- onnxruntime_providers_shared.dll
-- onnxruntime_providers_tensorrt.dll
 
 
+#### 4) Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
 
-#### 2) Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
-
-From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.1/lib/native/amd64/release
+From Azure Kinect Body Tracking SDK\tools\
 
 - cudnn64_8.dll
 - cudnn64_cnn_infer64_8.dll
 - cudnn64_ops_infer64_8.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.1/lib/native/amd64/release
+From Azure Kinect Body Tracking SDK\tools\
 
 - cudart64_110.dll
 - cublas64_11.dll
 - cublasLt64_11.dll
-- cufft64_10.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/lib/native/amd64/release
+From Azure Kinect Body Tracking SDK\tools\
 
 - onnxruntime.dll
-- onnxruntime_providers_shared.dll
-- onnxruntime_providers_tensorrt.dll
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.1.0.1/content
+From Azure Kinect Body Tracking SDK\tools\
 
 - dnn_model_2_0_op11.onnx
-- dnn_model_2_0_lite_op11.onnx
 
 
-#### 3) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
+#### 5) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
 
 ![alt text](./UnitySampleGettingStarted.png)
 
