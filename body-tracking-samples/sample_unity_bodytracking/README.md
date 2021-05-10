@@ -123,7 +123,6 @@ Press play.
 3) now drag the gameobject for the Kinect4AzureTracker onto the Tracker slot in the main object in the inspector.
 
 
-
 ### Finally if you Build a Standalone Executable 
 ####Then you will need to put these files in the same directory with the .exe:
 
