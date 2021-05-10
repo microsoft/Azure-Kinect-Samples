@@ -55,7 +55,7 @@ public abstract class BackgroundDataProvider:IDisposable
     public void Dispose()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.quitting += OnEditorClose;
+        UnityEditor.EditorApplication.quitting -= OnEditorClose;
 #endif
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource?.Dispose();

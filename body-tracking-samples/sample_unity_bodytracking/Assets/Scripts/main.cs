@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using Microsoft.Azure.Kinect.BodyTracking;
-using System.Threading;
+﻿using UnityEngine;
 
 public class main : MonoBehaviour
 {
@@ -21,7 +18,7 @@ public class main : MonoBehaviour
     {
         if (m_skeletalTrackingProvider.IsRunning)
         {
-            if (m_skeletalTrackingProvider.GetCurrentFrameData(ref m_lastFrameData))//m_backgroundDataProvider.GetCurrentFrameData(ref m_lastFrameData))
+            if (m_skeletalTrackingProvider.GetCurrentFrameData(ref m_lastFrameData))
             {
                 if (m_lastFrameData.NumOfBodies != 0)
                 {

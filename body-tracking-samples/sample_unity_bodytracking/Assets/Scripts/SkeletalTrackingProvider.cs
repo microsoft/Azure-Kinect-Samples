@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.Azure.Kinect.BodyTracking;
+using Microsoft.Azure.Kinect.Sensor;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Azure.Kinect.Sensor;
-using Microsoft.Azure.Kinect.BodyTracking;
-using UnityEngine;
 using System.Threading;
+using UnityEngine;
 
 public class SkeletalTrackingProvider : BackgroundDataProvider
 {
