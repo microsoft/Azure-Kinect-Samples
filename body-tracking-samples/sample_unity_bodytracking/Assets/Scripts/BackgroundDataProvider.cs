@@ -1,27 +1,32 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
-public abstract class BackgroundDataProvider
+public abstract class BackgroundDataProvider:IDisposable
 {
-    protected volatile bool m_runBackgroundThread;
     private BackgroundData m_frameBackgroundData = new BackgroundData();
     private bool m_latest = false;
     object m_lockObj = new object();
     public bool IsRunning { get; set; } = false;
+    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationToken _token;
 
-    public void StartClientThread(int id)
+    public BackgroundDataProvider(int id)
     {
-        m_runBackgroundThread = true;
-        Task.Run(() => RunBackgroundThreadAsync(id));
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting += OnEditorClose;
+#endif
+        _cancellationTokenSource = new CancellationTokenSource();
+        _token = _cancellationTokenSource.Token;
+        Task.Run(() => RunBackgroundThreadAsync(id, _token));
     }
 
-    protected abstract void RunBackgroundThreadAsync(int id);
-
-    public void StopClientThread()
+    private void OnEditorClose()
     {
-        UnityEngine.Debug.Log("Stopping BackgroundDataProvider thread.");
-        m_runBackgroundThread = false;
+        Dispose();
     }
+
+    protected abstract void RunBackgroundThreadAsync(int id, CancellationToken token);
 
     public void SetCurrentFrameData(ref BackgroundData currentFrameData)
     {
@@ -45,5 +50,15 @@ public abstract class BackgroundDataProvider
             m_latest = false;
             return result;
         }
+    }
+
+    public void Dispose()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.quitting -= OnEditorClose;
+#endif
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = null;
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.Azure.Kinect.BodyTracking;
+using Microsoft.Azure.Kinect.Sensor;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Azure.Kinect.Sensor;
-using Microsoft.Azure.Kinect.BodyTracking;
+using System.Threading;
 using UnityEngine;
 
 public class SkeletalTrackingProvider : BackgroundDataProvider
@@ -11,11 +11,16 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
     bool readFirstFrame = false;
     TimeSpan initialTimestamp;
 
+    public SkeletalTrackingProvider(int id): base(id)
+    {
+        Debug.Log("in the skeleton provider constructor");
+    }
+
     System.Runtime.Serialization.Formatters.Binary.BinaryFormatter binaryFormatter { get; set; } = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
 
     public Stream RawDataLoggingFile = null;
 
-    protected override void RunBackgroundThreadAsync(int id)
+    protected override void RunBackgroundThreadAsync(int id, CancellationToken token)
     {
         try
         {
@@ -41,7 +46,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
                 using (Tracker tracker = Tracker.Create(deviceCalibration, new TrackerConfiguration() { ProcessingMode = TrackerProcessingMode.Gpu, SensorOrientation = SensorOrientation.Default }))
                 {
                     UnityEngine.Debug.Log("Body tracker created.");
-                    while (m_runBackgroundThread)
+                    while (!token.IsCancellationRequested)
                     {
                         using (Capture sensorCapture = device.GetCapture())
                         {
@@ -106,6 +111,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
 
                         }
                     }
+                    Debug.Log("dispose of tracker now!!!!!");
                     tracker.Dispose();
                 }
                 device.Dispose();
@@ -117,7 +123,8 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
         }
         catch (Exception e)
         {
-            UnityEngine.Debug.LogError(e.Message);
+            Debug.Log($"catching exception for background thread {e.Message}");
+            token.ThrowIfCancellationRequested();
         }
     }
 }
