@@ -25,6 +25,12 @@ The latest libraries will be put in the Packages folder under sample_unity_bodyt
 
 Go to: https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-download and follow the directions to install the sdk for version  1.1.0
 
+The default location for the SDK is:   C:\Program Files\Azure Kinect Body Tracking SDK
+
+**You can download the SDK wherever you like but you will then need to update the paths in the MoveLibraryFiles.bat file**
+
+set BODY_TRACKING_SDK_PATH="YOUR PATH HERE"
+
 
 #### 3) Next add these libraries to the Assets/Plugins folder:
 

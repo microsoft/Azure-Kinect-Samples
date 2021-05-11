@@ -1,10 +1,11 @@
 if not exist Assets\Plugins mkdir Assets\Plugins
-set BODY_TRACKING_TOOLS_PATH="C:\Program Files\Azure Kinect Body Tracking SDK\tools\"
-set BODY_TRACKING_LIB_PATH="C:\Program Files\Azure Kinect Body Tracking SDK\sdk\netstandard2.0\release\"
+set BODY_TRACKING_SDK_PATH=C:\Program Files\Azure Kinect Body Tracking SDK\
+set BODY_TRACKING_TOOLS_PATH="%BODY_TRACKING_SDK_PATH%tools\"
+set BODY_TRACKING_LIB_PATH="%BODY_TRACKING_SDK_PATH%sdk\netstandard2.0\release\"
 copy %BODY_TRACKING_LIB_PATH%Microsoft.Azure.Kinect.BodyTracking.dll Assets\Plugins
 copy %BODY_TRACKING_LIB_PATH%Microsoft.Azure.Kinect.BodyTracking.pdb Assets\Plugins
 copy %BODY_TRACKING_LIB_PATH%Microsoft.Azure.Kinect.BodyTracking.deps.json Assets\Plugins
-copy %BODY_TRACKING_LIB_PATH%release\Microsoft.Azure.Kinect.BodyTracking.xml Assets\Plugins
+copy %BODY_TRACKING_LIB_PATH%Microsoft.Azure.Kinect.BodyTracking.xml Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.4.1\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.dll Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.4.1\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.pdb Assets\Plugins
 copy packages\Microsoft.Azure.Kinect.Sensor.1.4.1\lib\netstandard2.0\Microsoft.Azure.Kinect.Sensor.deps.json Assets\Plugins
