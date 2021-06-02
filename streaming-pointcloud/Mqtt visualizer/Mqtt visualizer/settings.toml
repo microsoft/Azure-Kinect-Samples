@@ -1,0 +1,13 @@
+translation_increment = 10.0
+rotation_increment = 1.0
+merged = false
+
+[MqttInfo]
+host = 'localhost'
+id = 'windowViewer'
+topic = 'points'
+port = 1883
+
+[Threshold]
+min = [-2000, 0, -1500]
+max = [2000, 2000, 2000]

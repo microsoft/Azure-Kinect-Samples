@@ -1,0 +1,12 @@
+{
+    "mqtt" : {
+        "host" : "localhost",
+        "port" : 1883
+    },
+    
+    "http_server" : {
+        "port" : 8000
+    },
+
+    "points_topic" : "points/pointmerger"
+}

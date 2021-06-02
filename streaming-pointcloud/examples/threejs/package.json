@@ -1,0 +1,11 @@
+{
+  "name": "threejs-viewer",
+  "version": "1.0.0",
+  "description": "Consuming and displaying Azure Kinect point cloud frames using THREE.js",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mqtt": "^3.0.0",
+    "socket.io": "^2.3.0"
+  }
+}
