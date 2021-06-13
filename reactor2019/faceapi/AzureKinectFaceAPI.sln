@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.89
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01 Starter Project", "1 - Starter Project\01 Starter Project.csproj", "{3685CFD2-1799-41C9-8664-8D144D86AE84}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02 View Color Camera", "2 - View Color Camera\02 View Color Camera.csproj", "{66C3AFB8-4DD2-4BB7-AE8A-E14C130C101A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03 Show depth", "3 - Show depth\03 Show depth.csproj", "{0B413A0A-69A4-44BF-8B02-79E7ABAFB087}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04 Retrieve Faces", "4 - Retrieve Faces\04 Retrieve Faces.csproj", "{F2463438-F606-47EB-8A3D-5BAC8149908B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05 Show depth for faces", "5 - Show depth for faces\05 Show depth for faces.csproj", "{61933BBC-516B-4655-A492-BF67DF784A2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3685CFD2-1799-41C9-8664-8D144D86AE84}.Debug|x64.ActiveCfg = Debug|x64
+		{3685CFD2-1799-41C9-8664-8D144D86AE84}.Debug|x64.Build.0 = Debug|x64
+		{3685CFD2-1799-41C9-8664-8D144D86AE84}.Release|x64.ActiveCfg = Release|x64
+		{3685CFD2-1799-41C9-8664-8D144D86AE84}.Release|x64.Build.0 = Release|x64
+		{66C3AFB8-4DD2-4BB7-AE8A-E14C130C101A}.Debug|x64.ActiveCfg = Debug|x64
+		{66C3AFB8-4DD2-4BB7-AE8A-E14C130C101A}.Debug|x64.Build.0 = Debug|x64
+		{66C3AFB8-4DD2-4BB7-AE8A-E14C130C101A}.Release|x64.ActiveCfg = Release|x64
+		{66C3AFB8-4DD2-4BB7-AE8A-E14C130C101A}.Release|x64.Build.0 = Release|x64
+		{0B413A0A-69A4-44BF-8B02-79E7ABAFB087}.Debug|x64.ActiveCfg = Debug|x64
+		{0B413A0A-69A4-44BF-8B02-79E7ABAFB087}.Debug|x64.Build.0 = Debug|x64
+		{0B413A0A-69A4-44BF-8B02-79E7ABAFB087}.Release|x64.ActiveCfg = Release|x64
+		{0B413A0A-69A4-44BF-8B02-79E7ABAFB087}.Release|x64.Build.0 = Release|x64
+		{F2463438-F606-47EB-8A3D-5BAC8149908B}.Debug|x64.ActiveCfg = Debug|x64
+		{F2463438-F606-47EB-8A3D-5BAC8149908B}.Debug|x64.Build.0 = Debug|x64
+		{F2463438-F606-47EB-8A3D-5BAC8149908B}.Release|x64.ActiveCfg = Release|x64
+		{F2463438-F606-47EB-8A3D-5BAC8149908B}.Release|x64.Build.0 = Release|x64
+		{61933BBC-516B-4655-A492-BF67DF784A2F}.Debug|x64.ActiveCfg = Debug|x64
+		{61933BBC-516B-4655-A492-BF67DF784A2F}.Debug|x64.Build.0 = Debug|x64
+		{61933BBC-516B-4655-A492-BF67DF784A2F}.Release|x64.ActiveCfg = Release|x64
+		{61933BBC-516B-4655-A492-BF67DF784A2F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {50CC0260-15FF-4194-AC27-D4429B86B325}
+	EndGlobalSection
+EndGlobal
