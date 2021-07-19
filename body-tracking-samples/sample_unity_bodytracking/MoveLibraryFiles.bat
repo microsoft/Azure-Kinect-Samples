@@ -31,4 +31,4 @@ copy %BODY_TRACKING_TOOLS_PATH%dnn_model_2_0_op11.onnx .\
 copy %BODY_TRACKING_TOOLS_PATH%cublas64_11.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%cublasLt64_11.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%cudart64_110.dll .\
-copy %BODY_TRACKING_TOOLS_PATH%cufft64_110.dll .\
+copy %BODY_TRACKING_TOOLS_PATH%cufft64_10.dll .\
