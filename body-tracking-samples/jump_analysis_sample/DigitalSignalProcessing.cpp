@@ -74,7 +74,7 @@ std::vector<float> DSP::DivideTwoArrays(std::vector<float>& dividend, std::vecto
 
 IndexValueTuple DSP::FindMaximum(const std::vector<float>& signal, size_t minIdx, size_t maxIdx)
 {
-    if (minIdx > signal.size() || minIdx > signal.size() || minIdx > maxIdx)
+    if (minIdx > signal.size() || maxIdx > signal.size() || minIdx > maxIdx)
     {
         return IndexValueTuple();
     }
@@ -94,7 +94,7 @@ IndexValueTuple DSP::FindMaximum(const std::vector<float>& signal, size_t minIdx
 
 IndexValueTuple DSP::FindMinimum(const std::vector<float>& signal, size_t minIdx, size_t maxIdx)
 {
-    if (minIdx > signal.size() || minIdx > signal.size() || minIdx > maxIdx)
+    if (minIdx > signal.size() || mmaxIdx > signal.size() || minIdx > maxIdx)
     {
         return IndexValueTuple();
     }
