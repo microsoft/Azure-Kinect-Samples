@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.9.0)
 
-cmake_policy(SET CMP0048 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 
 project(Azure-Kinect-Samples LANGUAGES C CXX
     VERSION 1.4)

@@ -2,3 +2,4 @@
 # Licensed under the MIT License.
 
 add_subdirectory(glfw)
+add_subdirectory(nlohmann_json)
