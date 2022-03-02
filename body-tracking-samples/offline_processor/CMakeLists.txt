@@ -5,10 +5,11 @@ add_executable(offline_processor
       main.cpp
 )
 
+target_include_directories(offline_processor PRIVATE ../sample_helper_includes)
+
 target_link_libraries(offline_processor PRIVATE
     k4a
-    k4arecord
     k4abt
-    sample_helper_includes
+    k4arecord
     nlohmann::json
 )
