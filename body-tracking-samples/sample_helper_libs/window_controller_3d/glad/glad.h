@@ -34,6 +34,13 @@
 #ifndef NOMINMAX
 #define NOMINMAX 1
 #endif
+#ifdef _MSC_VER
+
+#if _MSC_VER >= 1915
+#pragma warning( disable : 5105 )
+#endif
+#endif
+
 #include <windows.h>
 #endif
 

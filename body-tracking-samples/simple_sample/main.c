@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <k4a/k4a.h>
 #include <k4abt.h>
@@ -68,6 +69,10 @@ int main()
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
     VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
+    double total_success_tracker_time = 0.;
+    uint32_t total_success_body_count = 0;
+    int success_frame_count = 0;
+
     int frame_count = 0;
     do
     {
@@ -78,6 +83,8 @@ int main()
             frame_count++;
 
             printf("Start processing frame %d\n", frame_count);
+
+            clock_t begin_clock = clock();
 
             k4a_wait_result_t queue_capture_result = k4abt_tracker_enqueue_capture(tracker, sensor_capture, K4A_WAIT_INFINITE);
 
@@ -98,8 +105,16 @@ int main()
             k4a_wait_result_t pop_frame_result = k4abt_tracker_pop_result(tracker, &body_frame, K4A_WAIT_INFINITE);
             if (pop_frame_result == K4A_WAIT_RESULT_SUCCEEDED)
             {
+                clock_t end_clock = clock();
+                double time_spent = (double)(end_clock - begin_clock) / CLOCKS_PER_SEC;
+                total_success_tracker_time += time_spent;
+                success_frame_count++;
+
+                printf("Time spent for this frame: %f s\n", time_spent);
+
                 uint32_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
                 printf("%u bodies are detected!\n", num_bodies);
+                total_success_body_count += num_bodies;
 
                 for (uint32_t i = 0; i < num_bodies; i++)
                 {
@@ -150,6 +165,10 @@ int main()
     } while (frame_count < 100);
 
     printf("Finished body tracking processing!\n");
+
+    printf("Total body tracking success frame count: %d\n", success_frame_count);
+    printf("Average number of body detected per frame: %f\n", (double)total_success_body_count / success_frame_count);
+    printf("Average success frame tracker processing time: %f\n", total_success_tracker_time / success_frame_count);
 
     k4abt_tracker_shutdown(tracker);
     k4abt_tracker_destroy(tracker);
