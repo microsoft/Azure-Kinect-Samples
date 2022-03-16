@@ -38,7 +38,7 @@ For building with Linux, CMake is used. Build from a `git clone`, we do not supp
 
 Install the prerequisites
 ```
-apt install libk4abt0.9-dev
+apt install libk4abt1.1-dev
 apt install libxi-dev
 ```
 
