@@ -15,12 +15,21 @@
 
 void PrintUsage()
 {
-    printf("\nUSAGE: (k4abt_)simple_3d_viewer.exe SensorMode[NFOV_UNBINNED, WFOV_BINNED](optional) RuntimeMode[CPU](optional)\n");
+#ifdef _WIN32
+    printf("\nUSAGE: (k4abt_)simple_3d_viewer.exe SensorMode[NFOV_UNBINNED, WFOV_BINNED](optional) RuntimeMode[CPU, CUDA, DIRECTML, TENSORRT](optional) -model MODEL_PATH(optional)\n");
+#else
+    printf("\nUSAGE: (k4abt_)simple_3d_viewer.exe SensorMode[NFOV_UNBINNED, WFOV_BINNED](optional) RuntimeMode[CPU, CUDA, TENSORRT](optional)\n");
+#endif
     printf("  - SensorMode: \n");
     printf("      NFOV_UNBINNED (default) - Narrow Field of View Unbinned Mode [Resolution: 640x576; FOI: 75 degree x 65 degree]\n");
     printf("      WFOV_BINNED             - Wide Field of View Binned Mode [Resolution: 512x512; FOI: 120 degree x 120 degree]\n");
     printf("  - RuntimeMode: \n");
     printf("      CPU - Use the CPU only mode. It runs on machines without a GPU but it will be much slower\n");
+    printf("      CUDA - Use CUDA for processing.\n");
+#ifdef _WIN32
+    printf("      DIRECTML - Use the DirectML processing mode.\n");
+#endif
+    printf("      TENSORRT - Use the TensorRT processing mode.\n");
     printf("      OFFLINE - Play a specified file. Does not require Kinect device\n");
     printf("e.g.   (k4abt_)simple_3d_viewer.exe WFOV_BINNED CPU\n");
     printf("e.g.   (k4abt_)simple_3d_viewer.exe CPU\n");
@@ -82,9 +91,14 @@ int64_t CloseCallback(void* /*context*/)
 struct InputSettings
 {
     k4a_depth_mode_t DepthCameraMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
-    bool CpuOnlyMode = false;
+#ifdef _WIN32
+    k4abt_tracker_processing_mode_t processingMode = K4ABT_TRACKER_PROCESSING_MODE_GPU_DIRECTML;
+#else
+    k4abt_tracker_processing_mode_t processingMode = K4ABT_TRACKER_PROCESSING_MODE_GPU_CUDA;
+#endif
     bool Offline = false;
     std::string FileName;
+    std::string ModelPath;
 };
 
 bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettings)
@@ -102,8 +116,22 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
         }
         else if (inputArg == std::string("CPU"))
         {
-            inputSettings.CpuOnlyMode = true;
+            inputSettings.processingMode = K4ABT_TRACKER_PROCESSING_MODE_CPU;
         }
+        else if (inputArg == std::string("TENSORRT"))
+        {
+            inputSettings.processingMode = K4ABT_TRACKER_PROCESSING_MODE_GPU_TENSORRT;
+        }
+        else if (inputArg == std::string("CUDA"))
+        {
+            inputSettings.processingMode = K4ABT_TRACKER_PROCESSING_MODE_GPU_CUDA;
+        }
+#ifdef _WIN32
+        else if (inputArg == std::string("DIRECTML"))
+        {
+            inputSettings.processingMode = K4ABT_TRACKER_PROCESSING_MODE_GPU_DIRECTML;
+        }
+#endif
         else if (inputArg == std::string("OFFLINE"))
         {
             inputSettings.Offline = true;
@@ -116,14 +144,23 @@ bool ParseInputSettingsFromArg(int argc, char** argv, InputSettings& inputSettin
                 return false;
             }
         }
+        else if (inputArg == std::string("-model"))
+        {
+            if (i < argc - 1)
+                inputSettings.ModelPath = argv[++i];
+            else
+            {
+                printf("Error: model path missing\n");
+                return false;
+            }
+        }
         else
         {
-            printf("Error command not understood: %s\n", inputArg.c_str());
+            printf("Error: command not understood: %s\n", inputArg.c_str());
             return false;
         }
     }
     return true;
-
 }
 
 void VisualizeResult(k4abt_frame_t bodyFrame, Window3dWrapper& window3d, int depthWidth, int depthHeight) {
@@ -205,79 +242,82 @@ void VisualizeResult(k4abt_frame_t bodyFrame, Window3dWrapper& window3d, int dep
 
 }
 
-void PlayFile(InputSettings inputSettings) {
+void PlayFile(InputSettings inputSettings)
+{
     // Initialize the 3d window controller
     Window3dWrapper window3d;
 
     //create the tracker and playback handle
-    k4a_calibration_t sensor_calibration;
-    k4abt_tracker_t tracker = NULL;
-    k4a_playback_t playback_handle = NULL;
+    k4a_calibration_t sensorCalibration;
+    k4abt_tracker_t tracker = nullptr;
+    k4a_playback_t playbackHandle = nullptr;
 
     const char* file = inputSettings.FileName.c_str();
-    if (k4a_playback_open(file, &playback_handle) != K4A_RESULT_SUCCEEDED)
+    if (k4a_playback_open(file, &playbackHandle) != K4A_RESULT_SUCCEEDED)
     {
         printf("Failed to open recording: %s\n", file);
         return;
     }
 
-
-    if (k4a_playback_get_calibration(playback_handle, &sensor_calibration) != K4A_RESULT_SUCCEEDED)
+    if (k4a_playback_get_calibration(playbackHandle, &sensorCalibration) != K4A_RESULT_SUCCEEDED)
     {
         printf("Failed to get calibration\n");
         return;
     }
-    
 
-    k4a_capture_t capture = NULL;
-    k4a_stream_result_t result = K4A_STREAM_RESULT_SUCCEEDED;
+    k4a_capture_t capture = nullptr;
+    k4a_stream_result_t playbackResult = K4A_STREAM_RESULT_SUCCEEDED;
 
-    k4abt_tracker_configuration_t tracker_config = { K4ABT_SENSOR_ORIENTATION_DEFAULT };
+    k4abt_tracker_configuration_t trackerConfig = K4ABT_TRACKER_CONFIG_DEFAULT;
+    trackerConfig.processing_mode = inputSettings.processingMode;
+    trackerConfig.model_path = inputSettings.ModelPath.c_str();
+    VERIFY(k4abt_tracker_create(&sensorCalibration, trackerConfig, &tracker), "Body tracker initialization failed!");
 
-    tracker_config.processing_mode = inputSettings.CpuOnlyMode ? K4ABT_TRACKER_PROCESSING_MODE_CPU : K4ABT_TRACKER_PROCESSING_MODE_GPU;
+    int depthWidth = sensorCalibration.depth_camera_calibration.resolution_width;
+    int depthHeight = sensorCalibration.depth_camera_calibration.resolution_height;
 
-    VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
-
-    k4abt_tracker_set_temporal_smoothing(tracker, 1);
-
-    int depthWidth = sensor_calibration.depth_camera_calibration.resolution_width;
-    int depthHeight = sensor_calibration.depth_camera_calibration.resolution_height;
-
-    window3d.Create("3D Visualization", sensor_calibration);
+    window3d.Create("3D Visualization", sensorCalibration);
     window3d.SetCloseCallback(CloseCallback);
     window3d.SetKeyCallback(ProcessKey);
 
-    while (result == K4A_STREAM_RESULT_SUCCEEDED)
+    while (playbackResult == K4A_STREAM_RESULT_SUCCEEDED && s_isRunning)
     {
-        result = k4a_playback_get_next_capture(playback_handle, &capture);
-        // check to make sure we have a depth image
-        // if we are not at the end of the file
-        if (result != K4A_STREAM_RESULT_EOF) {
-            k4a_image_t depth_image = k4a_capture_get_depth_image(capture);
-            if (depth_image == NULL) {
+        playbackResult = k4a_playback_get_next_capture(playbackHandle, &capture);
+        if (playbackResult == K4A_STREAM_RESULT_EOF)
+        {
+            // End of file reached
+            break;
+        }
+
+        if (playbackResult == K4A_STREAM_RESULT_SUCCEEDED)
+        {
+            // check to make sure we have a depth image
+            k4a_image_t depthImage = k4a_capture_get_depth_image(capture);
+            if (depthImage == nullptr) {
                 //If no depth image, print a warning and skip to next frame
-                printf("Warning: No depth image, skipping frame\n");
+                std::cout << "Warning: No depth image, skipping frame!" << std::endl;
                 k4a_capture_release(capture);
                 continue;
             }
             // Release the Depth image
-            k4a_image_release(depth_image);
-        }
-        if (result == K4A_STREAM_RESULT_SUCCEEDED)
-        {
-            
+            k4a_image_release(depthImage);
+
             //enque capture and pop results - synchronous
-            k4a_wait_result_t queue_capture_result = k4abt_tracker_enqueue_capture(tracker, capture, K4A_WAIT_INFINITE);
+            k4a_wait_result_t queueCaptureResult = k4abt_tracker_enqueue_capture(tracker, capture, K4A_WAIT_INFINITE);
 
             // Release the sensor capture once it is no longer needed.
             k4a_capture_release(capture);
 
-            k4abt_frame_t bodyFrame = NULL;
-            k4a_wait_result_t pop_frame_result = k4abt_tracker_pop_result(tracker, &bodyFrame, K4A_WAIT_INFINITE);
-            if (pop_frame_result == K4A_WAIT_RESULT_SUCCEEDED)
+            if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
             {
-                size_t num_bodies = k4abt_frame_get_num_bodies(bodyFrame);
-                printf("%zu bodies are detected\n", num_bodies);
+                std::cout << "Error! Add capture to tracker process queue failed!" << std::endl;
+                break;
+            }
+
+            k4abt_frame_t bodyFrame = nullptr;
+            k4a_wait_result_t popFrameResult = k4abt_tracker_pop_result(tracker, &bodyFrame, K4A_WAIT_INFINITE);
+            if (popFrameResult == K4A_WAIT_RESULT_SUCCEEDED)
+            {
                 /************* Successfully get a body tracking result, process the result here ***************/
                 VisualizeResult(bodyFrame, window3d, depthWidth, depthHeight); 
                 //Release the bodyFrame
@@ -285,31 +325,25 @@ void PlayFile(InputSettings inputSettings) {
             }
             else
             {
-                printf("Pop body frame result failed!\n");
+                std::cout << "Pop body frame result failed!" << std::endl;
                 break;
             }
-           
         }
 
         window3d.SetLayout3d(s_layoutMode);
         window3d.SetJointFrameVisualization(s_visualizeJointFrame);
         window3d.Render();
-
-        if (result == K4A_STREAM_RESULT_EOF)
-        {
-            // End of file reached
-            break;
-        }
     }
+
     k4abt_tracker_shutdown(tracker);
     k4abt_tracker_destroy(tracker);
     window3d.Delete();
     printf("Finished body tracking processing!\n");
-    k4a_playback_close(playback_handle);
-
+    k4a_playback_close(playbackHandle);
 }
 
-void PlayFromDevice(InputSettings inputSettings) {
+void PlayFromDevice(InputSettings inputSettings) 
+{
     k4a_device_t device = nullptr;
     VERIFY(k4a_device_open(0, &device), "Open K4A Device failed!");
 
@@ -328,9 +362,11 @@ void PlayFromDevice(InputSettings inputSettings) {
 
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
-    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
-    tracker_config.processing_mode = inputSettings.CpuOnlyMode ? K4ABT_TRACKER_PROCESSING_MODE_CPU : K4ABT_TRACKER_PROCESSING_MODE_GPU;
-    VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
+    k4abt_tracker_configuration_t trackerConfig = K4ABT_TRACKER_CONFIG_DEFAULT;
+    trackerConfig.processing_mode = inputSettings.processingMode;
+    trackerConfig.model_path = inputSettings.ModelPath.c_str();
+    VERIFY(k4abt_tracker_create(&sensorCalibration, trackerConfig, &tracker), "Body tracker initialization failed!");
+
     // Initialize the 3d window controller
     Window3dWrapper window3d;
     window3d.Create("3D Visualization", sensorCalibration);
@@ -387,27 +423,27 @@ void PlayFromDevice(InputSettings inputSettings) {
 
     k4a_device_stop_cameras(device);
     k4a_device_close(device);
-
-
 }
 
 int main(int argc, char** argv)
 {
     InputSettings inputSettings;
    
-    if (ParseInputSettingsFromArg(argc, argv, inputSettings)) {
-        // Either play the offline file or play from the device
-        if (inputSettings.Offline == true) {     
-            PlayFile(inputSettings);
-        }
-        else {
-            PlayFromDevice(inputSettings);
-        }
-    }
-    else {
+    if (!ParseInputSettingsFromArg(argc, argv, inputSettings))
+    {
         // Print app usage if user entered incorrect arguments.
         PrintUsage();
         return -1;
+    }
+
+    // Either play the offline file or play from the device
+    if (inputSettings.Offline == true)
+    {
+        PlayFile(inputSettings);
+    }
+    else
+    {
+        PlayFromDevice(inputSettings);
     }
 
     return 0;

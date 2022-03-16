@@ -80,7 +80,58 @@ void transform_body_index_map_from_depth_to_color(
         K4ABT_BODY_INDEX_MAP_BACKGROUND), "Failed to transform body index map to color space!");
 }
 
-int main()
+bool ProcessArguments(k4abt_tracker_configuration_t& tracker_config, int argc, char** argv)
+{
+#ifdef _WIN32
+    printf("Usage: k4abt_camera_space_transform_sample PROCESSING_MODE[CUDA, CPU, DirectML ( default ), or TensorRT](optional) -model MODEL_FILEPATH(optional).\n");
+#else
+    printf("Usage: k4abt_camera_space_transform_sample PROCESSING_MODE[CUDA ( default ), CPU, or TensorRT](optional) -model MODEL_FILEPATH(optional).\n");
+#endif
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (0 == strcmp(argv[i], "TensorRT"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_TENSORRT;
+        }
+        else if (0 == strcmp(argv[i], "CUDA"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_CUDA;
+        }
+        else if (0 == strcmp(argv[i], "CPU"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_CPU;
+        }
+#ifdef _WIN32
+        else if (0 == strcmp(argv[i], "DirectML"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_DIRECTML;
+        }
+#endif
+        else if (0 == strcmp(argv[i], "-model"))
+        {
+            if( i < argc - 1 )
+                tracker_config.model_path = argv[++i];
+            else
+            {
+                printf("Error: model filepath missing\n");
+                return false;
+            }
+        }
+        else
+        {
+#ifdef _WIN32
+            printf("Invalid processing mode ! Accepted values are CUDA, CPU, DirectML ( default ), or TensorRT.\n");
+#else
+            printf("Invalid processing mode ! Accepted values are CUDA ( default ), CPU, or TensorRT.\n");
+#endif
+            return false;
+        }
+    }
+    return true;
+}
+
+int main(int argc, char** argv)
 {
     k4a_device_configuration_t device_config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
     device_config.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
@@ -106,6 +157,8 @@ int main()
 
     k4abt_tracker_t tracker = NULL;
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    if (!ProcessArguments(tracker_config, argc, argv))
+        exit(1);
     VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
     // Preallocated the buffers to hold the depth image in color space and the body index map in color space

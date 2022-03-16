@@ -58,7 +58,59 @@ int64_t CloseCallback(void* /*context*/)
     return 1;
 }
 
-int main()
+void PrintUsage()
+{
+#ifdef _WIN32
+    printf("Usage: k4abt_jump_analysis_sample PROCESSING_MODE[CUDA, DirectML ( default ), or TensorRT](optional) -model MODEL_FILEPATH(optional).\n");
+#else
+    printf("Usage: k4abt_jump_analysis_sample PROCESSING_MODE[CUDA ( default ) or TensorRT](optional) -model MODEL_FILEPATH(optional).\n");
+#endif
+}
+
+bool ProcessArguments(k4abt_tracker_configuration_t& tracker_config, int argc, char** argv)
+{
+    PrintUsage();
+
+    for (int i = 1; i < argc; i++ )
+    {
+        if (0 == strcmp(argv[i], "TensorRT"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_TENSORRT;
+        }
+        else if (0 == strcmp(argv[i], "CUDA"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_CUDA;
+        }
+#ifdef _WIN32
+        else if (0 == strcmp(argv[i], "DirectML"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_DIRECTML;
+        }
+#endif
+        else if (0 == strcmp(argv[i], "-model"))
+        {
+            if (i < argc - 1)
+                tracker_config.model_path = argv[++i];
+            else
+            {
+                printf("Error: model filepath missing\n");
+                return false;
+            }
+        }
+        else
+        {
+#ifdef _WIN32
+            printf("Invalid processing mode ! Accepted values are CUDA, DirectML ( default ), or TensorRT.\n");
+#else
+            printf("Invalid processing mode ! Accepted values are CUDA ( default ) or TensorRT.\n");
+#endif
+            return false;
+        }
+    }
+    return true;
+}
+
+int main(int argc, char** argv)
 {
     PrintAppUsage();
 
@@ -79,6 +131,10 @@ int main()
     // Create Body Tracker
     k4abt_tracker_t tracker = nullptr;
     k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    if( !ProcessArguments( tracker_config, argc, argv))
+    {
+        exit(1);
+    }
     VERIFY(k4abt_tracker_create(&sensorCalibration, tracker_config, &tracker), "Body tracker initialization failed!");
 
     // Initialize the 3d window controller

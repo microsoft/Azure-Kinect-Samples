@@ -83,7 +83,7 @@ bool check_depth_image_exists(k4a_capture_t capture)
     }
 }
 
-bool process_mkv_offline(const char* input_path, const char* output_path)
+bool process_mkv_offline(const char* input_path, const char* output_path, k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT )
 {
     k4a_playback_t playback_handle = nullptr;
     k4a_result_t result = k4a_playback_open(input_path, &playback_handle);
@@ -102,7 +102,6 @@ bool process_mkv_offline(const char* input_path, const char* output_path)
     }
 
     k4abt_tracker_t tracker = NULL;
-    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
     if (K4A_RESULT_SUCCEEDED != k4abt_tracker_create(&calibration, tracker_config, &tracker))
     {
         cerr << "Body tracker initialization failed!" << endl;
@@ -178,18 +177,73 @@ bool process_mkv_offline(const char* input_path, const char* output_path)
         cout << "Results saved in " << output_path;
     }
 
+    k4abt_tracker_shutdown(tracker);
+    k4abt_tracker_destroy(tracker);
     k4a_playback_close(playback_handle);
 
     return success;
 }
 
+void PrintUsage()
+{
+#ifdef _WIN32
+    cout << "Usage: k4abt_offline_processor.exe <input_mkv_file> <output_json_file> [processing_mode] [-model MODEL_FILE_PATH]\n\t[Optional] processing_mode\n\t\tCPU\n\t\tCUDA\n\t\tTensorRT\n\t\tDirectML ( default )" << endl;
+#else
+    cout << "Usage: k4abt_offline_processor.exe <input_mkv_file> <output_json_file> [processing_mode] [-model MODEL_FILE_PATH]\n\t[Optional] processing_mode\n\t\tCPU\n\t\tCUDA ( default )\n\t\tTensorRT" << endl;
+#endif
+}
+
+bool ProcessArguments(k4abt_tracker_configuration_t &tracker_config, int argc, char** argv)
+{
+    if (argc < 3)
+    {
+        PrintUsage();
+        return false;
+    }
+    for( int i = 3; i < argc; i++ )
+    {
+        if (0 == strcmp(argv[i], "TensorRT"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_TENSORRT;
+        }
+        else if (0 == strcmp(argv[i], "CUDA"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_CUDA;
+        }
+        else if (0 == strcmp(argv[i], "CPU"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_CPU;
+        }
+#ifdef _WIN32
+        else if (0 == strcmp(argv[i], "DirectML"))
+        {
+            tracker_config.processing_mode = K4ABT_TRACKER_PROCESSING_MODE_GPU_DIRECTML;
+        }
+#endif
+        else if (0 == strcmp(argv[i], "-model"))
+        {
+            if (i < argc - 1)
+                tracker_config.model_path = argv[++i];
+            else
+            {
+                printf("Error: model filepath missing\n");
+                PrintUsage();
+                return false;
+            }
+        }
+        else
+        {
+            PrintUsage();
+            return false;
+        }
+    }
+    return true;
+}
+
 int main(int argc, char **argv)
 {
-    if (argc != 3)
-    {
-        cout << "Usage: k4abt_offline_processor.exe <input_mkv_file> <output_json_file>" << endl;
+    k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
+    if (!ProcessArguments(tracker_config, argc, argv))
         return -1;
-    }
-
-    return process_mkv_offline(argv[1], argv[2]) ? 0 : -1;
+    return process_mkv_offline(argv[1], argv[2], tracker_config) ? 0 : -1;
 }
