@@ -24,10 +24,11 @@ copy packages\Microsoft.Azure.Kinect.Sensor.1.4.1\lib\native\amd64\release\k4are
 copy %BODY_TRACKING_TOOLS_PATH%onnxruntime.dll Assets\Plugins
 copy %BODY_TRACKING_TOOLS_PATH%k4abt.dll Assets\Plugins
 copy %BODY_TRACKING_TOOLS_PATH%cudnn64_8.dll .\
-copy %BODY_TRACKING_TOOLS_PATH%cudnn64_cnn_infer64_8.dll .\
-copy %BODY_TRACKING_TOOLS_PATH%cudnn64_ops_infer64_8.dll .\
+copy %BODY_TRACKING_TOOLS_PATH%cudnn_cnn_infer64_8.dll .\
+copy %BODY_TRACKING_TOOLS_PATH%cudnn_ops_infer64_8.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%onnxruntime.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%dnn_model_2_0_op11.onnx .\
 copy %BODY_TRACKING_TOOLS_PATH%cublas64_11.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%cublasLt64_11.dll .\
 copy %BODY_TRACKING_TOOLS_PATH%cudart64_110.dll .\
+copy %BODY_TRACKING_TOOLS_PATH%cufft64_10.dll .\
