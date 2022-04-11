@@ -56,7 +56,6 @@ From Azure Kinect Body Tracking SDK\tools
 - cudart64_110.dll
 - cublas64_11.dll
 - cublasLt64_11.dll
-- vcomp140.dll
 
 From Packages/System.Buffers.4.4.0/lib/netstandard2.0
 
@@ -91,14 +90,15 @@ From Azure Kinect Body Tracking SDK\sdk\windows-desktop\amd64\release\bin
 From Azure Kinect Body Tracking SDK\tools\
 
 - cudnn64_8.dll
-- cudnn64_cnn_infer64_8.dll
-- cudnn64_ops_infer64_8.dll
+- cudnn_cnn_infer64_8.dll
+- cudnn_ops_infer64_8.dll
 
 From Azure Kinect Body Tracking SDK\tools\
 
 - cudart64_110.dll
 - cublas64_11.dll
 - cublasLt64_11.dll
+- cufft64_10.dll
 
 From Azure Kinect Body Tracking SDK\tools\
 
@@ -127,17 +127,17 @@ Press play.
 ####Then you will need to put these files in the same directory with the .exe:
 
 - onnxruntime.dll
+- onnxruntime_providers_cuda.dll
 - onnxruntime_providers_shared.dll
 - onnxruntime_providers_tensorrt.dll
 - dnn_model_2_0_op11.onnx
 - dnn_model_2_0_lite_op11.onnx
 - cudnn64_8.dll
-- cudnn64_cnn_infer64_8.dll
-- cudnn64_ops_infer64_8.dll
+- cudnn_cnn_infer64_8.dll
+- cudnn_ops_infer64_8.dll
 - cudart64_110.dll
 - cublas64_11.dll
 - cublasLt64_11.dll
 - cufft64_10.dll
 - directml.dll
-- vcomp140.dll
 
