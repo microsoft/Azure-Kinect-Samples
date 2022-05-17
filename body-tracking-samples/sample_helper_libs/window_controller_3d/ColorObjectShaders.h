@@ -12,9 +12,9 @@ static const char* const glslColorObjectVertexShader = GLSL_STRING(
     layout(location = 1) in vec3 vertexNormal;
     layout(location = 2) in vec4 vertexColor;
 
-    varying vec4 fragmentColor;
-    varying vec3 fragmentPosition;
-    varying vec3 fragmentNormal;
+    out vec4 fragmentColor;
+    out vec3 fragmentPosition;
+    out vec3 fragmentNormal;
 
     uniform mat4 model;
     uniform mat4 view;
@@ -36,9 +36,9 @@ static const char* const glslColorObjectVertexShader = GLSL_STRING(
 static const char* const glslColorObjectFragmentShader = GLSL_STRING(
 
     out vec4 fragColor;
-    varying vec4 fragmentColor;
-    varying vec3 fragmentPosition;
-    varying vec3 fragmentNormal;
+    in vec4 fragmentColor;
+    in vec3 fragmentPosition;
+    in vec3 fragmentNormal;
 
     void main()
     {
