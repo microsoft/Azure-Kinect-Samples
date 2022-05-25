@@ -11,7 +11,7 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
     bool readFirstFrame = false;
     TimeSpan initialTimestamp;
 
-    public SkeletalTrackingProvider(int id): base(id)
+    public SkeletalTrackingProvider(int id) : base(id)
     {
         Debug.Log("in the skeleton provider constructor");
     }
@@ -39,11 +39,11 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
                     WiredSyncMode = WiredSyncMode.Standalone,
                 });
 
-                UnityEngine.Debug.Log("Open K4A device successful. id " + id + "sn:" + device.SerialNum );
+                UnityEngine.Debug.Log("Open K4A device successful. id " + id + "sn:" + device.SerialNum);
 
                 var deviceCalibration = device.GetCalibration();
 
-                using (Tracker tracker = Tracker.Create(deviceCalibration, new TrackerConfiguration() { ProcessingMode = TrackerProcessingMode.Cuda, SensorOrientation = SensorOrientation.Default }))
+                using (Tracker tracker = Tracker.Create(deviceCalibration, new TrackerConfiguration() { ProcessingMode = TrackerProcessingMode.Gpu, SensorOrientation = SensorOrientation.Default }))
                 {
                     UnityEngine.Debug.Log("Body tracker created.");
                     while (!token.IsCancellationRequested)
