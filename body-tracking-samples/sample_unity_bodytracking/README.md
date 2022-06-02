@@ -19,17 +19,9 @@ Update-Package -reinstall
 
 The latest libraries will be put in the Packages folder under sample_unity_bodytracking
 
+#### 2) Next add these libraries to the Assets/Plugins folder:
 
-#### 2) Next make sure you have all the required DLLs for ONNX Runtime execution 
-
-[Required dlls for ONNX Runtime execution](https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-setup#required-dlls-for-onnx-runtime-execution-environments)
-
-You can install an appropriate version of the CUDA/cuDNN/TRT and add a path to the PATH environment variable.
-
-
-#### 3) Next add these libraries to the Assets/Plugins folder:
-
-You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
+You can do this by hand or just **run the batch file MoveLibraryFile.bat** in the sample_unity_bodytracking directory
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.1.2/lib/netstandard2.0
 
@@ -80,9 +72,9 @@ From Packages/System.Runtime.CompilerServices.Unsafe.4.5.2/lib/netstandard2.0
 - System.Runtime.CompilerServices.Unsafe.dll
 
 
-#### 4) Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder
+#### 3) Then add these libraries to the sample_unity_bodytracking project root directory that contains the Assets folder:
 
-You can do this by hand or just run the batch file MoveLibraryFile.bat in the sample_unity_bodytracking directory
+You can do this by hand or just **run the batch file MoveLibraryFile.bat** in the sample_unity_bodytracking directory
 
 From Packages/Microsoft.Azure.Kinect.BodyTracking.1.1.2/content
 
@@ -97,35 +89,59 @@ From Packages/Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0/lib/native/
 - onnxruntime_providers_tensorrt.dll
 
 
-#### 5) Then copy DirectML.dll to unity editor installation folder (...\Unity\Hub\Editor\version\Editor).
+#### 4) Next make sure you have all the [required DLLs for ONNX Runtime execution](https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-setup#required-dlls-for-onnx-runtime-execution-environments):
 
-From Packages/Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0/lib/native/amd64/release
+First, download and install [Visual C++ Redistributable](https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-setup#visual-c-redistributable-for-visual-studio-2015).
 
-- directml.dll
+Additionally:
+
+**For CUDA**:
+* Download and install appropriate version of CUDA and make sure that CUDA_PATH exists as an environment variable (e.g C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4).
+* Download and install appropriate version of cuDNN and add a value to the PATH environment variable for it (e.g C:\Program Files\NVIDIA GPU Computing Toolkit\cuda-8.2.2.6\bin).
+
+**For TensorRT**:
+* Download and install appropriate version of CUDA and make sure that CUDA_PATH exists as an environment variable (e.g C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4).
+* Download and install appropriate version of TensorRT and add a value to the PATH environment variable for it (e.g C:\Program Files\NVIDIA GPU Computing Toolkit\TensorRT-8.2.1.8\lib).
+
+**For DirectML**:
+* Copy the **directml.dll** from the sample_unity_bodytracking folder to the unity editor directory (e.g C:\Program Files\Unity\Hub\Editor\2019.1.2f1\Editor)
 
 
-#### 6) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene
+#### 5) Then specify Execution Provider for the tracking:
+
+In the ...\sample_unity_bodytracking\Assets\Scripts\SkeletalTrackingProvider.cs change the ProcessingMode to the one you want.
+
+* TrackerProcessingMode.GPU (Defaults to DirectML for Windows)
+* TrackerProcessingMode.CPU
+* TrackerProcessingMode.Cuda
+* TrackerProcessingMode.TensorRT
+* TrackerProcessingMode.DirectML
+
+
+#### 6) Open the Unity Project and under Scenes/  select the Kinect4AzureSampleScene:
 
 ![alt text](./UnitySampleGettingStarted.png)
 
 
 Press play.
 
-#### If you wish to create a new scene just:
 
-1) create a gameobject and add the component for the main.cs script
-2) go to the prefab folder and drop in the Kinect4AzureTracker prefab
-3) now drag the gameobject for the Kinect4AzureTracker onto the Tracker slot in the main object in the inspector.
+#### If you wish to create a new scene:
+
+* Create a gameobject and add the component for the main.cs script.
+* Go to the prefab folder and drop in the Kinect4AzureTracker prefab.
+* Now drag the gameobject for the Kinect4AzureTracker onto the Tracker slot in the main object in the inspector.
 
 
-### Finally if you Build a Standalone Executable 
+### Finally if you Build a Standalone Executable:
 
-You will need to put these files in the same directory with the .exe:
+You will need to put [required DLLs for ONNX Runtime execution](https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-setup#required-dlls-for-onnx-runtime-execution-environments) in the same directory with the .exe:
 
-- directml.dll
-- onnxruntime.dll
-- onnxruntime_providers_cuda.dll
-- onnxruntime_providers_shared.dll
-- onnxruntime_providers_tensorrt.dll
-- dnn_model_2_0_op11.onnx
+You can copy ONNXRuntime and DirectML files from nuget package by hand or from sample_unity_bodytracking directory after running **the batch file MoveLibraryFile.bat** (Step #3)
 
+For the CUDA/cuDNN/TensorRT DLLs (Step #4) you can either have them in the PATH environment variable or copy required set of DLLs from the installation locations:
+
+e.g. 
+* from C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\bin for the CUDA files.
+* from C:\Program Files\NVIDIA GPU Computing Toolkit\cuda-8.2.2.6\bin for the cuDNN files.
+* from C:\Program Files\NVIDIA GPU Computing Toolkit\TensorRT-8.2.1.8\lib for the TensorRT files.
