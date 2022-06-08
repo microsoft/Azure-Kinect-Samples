@@ -1,0 +1,1 @@
+# Walkthrough how to synchronize two Azure Kinect DKs to one host 
