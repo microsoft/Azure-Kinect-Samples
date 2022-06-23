@@ -1,0 +1,11 @@
+[CameraInfo]
+fps = '30'
+depth_mode = 'NFOV_UNBINNED'
+color_resolution = '720P'
+color = true
+
+[MqttInfo]
+host = 'localhost'
+id = 'pointmerger'
+topic = 'points'
+port = 1883

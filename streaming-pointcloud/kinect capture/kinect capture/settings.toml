@@ -1,0 +1,7 @@
+file = "camerapositionN.toml"
+
+[MqttInfo]
+host = 'localhost'
+id = 'cameraN'
+topic = 'points'
+port = 1883
