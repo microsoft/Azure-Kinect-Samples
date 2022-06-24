@@ -12,7 +12,7 @@ The following steps are tested on Windows with OpenCV 4.1.0 (user should configu
 - Download and install opencv-4.1.0 from https://opencv.org/releases/ (e.g. on windows, download the opencv-4.1.0-vc14_vc15.exe, and extract contents), then, copy opencv\build\include\* to the opencv-kinfu-samples\extern\opencv-4.1.0\include\* (please create extern directory and subdirectories accordingly).
 - Download opencv_contrib-4.1.0 source from https://github.com/opencv/opencv_contrib/releases and extract contents, then copy opencv_contrib-4.1.0\modules\rgbd\include\* to extern\opencv_contrib-4.1.0\modules\rgbd\include\*, and copy opencv_contrib-4.1.0\modules\viz\include\* to extern\opencv_contrib-4.1\modules\viz\include\*.
 - Download VTK-8.2.0 from https://vtk.org/download/ and build the source accordingly.
-- Follow the instruction from opencv_contrib (https://github.com/opencv/opencv_contrib) to build opencv with extra modules (we used cmake-gui to generate opencv sln file and built opencv and opencv_contrib modules with Visual Studio 2017, user needs to configure the WITH_VTK, VTK_DIR and OPENCV_ENABLE_NONFREE in the cmake-gui before generating sln).
+- Download and Extract opencv_contrib from  (https://github.com/opencv/opencv_contrib) Follow the instruction to build opencv with extra modules (we used cmake-gui to generate opencv sln file and built opencv and opencv_contrib modules with Visual Studio 2017, user needs to configure the WITH_VTK=enabled, VTK_DIR=<directory location of the VTK cmakelists.txt file>, OPENCV_ENABLE_NONFREE=enabled and OPENCV_EXTRA_MODULES_PATH=<Directory location of the opencv_contrib-master\modules folder> in the cmake-gui before generating sln).
 - We pre-configured kinfu_example.vcxproj with opencv/opencv_contrib include/lib dependencies paths, the following is a list of dependencies we need for this sample:
     ```
     Includes:
@@ -33,7 +33,7 @@ The following steps are tested on Windows with OpenCV 4.1.0 (user should configu
         extern\lib\Release\opencv_rgbd410.lib
         extern\lib\Release\opencv_viz410.lib
     ```
-- Please add opencv lib dependencies in the kinfu_example.vcxproj file. E.g. for release configuration, you can do: 
+- Please add opencv lib dependencies in the kinfu_example.vcxproj file. E.g. for release configuration, you can do:
     ```
     <AdditionalDependencies>%(AdditionalDependencies);opencv_core410.lib;opencv_calib3d410.lib;
     opencv_rgbd410.lib;opencv_highgui410.lib;opencv_viz410.lib;opencv_imgproc410.lib;</AdditionalDependencies>
