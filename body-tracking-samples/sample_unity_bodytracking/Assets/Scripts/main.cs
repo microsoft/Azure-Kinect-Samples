@@ -33,6 +33,10 @@ public class main : MonoBehaviour
         if (m_skeletalTrackingProvider != null)
         {
             m_skeletalTrackingProvider.Dispose();
+            while (m_skeletalTrackingProvider.IsRunning)
+            {
+                ;
+            }
         }
     }
 }
