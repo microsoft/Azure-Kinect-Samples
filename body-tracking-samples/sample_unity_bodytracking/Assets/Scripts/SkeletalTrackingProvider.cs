@@ -124,11 +124,11 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
         }
         finally
         {
-            IsRunning = false;
             if (RawDataLoggingFile != null)
             {
                 RawDataLoggingFile.Close();
             }
+            IsRunning = false;
         }
     }
 }
