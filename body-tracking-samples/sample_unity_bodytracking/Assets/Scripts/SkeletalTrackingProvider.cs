@@ -116,15 +116,19 @@ public class SkeletalTrackingProvider : BackgroundDataProvider
                 }
                 device.Dispose();
             }
-            if (RawDataLoggingFile != null)
-            {
-                RawDataLoggingFile.Close();
-            }
         }
         catch (Exception e)
         {
             Debug.Log($"catching exception for background thread {e.Message}");
             token.ThrowIfCancellationRequested();
+        }
+        finally
+        {
+            if (RawDataLoggingFile != null)
+            {
+                RawDataLoggingFile.Close();
+            }
+            IsRunning = false;
         }
     }
 }
