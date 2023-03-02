@@ -211,7 +211,7 @@ DWORD WINAPI InstanceThread(LPVOID lpvParam)
         {
             if (GetLastError() == ERROR_BROKEN_PIPE)
             {
-                _tprintf(TEXT("InstanceThread: client disconnected.\n"), GetLastError());
+                _tprintf(TEXT("InstanceThread: client disconnected, GLE=%d.\n"), GetLastError());
             }
             else
             {
