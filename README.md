@@ -3,18 +3,15 @@
 This GitHub repository contains code samples that demonstrate how to use Microsoft's Azure Kinect DK Sensor and Body
 Tracking SDKs.
 
-For more information about the Azure Kinect DK and available documentation, see [Azure.com/Kinect]
-(https://azure.microsoft.com/services/kinect-dk/)
+For more information about the Azure Kinect DK and available documentation, see [Azure.com/Kinect](https://azure.microsoft.com/services/kinect-dk/)
 
 Each sample includes a README file that explains how to run and use the sample.
 
-[![Build Status](https://microsoft.visualstudio.com/Analog/_apis/build/status/Analog/AI/depthcamera/microsoft.Azure-Kinect-Samples?branchName=master)]
-(https://microsoft.visualstudio.com/Analog/_build/latest?definitionId=41402&branchName=master)
+[![Build Status](https://microsoft.visualstudio.com/Analog/_apis/build/status/Analog/AI/depthcamera/microsoft.Azure-Kinect-Samples?branchName=master)](https://microsoft.visualstudio.com/Analog/_build/latest?definitionId=41402&branchName=master)
 
 ## Contribute
 
-We welcome your contributions and suggestions! Please open new issues in our [Azure Kinect Sensor SDK repository]
-(https://github.com/microsoft/Azure-Kinect-Sensor-SDK/issues). Most contributions require you to agree to a Contributor
+We welcome your contributions and suggestions! Please open new issues in our [Azure Kinect Sensor SDK repository](https://github.com/microsoft/Azure-Kinect-Sensor-SDK/issues). Most contributions require you to agree to a Contributor
 License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your 
 contribution. For details, visit https://cla.microsoft.com. When you submit a pull request, a CLA-bot will 
 automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). 
